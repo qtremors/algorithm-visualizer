@@ -5,12 +5,16 @@ Built with a **React (TypeScript)** frontend and a **Python (FastAPI)** backend,
 
 ### 🖼️ Screenshots
 
-| Home Page | |
-|:---:|:---:|
-| ![Home Page](screenshots/Index.png) | |
+| Home Page |
+|:---:|
+| ![Home Page](screenshots/Index.png) |
+
 | Bubble Sort - Running | Bubble Sort - Sorted |
+|:---:|:---:|
 | ![Bubble Sort - Running](screenshots/BubbleSort_Running.png) | ![Bubble Sort - Sorted](screenshots/BubbleSorted.png) |
+
 | Selection Sort - Running | Selection Sort - Sorted |
+|:---:|:---:|
 | ![Selection Sort - Running](screenshots/SelectionSort_Running.png) | ![Selection Sort - Sorted](screenshots/SelectionSorted.png) |
 
 
