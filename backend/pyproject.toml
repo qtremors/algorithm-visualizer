@@ -1,0 +1,27 @@
+[project]
+name = "backend"
+version = "0.0.1"
+description = "High-performance algorithm visualizer with real-time streaming."
+readme = "../README.md"
+requires-python = ">=3.11"
+authors = [
+    { name = "Tremors", email = "hello@tremors.dev" }
+]
+license = { text = "TSL" }
+keywords = ["algorithm", "visualization", "fastapi", "react", "sorting", "pathfinding"]
+dependencies = [
+    "fastapi>=0.141.1",
+    "uvicorn[standard]>=0.52.4",
+    "websockets>=17.0.1",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.0.0",
+    "pytest-asyncio>=0.23.0",
+]
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]
+asyncio_mode = "auto"

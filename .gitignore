@@ -1,0 +1,28 @@
+# --- Python (Backend) ---
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+backend/.venv/
+backend/venv/
+*.log
+.env
+
+# --- Node (Frontend) ---
+node_modules/
+frontend/node_modules/
+frontend/dist/
+frontend/.env.local
+frontend/.env
+
+# --- IDE / System ---
+.DS_Store
+.vscode/
+.idea/
+*.swp
+.pytest_cache/
+.coverage
+htmlcov/
+.env.*
+!.env.example
