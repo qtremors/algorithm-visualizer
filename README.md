@@ -5,13 +5,14 @@ Built with a **React (TypeScript)** frontend and a **Python (FastAPI)** backend,
 
 ### 🖼️ Screenshots
 
-| | |
+| Home Page | |
 |:---:|:---:|
-| ![Home Page](screenshots/Index.png "Home Page") | 
-| ![Bubble Sort - Running](screenshots/BubbleSort_Running.png "Bubble Sort - Running") |![Bubble Sort - Sorted](screenshots/BubbleSorted.png "Bubble Sort - Sorted") |
-| ![Selection Sort - Running](screenshots/SelectionSort_Running.png "Selection Sort - Running") |![Selection Sort - Sorted](screenshots/SelectionSorted.png "Selection Sort - Sorted") |
+| ![Home Page](screenshots/Index.png) | |
+| Bubble Sort - Running | Bubble Sort - Sorted |
+| ![Bubble Sort - Running](screenshots/BubbleSort_Running.png) | ![Bubble Sort - Sorted](screenshots/BubbleSorted.png) |
+| Selection Sort - Running | Selection Sort - Sorted |
+| ![Selection Sort - Running](screenshots/SelectionSort_Running.png) | ![Selection Sort - Sorted](screenshots/SelectionSorted.png) |
 
----
 
 ## ✨ Key Features
 - **Real-Time Visualization**: Algorithm execution steps are streamed from the backend via WebSockets for smooth, animated experiences.
