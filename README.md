@@ -115,28 +115,6 @@ Navigate to **http://localhost:5173** in your browser to start using the applica
     - Graph: BFS, DFS, Dijkstra's Algorithm
     - Data Structures: Trees, Linked Lists, Hash Tables
 - **🎬 Export Visualizations**: Export animations as GIF or video for sharing.
-- **🤝 Collaborative Sessions**: Allow multiple users to watch a visualization together in real time.
-
----
-
-## 🙌 Contributing
-Contributions are welcome!  
-If you have an idea for a feature or found a bug, open an issue or submit a pull request.
-
-1. **Fork the Project**
-2. **Create a Feature Branch**
-   ```bash
-   git checkout -b feature/AmazingFeature
-   ```
-3. **Commit Your Changes**
-   ```bash
-   git commit -m 'Add some AmazingFeature'
-   ```
-4. **Push to the Branch**
-   ```bash
-   git push origin feature/AmazingFeature
-   ```
-5. **Open a Pull Request**
 
 ---
 
