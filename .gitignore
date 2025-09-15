@@ -72,3 +72,4 @@ Coverage reports
 .coverage.*
 /htmlcov/
 .pytest_cache/
+frontend/.env.production
