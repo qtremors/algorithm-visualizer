@@ -20,6 +20,13 @@ interface AlgorithmsData {
   };
 }
 
+
+const API_HOST = import.meta.env.VITE_API_BASE_URL;
+const API_URL = `https://${API_HOST}`;
+const WS_URL = `wss://${API_HOST}`;
+
+
+
 // --- Main App Component ---
 export default function App() {
   // State for algorithm metadata and selection
@@ -85,7 +92,8 @@ export default function App() {
   useEffect(() => {
     const fetchAlgorithms = async () => {
       try {
-        const response = await fetch('http://127.0.0.1:8000/api/algorithms');
+        // const response = await fetch('http://127.0.0.1:8000/api/algorithms');
+        const response = await fetch(`${API_URL}/api/algorithms`);
         if (!response.ok) throw new Error('Network response was not ok');
         const data: AlgorithmsData = await response.json();
         setAlgorithms(data);
@@ -171,7 +179,8 @@ export default function App() {
     setArrayState(parsedArray); 
     setStatusLog(["Connecting to server..."]);
     
-    const newWs = new WebSocket(`ws://127.0.0.1:8000/ws/visualize/${selectedAlgorithm.category}/${selectedAlgorithm.name}`);
+    // const newWs = new WebSocket(`ws://127.0.0.1:8000/ws/visualize/${selectedAlgorithm.category}/${selectedAlgorithm.name}`);
+    const newWs = new WebSocket(`${WS_URL}/ws/visualize/${selectedAlgorithm.category}/${selectedAlgorithm.name}`);
     const receivedSteps: AlgorithmStep[] = [];
 
     newWs.onopen = () => {
