@@ -1,10 +1,14 @@
 # AlgoVisualizer Changelog
 
 > **Project:** AlgoVisualizer
-> **Version:** 0.0.2
-> **Last Updated:** 2025-09-15
+> **Version:** 0.0.3
+> **Last Updated:** 2025-11-13
 
 ---
+
+## [0.0.3] - 2025-11-13
+
+- **Add Typed Frontend Foundation**: Add frontend input and protocol contracts, metadata loading, URL helpers, styling, routing entry points, and build configuration.
 
 ## [0.0.2] - 2025-09-15
 
