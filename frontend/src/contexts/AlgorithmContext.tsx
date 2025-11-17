@@ -9,8 +9,10 @@ interface AlgorithmContextType {
 
 const AlgorithmContext = createContext<AlgorithmContextType | undefined>(undefined);
 
-const API_HOST = import.meta.env.VITE_API_BASE_URL || '127.0.0.1:8000';
-const API_URL = `http://${API_HOST}/api/algorithms`;
+// If VITE_API_BASE_URL is set, use it. Otherwise, use localhost.
+const HOST = import.meta.env.VITE_API_BASE_URL || '127.0.0.1:8000';
+const PROTOCOL = window.location.protocol === 'https:' ? 'https://' : 'http://';
+const API_URL = `${PROTOCOL}${HOST}/api/algorithms`;
 
 export const AlgorithmProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [algorithms, setAlgorithms] = useState<AlgorithmsData | null>(null);

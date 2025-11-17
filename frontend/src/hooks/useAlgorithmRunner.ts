@@ -1,8 +1,10 @@
 import { useState, useCallback, useEffect } from 'react';
 import type { AlgorithmStep } from '../types';
 
-const API_HOST = import.meta.env.VITE_API_BASE_URL || '127.0.0.1:8000';
-const WS_URL = `ws://${API_HOST}/ws/visualize`;
+const HOST = import.meta.env.VITE_API_BASE_URL || '127.0.0.1:8000';
+// If on HTTPS, use WSS (Secure WebSocket), otherwise use WS
+const PROTOCOL = window.location.protocol === 'https:' ? 'wss://' : 'ws://';
+const WS_URL = `${PROTOCOL}${HOST}/ws/visualize`;
 
 export const useAlgorithmRunner = (category?: string, algorithmName?: string) => {
   const [steps, setSteps] = useState<AlgorithmStep[]>([]);
