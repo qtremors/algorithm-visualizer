@@ -99,7 +99,7 @@ export default function PlaybackControls({
           <button 
             onClick={onVisualize}
             disabled={isVisualizing || isPlaying}
-            className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-2 px-6 rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-indigo-900/20 whitespace-nowrap h-12"
+            className="px-8 py-3 rounded-lg bg-blue-600 text-white font-bold hover:bg-blue-500 transition-all flex items-center gap-2 shadow-lg shadow-blue-900/20"
           >
             {isVisualizing ? (
                 <span className="flex items-center gap-2">Running...</span>

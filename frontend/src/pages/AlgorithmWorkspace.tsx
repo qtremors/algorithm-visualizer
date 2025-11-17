@@ -152,7 +152,6 @@ export default function AlgorithmWorkspace() {
     if (!algorithmMetadata) return null;
     const hasSteps = steps && steps.length > 0;
     const displayStep = hasSteps ? currentStep : null;
-    const displayData = displayStep?.snapshot || inputData;
 
     switch (algorithmMetadata.visualizer) {
       case 'bar_chart':
