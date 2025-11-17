@@ -1,123 +1,175 @@
 # Algorithm Visualizer
 
-A **full-stack web application** designed to bring algorithms to life through **real-time, interactive visualizations**.  
-Built with a **React (TypeScript)** frontend and a **Python (FastAPI)** backend, this tool provides an engaging way to understand how different algorithms operate step by step.
+A full-stack web application that brings algorithms to life through real-time, interactive visualizations.
 
-### 🖼️ Screenshots
+Built with a **React (TypeScript)** frontend and a **FastAPI (Python)** backend, this tool provides an engaging way to explore how algorithms operate step by step.
 
-| Home Page |
-|:---:|
-| ![Home Page](screenshots/Index.png) |
+> **Note:** This application is optimized for **desktop use only**. Due to the complexity of the grid layouts and control panels, many features will not display or function correctly on mobile devices.
 
-| Bubble Sort - Running | Bubble Sort - Sorted |
-|:---:|:---:|
-| ![Bubble Sort - Running](screenshots/BubbleSort_Running.png) | ![Bubble Sort - Sorted](screenshots/BubbleSorted.png) |
+---
 
-| Selection Sort - Running | Selection Sort - Sorted |
-|:---:|:---:|
-| ![Selection Sort - Running](screenshots/SelectionSort_Running.png) | ![Selection Sort - Sorted](screenshots/SelectionSorted.png) |
+## 🖼️ Screenshots
 
+| Sorting View | Sorted View |
+|:---------:|:------------:|
+| ![Sorting](assets/sorting.png) | ![Sorted](assets/sorted.png) |
 
-## ✨ Key Features
-- **Real-Time Visualization**: Algorithm execution steps are streamed from the backend via WebSockets for smooth, animated experiences.
-- **Multiple Sorting Algorithms**: Supports **Bubble Sort** and **Selection Sort** with an extensible design for adding more.
-- **Interactive Controls**: Play, Pause, Next Step, Reset, and adjustable speed slider.
-- **Dynamic Pseudocode**: Highlights relevant pseudocode lines in sync with the visualization.
-- **User-Defined Data**: Generate random arrays with custom size and value ranges or input your own data.
-- **Responsive Design**: Clean, modern UI built with TailwindCSS for desktop and mobile.
-- **Live Status Log**: Tracks each algorithm step, with the most recent at the top.
+| Path-Finding View | Path-Found View |
+|:---------:|:------------:|
+| ![Path-Finding](assets/pathfinding.png) | ![Path-Found](assets/pathfound.png) |
+
+---
+
+## ✨ Features
+
+### 🔴 Real-Time Visualization
+
+Algorithm execution steps are streamed from the backend using **WebSockets**, enabling smooth, animated playback.
+
+### 🧩 Supported Categories
+
+**Sorting Algorithms**
+
+* Bubble Sort
+* Selection Sort
+* Insertion Sort
+
+**Pathfinding Algorithms**
+
+* Dijkstra’s
+* Breadth-First Search (BFS)
+* Depth-First Search (DFS)
+
+### 🎛️ Interactive Controls
+
+* Playback: Play, Pause, Step Forward/Backward, Reset, Speed Control
+* **Grid Tools:** Draw walls, reposition start/end nodes, random maze generation
+* **Array Tools:** Generate random arrays or input your own values
+
+### 📚 Dynamic Panels
+
+* **Pseudocode Panel:** Highlights the active line in real-time
+* **Status Log:** Scrollable history of all operations
+* **Info Modal:** Complexity, strengths, and limitations for each algorithm
+
+### 🎨 Modern UI
+
+Built with **TailwindCSS** for a clean, responsive, dashboard-style design.
 
 ---
 
 ## 🛠️ Tech Stack
-This is a **monorepo** containing two main parts:
 
-### **Frontend**
-- Framework: **React (TypeScript)**
-- Build Tool: **Vite**
-- Styling: **TailwindCSS**
+### Frontend
 
-### **Backend**
-- Framework: **FastAPI**
-- Server: **Uvicorn (ASGI)**
-- Language: **Python**
+* React (TypeScript)
+* Vite
+* TailwindCSS
+* Lucide Icons
+
+### Backend
+
+* FastAPI
+* Python
+* Uvicorn (ASGI)
 
 ---
 
 ## 🚀 Getting Started
 
-### **Prerequisites**
-- **Node.js** (v18 or newer)
-- **Python** (v3.8 or newer) and `pip`
+### Prerequisites
+
+* **Node.js** v18 or newer
+* **Python** v3.8 or newer
+* `pip` or `uv`
 
 ---
 
-### **Installation & Setup**
+### 1. Clone the Repository
 
-#### 1. Clone the Repository:
 ```bash
 git clone https://github.com/qtremors/algorithm-visualizer.git
 cd algorithm-visualizer
 ```
 
-#### 2. Setup the Backend:
+---
+
+### 2. Backend Setup
+
 ```bash
-# Navigate to the backend directory
+# Navigate to backend
 cd backend
 
-# Create and activate a virtual environment
-python -m venv venv
-# On Windows: venv\Scripts\activate
-# On macOS/Linux: source venv/bin/activate
+# Create & activate virtual environment
+python -m venv .venv
+# Windows: .venv\Scripts\activate
+# macOS/Linux: source .venv/bin/activate
 
-# Install required Python packages
+# Install dependencies
 pip install -r requirements.txt
 
-# Start the backend server
+# Run the backend server
 uvicorn app.main:app --reload
 ```
-The backend will be running at **http://127.0.0.1:8000**.
+
+Backend runs at: **[http://127.0.0.1:8000](http://127.0.0.1:8000)**
 
 ---
 
-#### 3. Setup the Frontend:
-(Open a new terminal)
+### 3. Frontend Setup
+
+Open a new terminal:
+
 ```bash
-# Navigate to the frontend directory
 cd frontend
 
-# Install npm packages
 npm install
-
-# Start the frontend development server
 npm run dev
 ```
-The frontend will be running at **http://localhost:5173**.
+
+Frontend runs at: **[http://localhost:5173](http://localhost:5173)**
 
 ---
 
-### **Open the App**
-Navigate to **http://localhost:5173** in your browser to start using the application.
+## ▶️ Using the App
+
+Visit **[http://localhost:5173](http://localhost:5173)** in your browser to start visualizing algorithms.
 
 ---
 
-## 🏗️ How It Works
-- **Algorithm Logic**: Each algorithm on the backend is a Python class inheriting from `BaseAlgorithm`. The `run()` method is a generator that yields a dictionary for each step (e.g., comparison or swap).
-- **WebSocket Streaming**: When the user clicks "Visualize," the frontend opens a WebSocket connection. The backend streams each step in real-time.
-- **Frontend Animation**: The React frontend queues steps and uses `requestAnimationFrame` to animate them at user-controlled speed, updating bars, highlighting pseudocode, and logging actions.
+## 🏗️ Architecture Overview
+
+### Backend (Execution Engine)
+
+Each algorithm is implemented as a Python class inheriting from `BaseAlgorithm`.
+Its `run()` method acts as a **generator**, yielding structured step-by-step data (e.g., comparisons, swaps, node visits).
+This allows new algorithms to be added without modifying the core API.
+
+### Frontend (Visualizer Framework)
+
+The React app uses **metadata-driven** rendering:
+
+* Fetches algorithm definitions from the backend
+* Loads the appropriate input components (array/grid)
+* Renders the correct visualization (bars/grid)
+
+### Communication
+
+WebSockets maintain a persistent connection to stream algorithm steps in real-time.
 
 ---
 
-## 🗺️ Future Roadmap
-- **📈 Algorithm Comparison Mode**: Visualize two algorithms side by side on the same dataset.
-- **🌳 More Algorithms & Data Structures**:
-    - Sorting: Insertion Sort, Merge Sort, Quick Sort
-    - Graph: BFS, DFS, Dijkstra's Algorithm
-    - Data Structures: Trees, Linked Lists, Hash Tables
-- **🎬 Export Visualizations**: Export animations as GIF or video for sharing.
+## 🗺️ Roadmap
+
+* **Algorithm Comparison Mode:** Run two algorithms side-by-side
+* **More Algorithms:**
+
+  * Merge Sort
+  * Quick Sort
+  * A* Search
+* **Data Structure Visualizations:**
+
+  * Binary Trees
+  * Linked Lists
 
 ---
-
-### ⭐ Show Your Support
-If you like this project, consider giving it a **star** on GitHub!
-
