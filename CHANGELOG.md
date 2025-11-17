@@ -1,10 +1,14 @@
 # AlgoVisualizer Changelog
 
 > **Project:** AlgoVisualizer
-> **Version:** 0.0.3
-> **Last Updated:** 2025-11-13
+> **Version:** 0.0.4
+> **Last Updated:** 2025-11-17
 
 ---
+
+## [0.0.4] - 2025-11-17
+
+- **Add Streaming Playback And Array Editing**: Add validated WebSocket reception, incremental playback, cancellation, array input, and runner/playback regression tests.
 
 ## [0.0.3] - 2025-11-13
 
