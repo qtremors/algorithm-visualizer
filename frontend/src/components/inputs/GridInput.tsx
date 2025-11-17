@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Ban, Flag, PlayCircle, Shuffle, RefreshCw, Layers } from 'lucide-react'; // Added Layers icon
+import { Ban, Flag, PlayCircle, Shuffle, RefreshCw } from 'lucide-react'; 
 import { cn } from '../../lib/utils';
 
 type GridInputProps = {
