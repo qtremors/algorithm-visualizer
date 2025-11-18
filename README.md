@@ -16,7 +16,7 @@ Built with a **FastAPI (Python)** backend for robust execution logic and a **Rea
 |:---------:|:------------:|
 | ![Path-Finding](assets/pathfinding.png) | ![Path-Found](assets/pathfound.png) |
 
-### Static screenshots don't do the project justice—check out the live **![website](https://tremors-algoviz.netlify.app)** in action.
+### Static screenshots don't do the project justice—check out the live **[Algorithm Visualizer](https://tremors-algoviz.netlify.app/)** in action.
 
 ---
 
