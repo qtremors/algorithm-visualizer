@@ -1,6 +1,6 @@
 import { useState, useMemo, useCallback, useEffect, useRef } from 'react';
 import { useParams } from 'react-router-dom';
-import { Info, X, Code, History } from 'lucide-react';
+import { Info, X, Code, History, Grid3X3, Network } from 'lucide-react';
 import { useAlgorithms } from '../contexts/AlgorithmContext.tsx';
 import { useAlgorithmRunner } from '../hooks/useAlgorithmRunner.ts';
 import { usePlayback } from '../hooks/usePlayback.ts';
@@ -8,8 +8,10 @@ import type { AlgorithmStep } from '../types';
 
 import ArrayInput from '../components/inputs/ArrayInput.tsx';
 import GridInput from '../components/inputs/GridInput.tsx';
+import GraphInput from '../components/inputs/GraphInput.tsx';
 import SortingVisualizer from '../components/visualizers/SortingVisualizer.tsx';
 import GridVisualizer from '../components/visualizers/GridVisualizer.tsx';
+import GraphVisualizer from '../components/visualizers/GraphVisualizer.tsx';
 import PlaybackControls from '../components/core/PlaybackControls.tsx';
 import Pseudocode, { CodeRenderer } from '../components/core/Pseudocode.tsx';
 import StatusLog from '../components/core/StatusLog.tsx';
@@ -26,14 +28,24 @@ export default function AlgorithmWorkspace() {
     return algorithms[category];
   }, [algorithms, category]);
 
+  // --- STATE ---
   const [selectedAlgoName, setSelectedAlgoName] = useState<string>('');
   const [inputData, setInputData] = useState<any>(null);
-  const [visualizationMode, setVisualizationMode] = useState<string>('wall');
   
+  // View Modes
+  const [visualizationMode, setVisualizationMode] = useState<string>('wall'); // For Grid
+  const [viewMode, setViewMode] = useState<'grid' | 'graph'>('grid');
+  const [zoom, setZoom] = useState(1); // NEW: Zoom State
+  
+  // Graph Interaction State
+  const [graphTool, setGraphTool] = useState<string>('node');
+  const [draggedNode, setDraggedNode] = useState<string | null>(null);
+  const [tempLine, setTempLine] = useState<{start: any, end: any} | null>(null);
+
+  // Logs & Modals
   const [logHistory, setLogHistory] = useState<string[]>(['Ready.']);
   const [isCombinedModalOpen, setIsCombinedModalOpen] = useState(false);
   const [isInfoModalOpen, setIsInfoModalOpen] = useState(false);
-  
   const combinedLogRef = useRef<HTMLDivElement>(null);
   const [resetKey, setResetKey] = useState(0);
 
@@ -60,6 +72,8 @@ export default function AlgorithmWorkspace() {
     setSpeed,
   } = usePlayback(steps as AlgorithmStep[]);
 
+  // --- HANDLERS ---
+
   const handleRun = useCallback((data: any) => {
     const dataToRun = data || inputData;
     if (dataToRun) {
@@ -74,15 +88,103 @@ export default function AlgorithmWorkspace() {
     setResetKey(prev => prev + 1); 
   }, [reset]);
 
-  // --- Completely wipe old state when input changes ---
   const handleInputUpdate = useCallback((newData: any) => {
     setInputData(newData);
-    reset();
-    resetSteps();
-    setLogHistory(['Ready.']);
-    setResetKey(prev => prev + 1);
-  }, [reset, resetSteps]);
+    reset();        
+    resetSteps();   
+    
+    // Clear interaction states
+    setTempLine(null);
+    setDraggedNode(null);
 
+    if (steps && steps.length > 0) {
+        setLogHistory(['Ready.']);
+        setResetKey(prev => prev + 1);
+    }
+  }, [reset, resetSteps, steps]);
+
+  // Graph Weight Editing
+  const handleWeightChange = (sourceId: string, targetId: string, currentWeight: number) => {
+      const newWeightStr = prompt(`Enter new weight for connection ${sourceId} -> ${targetId}:`, String(currentWeight));
+      if (newWeightStr === null) return;
+      
+      const newWeight = parseInt(newWeightStr, 10);
+      if (!isNaN(newWeight) && newWeight >= 0) {
+          const newData = JSON.parse(JSON.stringify(inputData));
+          // Update weight
+          if(newData.adjacency[sourceId]) newData.adjacency[sourceId][targetId] = newWeight;
+          if(newData.adjacency[targetId] && newData.adjacency[targetId][sourceId] !== undefined) {
+              newData.adjacency[targetId][sourceId] = newWeight;
+          }
+          handleInputUpdate(newData);
+      }
+  };
+
+  // Graph Interactions (Add Node, Connect)
+  const handleGraphInteraction = (action: string, payload: any) => {
+      if (!inputData) return;
+      const newData = JSON.parse(JSON.stringify(inputData));
+      
+      if (action === 'addNode') {
+          if (graphTool === 'node') {
+              const id = String.fromCharCode(65 + Object.keys(newData.nodes).length); 
+              newData.nodes[id] = { x: payload.x, y: payload.y };
+              newData.adjacency[id] = {};
+              handleInputUpdate(newData);
+          }
+      } 
+      else if (action === 'nodeClick') {
+          const nodeId = payload;
+          if (graphTool === 'start') {
+              newData.start = nodeId;
+              handleInputUpdate(newData);
+          } else if (graphTool === 'end') {
+              newData.end = nodeId;
+              handleInputUpdate(newData);
+          }
+      }
+      else if (action === 'connectStart') {
+          if (graphTool === 'edge') {
+              setDraggedNode(payload.nodeId);
+          }
+      }
+      else if (action === 'connectMove') {
+           if (graphTool === 'edge' && draggedNode && inputData.nodes[draggedNode]) {
+               const startNode = inputData.nodes[draggedNode];
+               setTempLine({ 
+                   start: { x: startNode.x, y: startNode.y }, 
+                   end: { x: payload.x, y: payload.y } 
+               });
+           }
+      }
+      else if (action === 'connectEnd') {
+          if (graphTool === 'edge' && draggedNode && payload.nodeId) {
+              const u = draggedNode;
+              const v = payload.nodeId;
+              if (u !== v) {
+                  // Default random weight 1-10
+                  if (!newData.adjacency[u]) newData.adjacency[u] = {};
+                  const weight = Math.floor(Math.random() * 10) + 1;
+                  newData.adjacency[u][v] = weight;
+                  
+                  if (!newData.adjacency[v]) newData.adjacency[v] = {};
+                  newData.adjacency[v][u] = weight;
+
+                  handleInputUpdate(newData);
+              }
+          }
+          setDraggedNode(null);
+          setTempLine(null);
+      }
+      else if (action === 'connectCancel') {
+          setDraggedNode(null);
+          setTempLine(null);
+      }
+  };
+
+  // --- EFFECTS ---
+
+  // 1. Log Updates
   useEffect(() => {
     if (isRunning && steps && steps.length > 0 && logHistory.length > 0 && logHistory[0] === 'Ready.') {
         setLogHistory([]);
@@ -111,12 +213,14 @@ export default function AlgorithmWorkspace() {
     }
   }, [isPlaying, currentStepIndex, steps]);
 
+  // 2. Combined Modal Scroll
   useEffect(() => {
     if (isCombinedModalOpen && combinedLogRef.current) {
       combinedLogRef.current.scrollTop = combinedLogRef.current.scrollHeight;
     }
   }, [logHistory, isCombinedModalOpen]);
 
+  // 3. Category/Page Switch Logic
   useEffect(() => {
     if (!categoryAlgorithms) return;
     if (category !== lastCategoryRef.current) {
@@ -130,21 +234,24 @@ export default function AlgorithmWorkspace() {
     }
   }, [category, categoryAlgorithms, selectedAlgoName, handleReset, resetSteps]);
 
+  // 4. Auto-Play
   useEffect(() => {
     if (steps && steps.length > 0) {
       play();
     }
   }, [steps, play]);
 
+
+
   const renderInputComponent = () => {
     if (!algorithmMetadata) return null;
-    switch (algorithmMetadata.input_type) {
-      case 'list[int]':
+    if (algorithmMetadata.input_type === 'list[int]') {
         return <ArrayInput onSubmit={handleInputUpdate} onRun={handleRun} disabled={isRunning || isPlaying} />;
-      case 'graph_grid':
+    }
+    if (viewMode === 'grid') {
         return <GridInput onSubmit={handleInputUpdate} mode={visualizationMode} setMode={setVisualizationMode} currentData={inputData} />;
-      default:
-        return <div className="text-red-500">Unknown input type</div>;
+    } else {
+        return <GraphInput onSubmit={handleInputUpdate} mode={graphTool} setMode={setGraphTool} currentData={inputData} zoom={zoom} setZoom={setZoom} />;
     }
   };
 
@@ -153,13 +260,26 @@ export default function AlgorithmWorkspace() {
     const hasSteps = steps && steps.length > 0;
     const displayStep = hasSteps ? currentStep : null;
 
-    switch (algorithmMetadata.visualizer) {
-      case 'bar_chart':
+    if (algorithmMetadata.visualizer === 'bar_chart') {
         return <SortingVisualizer step={displayStep} initialData={inputData as number[] | null} />;
-      case 'grid_2d':
+    }
+
+    if (viewMode === 'grid') {
         return <GridVisualizer step={displayStep} initialData={inputData} mode={visualizationMode} onUpdate={handleInputUpdate} isInteracting={!isRunning && !hasSteps} />;
-      default:
-        return <div className="text-red-500">Unknown visualizer type</div>;
+    } else {
+        return (
+            <GraphVisualizer 
+                step={displayStep} 
+                initialData={inputData} 
+                isInteracting={!isRunning && !hasSteps}
+                onNodeClick={(id) => handleGraphInteraction('nodeClick', id)}
+                onNodeDragStart={(id) => handleGraphInteraction('connectStart', { nodeId: id })}
+                onNodeMouseUp={(id) => handleGraphInteraction('connectEnd', { nodeId: id })}
+                onWeightClick={handleWeightChange}
+                tempLine={tempLine}
+                zoom={zoom}
+            />
+        );
     }
   };
 
@@ -173,12 +293,17 @@ export default function AlgorithmWorkspace() {
           <div className="w-full xl:w-64 flex-shrink-0">
              <div className="flex items-center justify-between mb-1.5">
                  <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider">Algorithm</label>
-                 <button 
-                    onClick={() => setIsInfoModalOpen(true)}
-                    className="text-blue-400 hover:text-blue-300 transition-colors flex items-center gap-1 text-xs font-medium"
-                 >
-                    <Info size={14} /> Info
-                 </button>
+                 <div className="flex gap-2">
+                    {category === 'pathfinding' && (
+                        <div className="flex bg-gray-900 rounded-md p-0.5 border border-gray-700">
+                            <button onClick={() => { setViewMode('grid'); setInputData(null); resetSteps(); }} className={`p-1 rounded ${viewMode === 'grid' ? 'bg-gray-700 text-white' : 'text-gray-500'}`} title="Grid View"><Grid3X3 size={14}/></button>
+                            <button onClick={() => { setViewMode('graph'); setInputData(null); resetSteps(); }} className={`p-1 rounded ${viewMode === 'graph' ? 'bg-gray-700 text-white' : 'text-gray-500'}`} title="Graph View"><Network size={14}/></button>
+                        </div>
+                    )}
+                    <button onClick={() => setIsInfoModalOpen(true)} className="text-blue-400 hover:text-blue-300 transition-colors flex items-center gap-1 text-xs font-medium">
+                        <Info size={14} /> Info
+                    </button>
+                 </div>
             </div>
             <div className="relative">
               <select value={selectedAlgoName} onChange={(e) => setSelectedAlgoName(e.target.value)} disabled={isRunning || isPlaying} className="w-full bg-gray-900 text-white pl-4 pr-10 py-2.5 rounded-lg border border-gray-700 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none appearance-none transition-colors font-medium">
@@ -212,7 +337,28 @@ export default function AlgorithmWorkspace() {
 
       {/* Workspace */}
       <div className="flex-grow flex flex-col lg:flex-row gap-4 min-h-0">
-        <div className="flex-1 min-w-0 bg-gray-800 rounded-xl shadow-lg border border-gray-700 overflow-hidden relative">
+        <div 
+            className="flex-1 min-w-0 bg-gray-800 rounded-xl shadow-lg border border-gray-700 overflow-auto relative"
+            onClick={(e) => {
+                if (viewMode === 'graph' && graphTool === 'node' && !isRunning) {
+                   const rect = e.currentTarget.getBoundingClientRect();
+                   const x = (e.clientX - rect.left + e.currentTarget.scrollLeft) / zoom;
+                   const y = (e.clientY - rect.top + e.currentTarget.scrollTop) / zoom;
+                   handleGraphInteraction('addNode', { x, y });
+                }
+            }}
+            onMouseMove={(e) => {
+                 if (viewMode === 'graph' && draggedNode) {
+                     const rect = e.currentTarget.getBoundingClientRect();
+                     const x = (e.clientX - rect.left + e.currentTarget.scrollLeft) / zoom;
+                     const y = (e.clientY - rect.top + e.currentTarget.scrollTop) / zoom;
+                     handleGraphInteraction('connectMove', { x, y });
+                 }
+            }}
+            onMouseUp={() => {
+                if (viewMode === 'graph') handleGraphInteraction('connectCancel', null);
+            }}
+        >
           <div className="absolute inset-0 flex flex-col">
             {renderVisualizerComponent()}
           </div>
@@ -237,10 +383,8 @@ export default function AlgorithmWorkspace() {
       </div>
 
       {/* Modals */}
-      {isInfoModalOpen && algorithmMetadata && (
-        <InfoModal metadata={algorithmMetadata} onClose={() => setIsInfoModalOpen(false)} />
-      )}
-
+      {isInfoModalOpen && algorithmMetadata && <InfoModal metadata={algorithmMetadata} onClose={() => setIsInfoModalOpen(false)} />}
+      
       {isCombinedModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-6 animate-in fade-in duration-200">
             <div className="bg-gray-900 border border-gray-700 rounded-xl shadow-2xl w-full max-w-5xl h-[85vh] flex flex-col overflow-hidden">

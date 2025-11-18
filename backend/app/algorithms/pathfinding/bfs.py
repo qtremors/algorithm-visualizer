@@ -1,12 +1,8 @@
-from typing import Dict, Any, Generator
+from typing import Dict, Any, Generator, List
 from ...base_algorithm import BaseAlgorithm
 from collections import deque
 
 class BFS(BaseAlgorithm):
-    """
-    Implements Breadth-First Search (BFS) for unweighted grids.
-    """
-
     metadata = {
         "name": "Breadth-First Search (BFS)",
         "pseudocode": [
@@ -28,43 +24,64 @@ class BFS(BaseAlgorithm):
         ],
         "input_type": "graph_grid",
         "visualizer": "grid_2d",
-        "description": "BFS works by exploring all the neighbor nodes at the present depth prior to moving on to the nodes at the next depth level.",
-        "complexity": {
-            "time": "O(V + E)",
-            "space": "O(V)"
-        },
-        "pros": [
-            "Guarantees the shortest path in unweighted graphs.",
-            "Complete: Finds a solution if one exists."
-        ],
-        "cons": [
-            "Requires more memory than DFS (stores all nodes at current level).",
-            "Slower than heuristic searches (like A*) for pathfinding."
-        ]
+        "description": "BFS explores layer by layer. Great for unweighted grids or social network connections.",
+        "complexity": { "time": "O(V + E)", "space": "O(V)" },
+        "pros": ["Guarantees shortest path in unweighted graphs.", "Complete."],
+        "cons": ["Does not consider edge weights.", "High memory usage on large graphs."]
     }
 
     def __init__(self, data: Any):
         super().__init__(data)
-        self.grid = data["grid"]
-        self.start = (data["start"]["row"], data["start"]["col"])
-        self.end = (data["end"]["row"], data["end"]["col"])
-        self.rows = len(self.grid)
-        self.cols = len(self.grid[0])
+        self.mode = "grid"
+        if "adjacency" in data:
+            self.mode = "graph"
+            self.adjacency = data["adjacency"]
+            self.start = data["start"]
+            self.end = data["end"]
+        else:
+            self.mode = "grid"
+            if data and "grid" in data:
+                self.grid = data["grid"]
+                self.start = (data["start"]["row"], data["start"]["col"])
+                self.end = (data["end"]["row"], data["end"]["col"])
+                self.rows = len(self.grid)
+                self.cols = len(self.grid[0]) if self.rows > 0 else 0
+            else:
+                self.grid = []
+
+    def get_neighbors(self, node) -> List[Any]:
+        neighbors = []
+        if self.mode == "graph":
+            if node in self.adjacency:
+                neighbors = list(self.adjacency[node].keys())
+        else:
+            r, c = node
+            for dr, dc in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
+                nr, nc = r + dr, c + dc
+                if 0 <= nr < self.rows and 0 <= nc < self.cols:
+                    if self.grid[nr][nc] != 1: # 1 is Wall
+                        neighbors.append((nr, nc))
+        return neighbors
+
+    def get_snapshot(self, visited, path):
+        if self.mode == "graph":
+            return { "type": "graph", "visited": list(visited), "path": list(path) }
+        return { "type": "grid", "visited": list(visited), "path": list(path), "grid": self.grid }
 
     def run(self) -> Generator[Dict[str, Any], None, None]:
+        if self.mode == "grid" and not self.grid: return
+        if self.mode == "graph" and not self.adjacency: return
+
         queue = deque([self.start])
         visited = {self.start}
         came_from = {} 
         
-        def get_snapshot(current_visited, path_nodes):
-            return { "visited": list(current_visited), "path": list(path_nodes), "grid": self.grid }
-
-        yield { "type": "info", "payload": {}, "snapshot": get_snapshot(visited, []), "message": "Starting BFS...", "line": 2 }
+        yield { "type": "info", "payload": {}, "snapshot": self.get_snapshot(visited, []), "message": "Starting BFS...", "line": 2 }
 
         while queue:
             curr = queue.popleft()
             
-            yield { "type": "visit_node", "payload": {"node": curr}, "snapshot": get_snapshot(visited, []), "message": f"Visiting node {curr}", "line": 6 }
+            yield { "type": "visit_node", "payload": {"node": curr}, "snapshot": self.get_snapshot(visited, []), "message": f"Visiting {curr}", "line": 6 }
 
             if curr == self.end:
                 path = []
@@ -74,16 +91,14 @@ class BFS(BaseAlgorithm):
                     temp = came_from[temp]
                 path.append(self.start)
                 path.reverse()
-                yield { "type": "found_path", "payload": {"path": path}, "snapshot": get_snapshot(visited, path), "message": "Target found!", "line": 7 }
+                yield { "type": "found_path", "payload": {"path": path}, "snapshot": self.get_snapshot(visited, path), "message": "Target found!", "line": 7 }
                 return
 
-            for dr, dc in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
-                nr, nc = curr[0] + dr, curr[1] + dc
-                if 0 <= nr < self.rows and 0 <= nc < self.cols:
-                    if (nr, nc) not in visited and self.grid[nr][nc] == 0:
-                        visited.add((nr, nc))
-                        came_from[(nr, nc)] = curr
-                        queue.append((nr, nc))
-                        yield { "type": "visit_node", "payload": {"node": (nr, nc)}, "snapshot": get_snapshot(visited, []), "message": f"Queuing neighbor {(nr, nc)}", "line": 10 }
+            for neighbor in self.get_neighbors(curr):
+                if neighbor not in visited:
+                    visited.add(neighbor)
+                    came_from[neighbor] = curr
+                    queue.append(neighbor)
+                    yield { "type": "visit_node", "payload": {"node": neighbor}, "snapshot": self.get_snapshot(visited, []), "message": f"Queuing {neighbor}", "line": 10 }
 
-        yield { "type": "info", "payload": {}, "snapshot": get_snapshot(visited, []), "message": "No path found.", "line": 14 }
+        yield { "type": "info", "payload": {}, "snapshot": self.get_snapshot(visited, []), "message": "No path found.", "line": 14 }

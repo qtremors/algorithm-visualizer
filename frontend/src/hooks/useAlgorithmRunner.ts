@@ -1,6 +1,7 @@
 import { useState, useCallback, useEffect } from 'react';
 import type { AlgorithmStep } from '../types';
 
+// --- DYNAMIC CONFIGURATION ---
 const HOST = import.meta.env.VITE_API_BASE_URL || '127.0.0.1:8000';
 // If on HTTPS, use WSS (Secure WebSocket), otherwise use WS
 const PROTOCOL = window.location.protocol === 'https:' ? 'wss://' : 'ws://';
