@@ -1,10 +1,8 @@
-# Algorithm Visualizer
+# AlgoVisualizer
 
-A full-stack web application that brings algorithms to life through real-time, interactive visualizations.
+**AlgoVisualizer** is a high-performance, interactive educational platform designed to demystify complex algorithms. By visualizing execution steps in real-time, it bridges the gap between abstract code and tangible logic.
 
-Built with a **React (TypeScript)** frontend and a **FastAPI (Python)** backend, this tool provides an engaging way to explore how algorithms operate step by step.
-
-> **Note:** This application is optimized for **desktop use only**. Due to the complexity of the grid layouts and control panels, many features will not display or function correctly on mobile devices.
+Built with a **FastAPI (Python)** backend for robust execution logic and a **React (TypeScript)** frontend for a responsive, modern UI, this project leverages **WebSockets** to stream algorithm states frame-by-frame.
 
 ---
 
@@ -18,158 +16,184 @@ Built with a **React (TypeScript)** frontend and a **FastAPI (Python)** backend,
 |:---------:|:------------:|
 | ![Path-Finding](assets/pathfinding.png) | ![Path-Found](assets/pathfound.png) |
 
----
-
-## ✨ Features
-
-### 🔴 Real-Time Visualization
-
-Algorithm execution steps are streamed from the backend using **WebSockets**, enabling smooth, animated playback.
-
-### 🧩 Supported Categories
-
-**Sorting Algorithms**
-
-* Bubble Sort
-* Selection Sort
-* Insertion Sort
-
-**Pathfinding Algorithms**
-
-* Dijkstra’s
-* Breadth-First Search (BFS)
-* Depth-First Search (DFS)
-
-### 🎛️ Interactive Controls
-
-* Playback: Play, Pause, Step Forward/Backward, Reset, Speed Control
-* **Grid Tools:** Draw walls, reposition start/end nodes, random maze generation
-* **Array Tools:** Generate random arrays or input your own values
-
-### 📚 Dynamic Panels
-
-* **Pseudocode Panel:** Highlights the active line in real-time
-* **Status Log:** Scrollable history of all operations
-* **Info Modal:** Complexity, strengths, and limitations for each algorithm
-
-### 🎨 Modern UI
-
-Built with **TailwindCSS** for a clean, responsive, dashboard-style design.
+### Static screenshots don't do the project justice—check out the live **[Algorithm Visualizer](https://tremors-algoviz.netlify.app/)** in action.
 
 ---
 
-## 🛠️ Tech Stack
 
-### Frontend
+### ⚡ Real-Time Execution
 
-* React (TypeScript)
-* Vite
-* TailwindCSS
-* Lucide Icons
+Unlike traditional visualizers that pre-calculate steps, AlgoVisualizer runs algorithms live on the backend.
 
-### Backend
+- **WebSocket Streaming:** The backend yields execution states (comparisons, swaps, path visits) which are streamed instantly to the frontend.
+    
+- **VCR-Style Controls:** Play, Pause, Step Forward, Step Backward, and Reset execution at any point.
+    
+- **Variable Speed:** Adjust playback speed from 10ms (near instant) to 1000ms (slow motion) to follow complex logic.
+    
 
-* FastAPI
-* Python
-* Uvicorn (ASGI)
+### 📊 Sorting Algorithms
 
----
+Visualize how different strategies sort data arrays.
 
-## 🚀 Getting Started
+- **Algorithms:** Bubble Sort, Selection Sort, Insertion Sort.
+    
+- **Custom Input:** Type your own comma-separated list of numbers.
+    
+- **Random Generator:** Generate arrays with custom size (5-100) and value ranges.
+    
+- **Visuals:** Color-coded bars indicate comparisons (Yellow), swaps (Red), and sorted elements (Green).
+    
+
+### 🕸️ Pathfinding Algorithms
+
+Navigate through complex 2D grids and graph networks.
+
+- **Algorithms:** Dijkstra's Algorithm, Breadth-First Search (BFS), Depth-First Search (DFS).
+    
+- **Dual Views:**
+    
+    - **Grid View:** A tile-based interactive map.
+        
+        - **Draw Walls:** Click and drag to create obstacles.
+            
+        - **Move Points:** Drag Start (Green) and End (Red) nodes.
+            
+        - **Smart Resizing:** "Fit to Screen" mode or Zoom/Scroll for massive grids.
+            
+    - **Graph View:** A node-link diagram.
+        
+        - **Add Nodes:** Click anywhere to create vertices.
+            
+        - **Connect Nodes:** Drag between nodes to create weighted edges.
+            
+        - **Delete Mode:** Remove nodes/edges with a click.
+            
+        - **Auto-Layout:** Generates Random Trees or Mesh Networks instantly.
+            
+
+### 🧠 Educational Tools
+
+- **Pseudocode Tracking:** The active line of code highlights in sync with the visualization.
+    
+- **Execution Log:** A scrollable history of every operation (e.g., "Swapping index 4 and 5", "Visiting Node A").
+    
+- **Info Modals:** Detailed breakdown of Time Complexity, Space Complexity, Pros, and Cons for every algorithm.
+    
+
+## 🎮 Controls & Usage
+
+### General
+
+- **Spacebar:** Play / Pause
+    
+- **Left / Right Arrow:** Step Backward / Forward
+    
+- **R:** Reset Visualization
+    
+
+### Graph View
+
+- **Node Tool:** Click empty space to add a Node.
+    
+- **Connect Tool:** Drag from Node A to Node B to create an edge.
+    
+- **Delete Tool:** Click a Node or Edge Weight to remove it.
+    
+- **Move Tool:** Drag Nodes to rearrange the layout.
+    
+- **Toggle Colors:** Switch connector coloring on/off for clarity.
+
+## 🛠️ Technology Stack
+
+### Frontend (Client)
+
+- **Framework:** React 18 + TypeScript
+    
+- **Build Tool:** Vite
+    
+- **Styling:** TailwindCSS (for responsive, utility-first design)
+    
+- **Icons:** Lucide React
+    
+- **State Management:** React Context API + Custom Hooks (`usePlayback`, `useAlgorithmRunner`)
+    
+
+### Backend (Server)
+
+- **Framework:** FastAPI (Python 3.9+)
+    
+- **Protocol:** WebSockets (via `fastapi.websockets`)
+    
+- **Design Pattern:** Strategy Pattern (BaseAlgorithm class with polymorphic implementations)
+    
+- **Server:** Uvicorn (ASGI)
+    
+
+## 🏗️ Architecture
+
+The project follows a **Metadata-Driven UI** architecture.
+
+1. **Discovery:** On load, the Frontend fetches the `/api/algorithms` registry. This JSON response dictates which algorithms exist, their inputs (Array vs Grid), and their visualizers.
+    
+2. **Execution:**
+    
+    - User clicks "Visualize".
+        
+    - Frontend sends the `initial_data` (Array or Adjacency Matrix) via WebSocket.
+        
+    - Backend instantiates the specific Algorithm Class (e.g., `BubbleSort`).
+        
+    - The `run()` method is a **Python Generator** that `yields` a `step` dictionary for every atomic action.
+        
+3. **Rendering:**
+    
+    - Frontend receives the stream of steps.
+        
+    - `usePlayback` hook buffers them and manages the "current frame" index.
+        
+    - `SortingVisualizer` or `GraphVisualizer` renders the state at that specific index.
+        
+
+## 📦 Installation & Setup
 
 ### Prerequisites
 
-* **Node.js** v18 or newer
-* **Python** v3.8 or newer
-* `pip` or `uv`
+- Node.js (v18+)
+    
+- Python (v3.9+)
+    
 
----
+### 1. Backend Setup
 
-### 1. Clone the Repository
-
-```bash
-git clone https://github.com/qtremors/algorithm-visualizer.git
-cd algorithm-visualizer
-```
-
----
-
-### 2. Backend Setup
-
-```bash
-# Navigate to backend
+```python
 cd backend
 
-# Create & activate virtual environment
+# Create virtual environment
 python -m venv .venv
-# Windows: .venv\Scripts\activate
-# macOS/Linux: source .venv/bin/activate
+source .venv/bin/activate  # Windows: .venv\Scripts\activate
 
 # Install dependencies
 pip install -r requirements.txt
 
-# Run the backend server
-uvicorn app.main:app --reload
+# Start Server
+uvicorn main:app --reload --port 8000
 ```
 
-Backend runs at: **[http://127.0.0.1:8000](http://127.0.0.1:8000)**
-
----
-
-### 3. Frontend Setup
-
-Open a new terminal:
+### 2. Frontend Setup
 
 ```bash
 cd frontend
 
+# Install dependencies
 npm install
+
+# Start Dev Server
 npm run dev
 ```
 
-Frontend runs at: **[http://localhost:5173](http://localhost:5173)**
+Visit `http://localhost:5173` to start visualizing!
 
 ---
 
-## ▶️ Using the App
-
-Visit **[http://localhost:5173](http://localhost:5173)** in your browser to start visualizing algorithms.
-
----
-
-## 🏗️ Architecture Overview
-
-### Backend (Execution Engine)
-
-Each algorithm is implemented as a Python class inheriting from `BaseAlgorithm`.
-Its `run()` method acts as a **generator**, yielding structured step-by-step data (e.g., comparisons, swaps, node visits).
-This allows new algorithms to be added without modifying the core API.
-
-### Frontend (Visualizer Framework)
-
-The React app uses **metadata-driven** rendering:
-
-* Fetches algorithm definitions from the backend
-* Loads the appropriate input components (array/grid)
-* Renders the correct visualization (bars/grid)
-
-### Communication
-
-WebSockets maintain a persistent connection to stream algorithm steps in real-time.
-
----
-
-## 🗺️ Roadmap
-
-* **Algorithm Comparison Mode:** Run two algorithms side-by-side
-* **More Algorithms:**
-
-  * Merge Sort
-  * Quick Sort
-  * A* Search
-* **Data Structure Visualizations:**
-
-  * Binary Trees
-  * Linked Lists
-
----
+Designed & Developed by **Tremors** with 💖

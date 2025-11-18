@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Circle, Share2, PlayCircle, Flag, Trash2, ZoomIn } from 'lucide-react';
+import { Circle, Share2, PlayCircle, Flag, Trash2 } from 'lucide-react';
 import { cn } from '../../lib/utils';
 
 type GraphInputProps = {
@@ -7,11 +7,9 @@ type GraphInputProps = {
   mode: string;
   setMode: (mode: string) => void;
   currentData?: any;
-  zoom: number;
-  setZoom: (z: number) => void;
 };
 
-export default function GraphInput({ onSubmit, mode, setMode, currentData, zoom, setZoom }: GraphInputProps) {
+export default function GraphInput({ onSubmit, mode, setMode, currentData }: GraphInputProps) {
   const [nodeCount, setNodeCount] = useState(10); 
   const [edgeDensity, setEdgeDensity] = useState(3); 
 
@@ -201,20 +199,7 @@ export default function GraphInput({ onSubmit, mode, setMode, currentData, zoom,
                 <div className="w-px h-4 bg-gray-700 mx-1"></div>
                 <ToolButton active={mode === 'start'} onClick={() => setMode('start')} icon={<PlayCircle size={14} />} label="Start" color="text-green-500" />
                 <ToolButton active={mode === 'end'} onClick={() => setMode('end')} icon={<Flag size={14} />} label="End" color="text-red-500" />
-            </div>
-
-            <div className="flex items-center gap-2 px-2">
-                 <ZoomIn size={16} className="text-gray-500" />
-                 <input 
-                    type="range" 
-                    min="0.5" 
-                    max="1.5" 
-                    step="0.1" 
-                    value={zoom} 
-                    onChange={(e) => setZoom(parseFloat(e.target.value))}
-                    className="w-24 h-1.5 bg-gray-700 rounded-lg appearance-none cursor-pointer accent-blue-500"
-                 />
-                 <span className="text-xs text-gray-500 w-8">{Math.round(zoom * 100)}%</span>
+                <ToolButton active={mode === 'delete'} onClick={() => setMode('delete')} icon={<Trash2 size={14} />} label="Delete" color="text-red-400" />
             </div>
         </div>
       </div>

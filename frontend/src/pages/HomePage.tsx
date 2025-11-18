@@ -1,6 +1,17 @@
 import { Link } from 'react-router-dom';
 import { useAlgorithms } from '../contexts/AlgorithmContext.tsx';
 import { ArrowRight, BarChart3, GitGraph, Zap, Code2, Loader2, Cpu, Play } from 'lucide-react';
+import { cn } from '../lib/utils.ts';
+
+const SplitText = ({ text, className }: { text: string, className?: string }) => (
+  <span className={cn("lando-text", className)}>
+    {text.split("").map((char, i) => (
+      <span key={i} className="lando-char">
+        {char === " " ? "\u00A0" : char}
+      </span>
+    ))}
+  </span>
+);
 
 export default function HomePage() {
   const { algorithms, isLoading } = useAlgorithms();
@@ -26,23 +37,24 @@ export default function HomePage() {
   return (
     <div className="min-h-[calc(100vh-100px)] flex flex-col items-center justify-center">
       
-      {/* Removed the fancy background effects div completely */}
-
       <div className="container mx-auto px-4 py-16 flex flex-col gap-16 items-center">
         
         {/* Hero Section */}
-        <div className="text-center space-y-6 max-w-3xl mx-auto">
+        <div className="text-center space-y-6 max-w-3xl mx-auto cursor-default">
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-gray-800 border border-gray-700 text-gray-300 text-sm font-medium">
             <Zap size={14} fill="currentColor" className="text-yellow-400"/>
             Interactive Learning Tool
           </div>
           
-          <h1 className="text-5xl md:text-7xl font-black tracking-tight text-white">
-            Master Algorithms <br/>
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500">
-              Visually
-            </span>
-          </h1>
+          <div className="flex flex-col items-center group">
+            <h1 className="text-5xl md:text-7xl font-black tracking-tight text-white leading-snug">
+               <SplitText text="Master Algorithms" />
+               <br/>
+               <span className="text-blue-500">
+                 <SplitText text="Visually" />
+               </span>
+            </h1>
+          </div>
           
           <p className="text-lg md:text-xl text-gray-400 leading-relaxed max-w-2xl mx-auto">
             A powerful visualization tool designed to help you understand complex algorithms through real-time animations and step-by-step execution.
@@ -56,7 +68,7 @@ export default function HomePage() {
         </div>
 
         {/* Algorithm Categories */}
-        <div id="algorithms" className="w-full max-w-5xl">
+        <div id="algorithms" className="w-full max-w-5xl scroll-mt-24">
             {isLoading ? (
                 <div className="flex justify-center py-20">
                     <Loader2 className="h-10 w-10 text-blue-500 animate-spin" />
