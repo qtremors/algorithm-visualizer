@@ -20,3 +20,27 @@
     -moz-appearance: textfield;
   }
 }
+
+/* ────────────────────────────────────────────────────────────────
+   Minimal, Subtler Scrollbar for Chromium Browsers
+   ──────────────────────────────────────────────────────────────── */
+@layer components {
+    ::-webkit-scrollbar {
+        width: 4px;
+        height: 4px;
+    }
+
+    ::-webkit-scrollbar-track {
+        background: transparent; 
+        border-radius: 2px;
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background: transparent; 
+        border-radius: 2px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+        background: #71717a; 
+    }
+}
