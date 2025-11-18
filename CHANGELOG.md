@@ -1,10 +1,14 @@
 # AlgoVisualizer Changelog
 
 > **Project:** AlgoVisualizer
-> **Version:** 0.0.4
-> **Last Updated:** 2025-11-17
+> **Version:** 0.0.5
+> **Last Updated:** 2025-11-18
 
 ---
+
+## [0.0.5] - 2025-11-18
+
+- **Add Algorithm Workspace State**: Add workspace draft management, algorithm selection, workspace composition, visualizer panel wiring, and workspace tests.
 
 ## [0.0.4] - 2025-11-17
 
