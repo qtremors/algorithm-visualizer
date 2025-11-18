@@ -1,13 +1,8 @@
-from typing import Dict, Any, Generator
+from typing import Dict, Any, Generator, List, Tuple
 from ...base_algorithm import BaseAlgorithm
 import heapq
 
 class Dijkstra(BaseAlgorithm):
-    """
-    Implements Dijkstra's algorithm for visualization on a grid.
-    """
-
-    # --- Metadata ---
     metadata = {
         "name": "Dijkstra's Algorithm",
         "pseudocode": [
@@ -30,111 +25,149 @@ class Dijkstra(BaseAlgorithm):
         ],
         "input_type": "graph_grid",
         "visualizer": "grid_2d",
-        "description": "Dijkstra's algorithm is a popular search algorithm used to find the shortest path between nodes in a graph.",
-        "complexity": {
-            "time": "O(V + E log V)",
-            "space": "O(V)"
-        },
-        "pros": [
-            "Guarantees the shortest path.",
-            "Widely used in routing protocols."
-        ],
-        "cons": [
-            "Slower than BFS for unweighted graphs.",
-            "Does not work with negative edge weights."
-        ]
+        "description": "Dijkstra's algorithm finds the shortest path between nodes. It supports both Grids (weighted tiles) and Network Graphs (weighted edges).",
+        "complexity": { "time": "O(V + E log V)", "space": "O(V)" },
+        "pros": ["Guarantees shortest path.", "Handles weighted edges/nodes."],
+        "cons": ["Slower than BFS on unweighted graphs.", "Can be computationally expensive on dense graphs."]
     }
 
     def __init__(self, data: Any):
-        if not isinstance(data, dict) or "grid" not in data:
-             # Fallback for initial empty state if needed, or raise error
-             pass
-             
         super().__init__(data)
-        # specific init logic
-        if data and "grid" in data:
-            self.grid = data["grid"]
-            self.start = (data["start"]["row"], data["start"]["col"])
-            self.end = (data["end"]["row"], data["end"]["col"])
-            self.rows = len(self.grid)
-            self.cols = len(self.grid[0]) if self.rows > 0 else 0
+        self.mode = "grid"
+        
+        # Detect Input Type
+        if "adjacency" in data:
+            # --- GRAPH MODE ---
+            self.mode = "graph"
+            self.adjacency = data["adjacency"] # Dict[NodeID, Dict[NeighborID, Weight]]
+            self.start = data["start"]         # String ID
+            self.end = data["end"]             # String ID
+            self.nodes = data.get("nodes", {}) # Metadata for viz (x,y coords)
         else:
-            self.grid = []
-            self.rows = 0
-            self.cols = 0
+            # --- GRID MODE ---
+            self.mode = "grid"
+            if data and "grid" in data:
+                self.grid = data["grid"]
+                self.start = (data["start"]["row"], data["start"]["col"])
+                self.end = (data["end"]["row"], data["end"]["col"])
+                self.rows = len(self.grid)
+                self.cols = len(self.grid[0]) if self.rows > 0 else 0
+            else:
+                self.grid = []
+                self.rows = 0
+                self.cols = 0
+
+    def get_neighbors(self, node) -> List[Tuple[Any, int]]:
+        """
+        Returns a list of (neighbor, weight) tuples.
+        Abstracts away the difference between Grid and Graph.
+        """
+        neighbors = []
+        
+        if self.mode == "graph":
+            # Graph Mode: Neighbors are in the adjacency list
+            if node in self.adjacency:
+                for neighbor_id, weight in self.adjacency[node].items():
+                    neighbors.append((neighbor_id, weight))
+        
+        else:
+            # Grid Mode: Calculate 4-directional neighbors
+            r, c = node
+            for dr, dc in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
+                nr, nc = r + dr, c + dc
+                if 0 <= nr < self.rows and 0 <= nc < self.cols:
+                    cell_val = self.grid[nr][nc]
+                    # 1 = Wall (Skip)
+                    if cell_val == 1: continue
+                    # 0 = Path (Cost 1), 5 = Weight (Cost 5)
+                    move_cost = 5 if cell_val == 5 else 1
+                    neighbors.append(((nr, nc), move_cost))
+                    
+        return neighbors
+
+    def get_snapshot(self, visited, path):
+        if self.mode == "graph":
+            return { 
+                "type": "graph",
+                "visited": list(visited), 
+                "path": list(path) 
+            }
+        else:
+            return { 
+                "type": "grid",
+                "visited": list(visited), 
+                "path": list(path), 
+                "grid": self.grid 
+            }
 
     def run(self) -> Generator[Dict[str, Any], None, None]:
-        if not self.grid:
-            return
+        # Validate start
+        if self.mode == "grid" and not self.grid: return
+        if self.mode == "graph" and not self.adjacency: return
 
-        # A simple snapshot representation for a grid
-        def get_snapshot(visited_nodes, path_nodes):
-            return { "visited": list(visited_nodes), "path": list(path_nodes), "grid": self.grid }
-
-        pq = [(0, self.start[0], self.start[1])]
-        distances = { (r, c): float('inf') for r in range(self.rows) for c in range(self.cols) }
-        distances[self.start] = 0
+        pq = [(0, self.start)] # (distance, node_id)
+        distances = {self.start: 0} # Track distances for all nodes
         previous_nodes = {}
         visited = set()
 
-        yield {
-            "type": "info", "payload": {"node": self.start}, "snapshot": get_snapshot(visited, []),
-            "message": f"Starting Dijkstra at {self.start}", "line": 1
+        yield { 
+            "type": "info", 
+            "payload": {"node": self.start}, 
+            "snapshot": self.get_snapshot(visited, []), 
+            "message": f"Starting Dijkstra at {self.start}", 
+            "line": 1 
         }
 
         while pq:
-            dist, r, c = heapq.heappop(pq)
+            dist, curr = heapq.heappop(pq)
             
-            if (r, c) in visited:
-                continue
+            if curr in visited: continue
+            visited.add(curr)
             
-            visited.add((r,c))
-            
-            yield {
-                "type": "visit_node",
-                "payload": {"node": (r, c)},
-                "snapshot": get_snapshot(visited, []),
-                "message": f"Visiting node ({r}, {c}) with distance {dist}",
-                "line": 9
+            yield { 
+                "type": "visit_node", 
+                "payload": {"node": curr}, 
+                "snapshot": self.get_snapshot(visited, []), 
+                "message": f"Visiting {curr} (Dist: {dist})", 
+                "line": 9 
             }
             
-            if (r, c) == self.end:
+            if curr == self.end:
                 path = []
-                curr = self.end
-                while curr in previous_nodes:
-                    path.append(curr)
-                    curr = previous_nodes[curr]
+                temp = curr
+                while temp in previous_nodes:
+                    path.append(temp)
+                    temp = previous_nodes[temp]
                 path.append(self.start)
                 path.reverse()
                 
-                yield {
-                    "type": "found_path",
-                    "payload": {"path": path},
-                    "snapshot": get_snapshot(visited, path),
-                    "message": f"Found path with length {dist}!",
-                    "line": 16
+                yield { 
+                    "type": "found_path", 
+                    "payload": {"path": path}, 
+                    "snapshot": self.get_snapshot(visited, path), 
+                    "message": f"Path Found! Total Cost: {dist}", 
+                    "line": 16 
                 }
                 return
 
-            neighbors = [(r-1, c), (r+1, c), (r, c-1), (r, c+1)]
-            for nr, nc in neighbors:
-                if 0 <= nr < self.rows and 0 <= nc < self.cols and self.grid[nr][nc] == 0:
-                    if (nr, nc) not in visited:
-                        new_dist = dist + 1
-                        if new_dist < distances[(nr, nc)]:
-                            distances[(nr, nc)] = new_dist
-                            previous_nodes[(nr, nc)] = (r, c)
-                            heapq.heappush(pq, (new_dist, nr, nc))
-                            
-                            yield {
-                                "type": "update_neighbor",
-                                "payload": {"node": (nr, nc), "distance": new_dist},
-                                "snapshot": get_snapshot(visited, []),
-                                "message": f"Updating neighbor ({nr}, {nc}) to distance {new_dist}",
-                                "line": 14
-                            }
+            # Polymorphic Neighbor Fetching
+            for neighbor, weight in self.get_neighbors(curr):
+                if neighbor in visited: continue
+                
+                new_dist = dist + weight
+                
+                # If found a shorter path to this neighbor (or first time seeing it)
+                if new_dist < distances.get(neighbor, float('inf')):
+                    distances[neighbor] = new_dist
+                    previous_nodes[neighbor] = curr
+                    heapq.heappush(pq, (new_dist, neighbor))
+                    
+                    yield { 
+                        "type": "update_neighbor", 
+                        "payload": {"node": neighbor, "distance": new_dist}, 
+                        "snapshot": self.get_snapshot(visited, []), 
+                        "message": f"Updating {neighbor} to Dist {new_dist}", 
+                        "line": 14 
+                    }
 
-        yield {
-            "type": "info", "payload": {}, "snapshot": get_snapshot(visited, []),
-            "message": "Path not found.", "line": 16
-        }
+        yield { "type": "info", "payload": {}, "snapshot": self.get_snapshot(visited, []), "message": "No path found.", "line": 16 }
