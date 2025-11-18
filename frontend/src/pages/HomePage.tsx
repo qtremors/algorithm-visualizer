@@ -1,12 +1,12 @@
 import { Link } from 'react-router-dom';
 import { useAlgorithms } from '../contexts/AlgorithmContext.tsx';
-import { ArrowRight, BarChart3, GitGraph, Zap, Code2, Loader2, Cpu, Play } from 'lucide-react';
+import { ArrowRight, BarChart3, GitGraph, Zap, Code2, Loader2, Cpu, Play, Server } from 'lucide-react';
 import { cn } from '../lib/utils.ts';
 
 const SplitText = ({ text, className }: { text: string, className?: string }) => (
   <span className={cn("lando-text", className)}>
     {text.split("").map((char, i) => (
-      <span key={i} className="lando-char">
+      <span key={i} className="lando-char" style={{ '--i': i } as React.CSSProperties}>
         {char === " " ? "\u00A0" : char}
       </span>
     ))}
@@ -14,7 +14,7 @@ const SplitText = ({ text, className }: { text: string, className?: string }) =>
 );
 
 export default function HomePage() {
-  const { algorithms, isLoading } = useAlgorithms();
+  const { algorithms, isLoading, isServerWaking } = useAlgorithms();
 
   const getCategoryIcon = (category: string) => {
     if (category.toLowerCase().includes('sort')) return <BarChart3 className="w-8 h-8 text-indigo-400" />;
@@ -40,13 +40,13 @@ export default function HomePage() {
       <div className="container mx-auto px-4 py-16 flex flex-col gap-16 items-center">
         
         {/* Hero Section */}
-        <div className="text-center space-y-6 max-w-3xl mx-auto cursor-default">
+        <div className="text-center space-y-6 max-w-3xl mx-auto group cursor-default">
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-gray-800 border border-gray-700 text-gray-300 text-sm font-medium">
             <Zap size={14} fill="currentColor" className="text-yellow-400"/>
             Interactive Learning Tool
           </div>
           
-          <div className="flex flex-col items-center group">
+          <div className="flex flex-col items-center">
             <h1 className="text-5xl md:text-7xl font-black tracking-tight text-white leading-snug">
                <SplitText text="Master Algorithms" />
                <br/>
@@ -70,8 +70,20 @@ export default function HomePage() {
         {/* Algorithm Categories */}
         <div id="algorithms" className="w-full max-w-5xl scroll-mt-24">
             {isLoading ? (
-                <div className="flex justify-center py-20">
+                <div className="flex flex-col items-center justify-center py-20 gap-4">
                     <Loader2 className="h-10 w-10 text-blue-500 animate-spin" />
+
+                    {/* Conditional Waking Message */}
+                    {isServerWaking && (
+                        <div className="flex flex-col items-center text-center animate-in fade-in slide-in-from-bottom-4 duration-700">
+                            <span className="flex items-center gap-2 text-yellow-400 font-medium bg-yellow-400/10 px-4 py-2 rounded-full border border-yellow-400/20">
+                                <Server size={16} /> Server is waking up...
+                            </span>
+                            <p className="text-gray-500 text-sm mt-3 max-w-md">
+                                Using Render's free tier. This usually takes about <span className="text-gray-300 font-bold">50 seconds</span> for the initial cold start. Please hold on!
+                            </p>
+                        </div>
+                    )}
                 </div>
             ) : (
                 <div className="grid md:grid-cols-2 gap-6">
