@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { Circle, Share2, PlayCircle, Flag, Shuffle, Trash2, ZoomIn } from 'lucide-react';
+import { useState } from 'react';
+import { Circle, Share2, PlayCircle, Flag, Trash2, ZoomIn } from 'lucide-react';
 import { cn } from '../../lib/utils';
 
 type GraphInputProps = {
@@ -69,7 +69,6 @@ export default function GraphInput({ onSubmit, mode, setMode, currentData, zoom,
     adjacency["A"] = {};
     
     let queue = ["A"];
-    let nextLabelCode = 66; 
     const getLabel = (idx: number) => idx < 26 ? String.fromCharCode(65 + idx) : String.fromCharCode(97 + idx - 26);
     let nodeIdx = 1;
 
