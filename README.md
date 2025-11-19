@@ -4,6 +4,9 @@
 
 Built with a **FastAPI (Python)** backend for robust execution logic and a **React (TypeScript)** frontend for a responsive, modern UI, this project leverages **WebSockets** to stream algorithm states frame-by-frame.
 
+> **Note:** This application is optimized for **desktop use only**. Due to the complexity of the grid layouts and control panels, many features will not display or function correctly on mobile devices.
+
+
 ---
 
 ## 🖼️ Screenshots
