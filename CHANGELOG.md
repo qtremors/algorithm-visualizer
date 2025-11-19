@@ -1,10 +1,14 @@
 # AlgoVisualizer Changelog
 
 > **Project:** AlgoVisualizer
-> **Version:** 0.0.5
-> **Last Updated:** 2025-11-18
+> **Version:** 0.0.6
+> **Last Updated:** 2025-11-19
 
 ---
+
+## [0.0.6] - 2025-11-19
+
+- **Add Playback Controls And Execution History**: Add playback and workspace controls, pseudocode, algorithm information, and virtual execution logs with regression coverage.
 
 ## [0.0.5] - 2025-11-18
 
