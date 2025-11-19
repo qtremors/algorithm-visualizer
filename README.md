@@ -153,46 +153,34 @@ The project follows a **Metadata-Driven UI** architecture.
     - `usePlayback` hook buffers them and manages the "current frame" index.
         
     - `SortingVisualizer` or `GraphVisualizer` renders the state at that specific index.
-        
 
-## 📦 Installation & Setup
 
-### Prerequisites
+## 🗺️ Roadmap
 
-- Node.js (v18+)
-    
-- Python (v3.9+)
-    
+I am !constantly working to improve AlgoVisualizer. Here is what's coming next:
 
-### 1. Backend Setup
+### 🏎️ Algorithm Comparison Mode ("Race Mode")
+* **Feature:** Run two different algorithms side-by-side on the exact same dataset.
+* **Goal:** Visually demonstrate efficiency differences (e.g., Quick Sort vs. Bubble Sort) in real-time.
 
-```python
-cd backend
+### 🌀 Procedural Maze Generation
+* **Feature:** Replace random wall placement with intelligent maze generation algorithms.
+* **Planned Algorithms:** Recursive Backtracker, Prim's Algorithm, Eller's Algorithm.
+* **Goal:** Create perfect mazes that challenge pathfinding heuristics.
 
-# Create virtual environment
-python -m venv .venv
-source .venv/bin/activate  # Windows: .venv\Scripts\activate
+### 📚 Expanded Algorithm Library
+* **Feature:** Implementation of highly requested advanced algorithms for both categories.
+* **Planned Sorting:** Merge Sort, Quick Sort, Heap Sort ($O(n \log n)$ complexity visualization).
+* **Planned Pathfinding:** A* (A-Star) Search, Bidirectional Search, Bellman-Ford.
+* **Goal:** Provide a comprehensive toolkit that covers both basic and advanced algorithmic concepts.
 
-# Install dependencies
-pip install -r requirements.txt
+### 🌲 Recursive Data Structures
+* **Feature:** Specialized visualizers for hierarchical data.
+* **Planned:** Binary Search Trees (BST), AVL Trees, and visual recursion trees.
 
-# Start Server
-uvicorn main:app --reload --port 8000
-```
-
-### 2. Frontend Setup
-
-```bash
-cd frontend
-
-# Install dependencies
-npm install
-
-# Start Dev Server
-npm run dev
-```
-
-Visit `http://localhost:5173` to start visualizing!
+### 💾 Session Persistence
+* **Feature:** Generate shareable URLs for specific graph layouts or sorting inputs.
+* **Goal:** Allow users to save their test cases and share them with others.
 
 ---
 
