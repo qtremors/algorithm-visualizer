@@ -1,10 +1,14 @@
 # AlgoVisualizer Changelog
 
 > **Project:** AlgoVisualizer
-> **Version:** 0.0.6
-> **Last Updated:** 2025-11-19
+> **Version:** 0.0.7
+> **Last Updated:** 2025-12-18
 
 ---
+
+## [0.0.7] - 2025-12-18
+
+- **Add Sorting And Grid Visualizations**: Add grid input and rendering, sorting bars, shared dialogs, footer, and input-editor tests.
 
 ## [0.0.6] - 2025-11-19
 
