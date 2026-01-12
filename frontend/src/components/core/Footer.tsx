@@ -22,19 +22,19 @@ export default function Footer() {
     <>
       <footer className="w-full bg-gray-900 border-t border-gray-800 mt-auto">
         <div className="container relative mx-auto px-4 py-4 flex flex-col md:flex-row items-center justify-between gap-4">
-          
+
           {/* Left: Copyright / Branding */}
           <div className="text-gray-500 text-sm flex items-center gap-1">
-            <span>© 2025 AlgoVisualizer. Made with</span>
+            <span>© 2026 AlgoVisualizer. Made with</span>
             <Heart size={12} className="text-red-500 fill-current" />
             <span>by</span>
-              <a href="https://github.com/qtremors" target="_blank" rel="noopener noreferrer"
-                className="text-white font-medium hover:text-blue-400 transition-colors hover:text-shadow-md hover:text-shadow-blue-500/50">
+            <a href="https://github.com/qtremors" target="_blank" rel="noopener noreferrer"
+              className="text-white font-medium hover:text-blue-400 transition-colors hover:text-shadow-md hover:text-shadow-blue-500/50">
               Tremors</a>
           </div>
 
           {/* Center: Dynamic Action Button */}
-          <button 
+          <button
             onClick={() => setIsGuideOpen(true)}
             className="group flex items-center gap-2 px-4 py-1.5 bg-gray-800 hover:bg-gray-700 border border-gray-700 rounded-full transition-all shadow-sm hover:shadow-md hover:border-gray-600 md:absolute md:left-1/2 md:-translate-x-1/2"
           >
@@ -50,9 +50,9 @@ export default function Footer() {
               <Github size={16} />
               <span className="hidden sm:inline">GitHub</span>
             </a>
-            <button 
-                onClick={() => setIsAboutOpen(true)}
-                className="text-gray-500 hover:text-white transition-colors text-sm"
+            <button
+              onClick={() => setIsAboutOpen(true)}
+              className="text-gray-500 hover:text-white transition-colors text-sm"
             >
               About
             </button>
@@ -61,14 +61,14 @@ export default function Footer() {
       </footer>
 
       {/* Modals */}
-      <GuideModal 
-        isOpen={isGuideOpen} 
-        onClose={() => setIsGuideOpen(false)} 
-        category={category} 
+      <GuideModal
+        isOpen={isGuideOpen}
+        onClose={() => setIsGuideOpen(false)}
+        category={category}
       />
-      <AboutModal 
-        isOpen={isAboutOpen} 
-        onClose={() => setIsAboutOpen(false)} 
+      <AboutModal
+        isOpen={isAboutOpen}
+        onClose={() => setIsAboutOpen(false)}
       />
     </>
   );

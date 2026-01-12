@@ -1,151 +1,140 @@
-# AlgoVisualizer
+<p align="center">
+  <img src="frontend/public/algoviz.png" alt="AlgoVisualizer Logo" width="120"/>
+</p>
 
-**AlgoVisualizer** is a high-performance, interactive educational platform designed to demystify complex algorithms. By visualizing execution steps in real-time, it bridges the gap between abstract code and tangible logic.
+<h1 align="center"><a href="https://tremors-algoviz.netlify.app">AlgoVisualizer</a></h1>
 
-Built with a **FastAPI (Python)** backend for robust execution logic and a **React (TypeScript)** frontend for a responsive, modern UI, this project leverages **WebSockets** to stream algorithm states frame-by-frame.
+<p align="center">
+  A high-performance, interactive educational platform that demystifies complex algorithms through real-time visualization.
+</p>
 
-> **Note:** This application is optimized for **desktop use only**. Due to the complexity of the grid layouts and control panels, mobile support is limited.
+<p align="center">
+  <img src="https://img.shields.io/badge/React-19.2-61DAFB?logo=react" alt="React">
+  <img src="https://img.shields.io/badge/FastAPI-0.121-009688?logo=fastapi" alt="FastAPI">
+  <img src="https://img.shields.io/badge/TypeScript-5.9-3178C6?logo=typescript" alt="TypeScript">
+  <img src="https://img.shields.io/badge/WebSocket-Streaming-purple" alt="WebSocket">
+  <img src="https://img.shields.io/badge/License-TSL-red" alt="License">
+</p>
 
----
+> [!NOTE]
+> **Personal Project** 🎯 I built this to deeply understand sorting and pathfinding algorithms by implementing them from scratch with real-time visual feedback. Feel free to explore and learn from it!
 
-## 🖼️ Screenshots
+## Live Website 
 
-| Sorting View | Sorted View |
-|:---------:|:------------:|
-| ![Sorting](assets/sorting.png) | ![Sorted](assets/sorted.png) |
+**➡️ [tremors-algoviz.netlify.app](https://tremors-algoviz.netlify.app)**
 
-| Path-Finding View | Path-Found View |
-|:---------:|:------------:|
-| ![Path-Finding](assets/pathfinding.png) | ![Path-Found](assets/pathfound.png) |
+> **Live Demo Limitations**: The backend may take a few seconds to wake up on first visit (cold start).
 
----
-
-## ⚡ Real-Time Execution
-
-Unlike traditional visualizers that pre-calculate steps, AlgoVisualizer runs algorithms live on the backend.
-
-- **WebSocket Streaming:** The backend yields execution states (comparisons, swaps, path visits) which are streamed instantly to the frontend.
-- **VCR-Style Controls:** Play, Pause, Step Forward, Step Backward, and Reset execution at any point.
-- **Variable Speed:** Adjust playback speed from 10ms (near instant) to 1000ms (slow motion) to follow complex logic.
-
-### 📊 Sorting Algorithms
-Visualize how different strategies sort data arrays.
-- **Algorithms:** Bubble Sort, Selection Sort, Insertion Sort.
-- **Custom Input:** Type your own comma-separated list of numbers.
-- **Random Generator:** Generate arrays with custom size (5-100) and value ranges.
-- **Visuals:** Color-coded bars indicate comparisons (Yellow), swaps (Red), and sorted elements (Green).
-
-### 🕸️ Pathfinding Algorithms
-Navigate through complex 2D grids and graph networks.
-- **Algorithms:** Dijkstra's Algorithm, Breadth-First Search (BFS), Depth-First Search (DFS).
-- **Dual Views:**
-    - **Grid View:** A tile-based interactive map. Draw walls, move start/end nodes, and resize the grid.
-    - **Graph View:** A node-link diagram. Add nodes, connect edges with custom weights, and auto-generate layouts.
-
-### 🧠 Educational Tools
-- **Pseudocode Tracking:** The active line of code highlights in sync with the visualization.
-- **Execution Log:** A scrollable history of every operation (e.g., "Swapping index 4 and 5", "Visiting Node A").
-- **Info Modals:** Detailed breakdown of Time Complexity, Space Complexity, Pros, and Cons for every algorithm.
+> [!WARNING]
+> **Desktop Optimized**: This application features complex grid layouts and interactive controls that require a mouse and larger screen. Mobile support is limited.
 
 ---
 
-## 🛠️ Technology Stack
+## ✨ Features
 
-### Backend (Server)
-- **Runtime:** Python 3.11+
-- **Framework:** FastAPI
-- **Package Manager:** `uv`
-- **Protocol:** WebSockets (via `fastapi.websockets`)
-- **Design Pattern:** Strategy Pattern (BaseAlgorithm class with polymorphic implementations)
-
-### Frontend (Client)
-- **Framework:** React 18 + TypeScript
-- **Build Tool:** Vite
-- **Styling:** TailwindCSS
-- **State Management:** React Context API + Custom Hooks (`usePlayback`)
+| Feature | Description |
+|---------|-------------|
+| ⚡ **Real-Time Execution** | Algorithms run live on the backend, streaming steps via WebSocket |
+| 🎮 **VCR-Style Controls** | Play, Pause, Step Forward/Back, Reset, and variable speed (10ms-500ms) |
+| 📊 **Sorting Algorithms** | Bubble Sort, Selection Sort, Insertion Sort with color-coded comparisons |
+| 🕸️ **Pathfinding Algorithms** | Dijkstra, BFS, DFS on both 2D Grids and Network Graphs |
+| 💻 **Pseudocode Tracking** | Live highlighting of the current execution line |
+| 📝 **Execution Log** | Scrollable history of every operation |
+| 🎓 **Educational Modals** | Time/Space complexity, pros, cons for each algorithm |
 
 ---
 
-## 🚀 Getting Started
+## 📸 Screenshots
 
-### Prerequisites
+<p align="center">
+  <img src="assets/sorting.png" alt="Sorting Visualization" width="400"/>
+  <img src="assets/sorted.png" alt="Sorted Result" width="400"/>
+</p>
 
-1.  **Node.js**: Install Node.js (v18 or higher) for the frontend.
-2.  **uv**: This project uses `uv` for ultra-fast Python package management.
-    *   **MacOS/Linux:** `curl -LsSf https://astral.sh/uv/install.sh | sh`
-    *   **Windows:** `powershell -c "irm https://astral.sh/uv/install.ps1 | iex"`
-    *   *Alternatively, install via pip:* `pip install uv`
+<p align="center">
+  <img src="assets/pathfinding.png" alt="Pathfinding in Progress" width="400"/>
+  <img src="assets/pathfound.png" alt="Path Found" width="400"/>
+</p>
 
-### Installation
+---
 
-1.  **Clone the repository:**
-    ```bash
-    git clone https://github.com/StartLedger/algorithm-visualizer.git
-    cd algorithm-visualizer
-    ```
-
-### Running the Application
-
-This project requires two terminals running simultaneously: one for the backend and one for the frontend.
-
-#### 1. Start the Backend
-Navigate to the backend directory and run the server using `uv`. It will automatically handle virtual environment creation and dependency installation.
+## 🚀 Quick Start
 
 ```bash
+# Clone and navigate
+git clone https://github.com/qtremors/algorithm-visualizer.git
+cd algorithm-visualizer
+
+# Start Backend (Terminal 1)
 cd backend
 uv run uvicorn app.main:app --reload
-```
-*The backend API will be available at `http://localhost:8000`*
 
-#### 2. Start the Frontend
-Open a new terminal, navigate to the frontend directory, install dependencies, and start the vite server.
-
-```bash
+# Start Frontend (Terminal 2)
 cd frontend
 npm install
 npm run dev
 ```
-*The frontend application will be available at `http://localhost:5173`*
+
+Visit **http://localhost:5173** 🎉
 
 ---
 
-## 🏗️ Architecture
+## 🛠️ Tech Stack
 
-The project follows a **Metadata-Driven UI** architecture.
-
-1.  **Discovery:** On load, the Frontend fetches the `/api/algorithms` registry. This JSON response dictates which algorithms exist, their inputs (Array vs Grid), and their visualizers.
-2.  **Execution:**
-    - User clicks "Visualize".
-    - Frontend sends the `initial_data` (Array or Adjacency Matrix) via WebSocket.
-    - Backend instantiates the specific Algorithm Class.
-    - The `run()` method is a **Python Generator** that `yields` a `step` dictionary for every atomic action.
-3.  **Rendering:**
-    - Frontend receives the stream of steps.
-    - `usePlayback` hook buffers them and manages the "current frame" index.
-    - Visualizers render the state at that specific index.
+| Layer | Technology |
+|-------|------------|
+| **Frontend** | React 19, TypeScript, Vite, TailwindCSS |
+| **Backend** | Python 3.11+, FastAPI, WebSockets |
+| **Protocol** | Real-time WebSocket streaming |
+| **Package Managers** | npm (frontend), uv (backend) |
 
 ---
 
-## 🗺️ Roadmap
+## 📁 Project Structure
 
-- [ ] **Algorithm Comparison Mode ("Race Mode"):** Run two algorithms side-by-side.
-- [ ] **Procedural Maze Generation:** Recursive Backtracker, Prim's Algorithm.
-- [ ] **Expanded Library:** Merge Sort, Quick Sort, A*, Bellman-Ford.
-- [ ] **Recursive Data Structures:** BST, AVL Trees.
-- [ ] **Session Persistence:** Shareable URLs for specific setups.
+```
+algorithm-visualizer/
+├── backend/              # FastAPI Python backend
+│   ├── app/
+│   │   ├── main.py       # Entry point, WebSocket handler
+│   │   ├── base_algorithm.py
+│   │   └── algorithms/   # Sorting & Pathfinding implementations
+│   └── pyproject.toml
+├── frontend/             # React TypeScript frontend
+│   ├── src/
+│   │   ├── components/   # UI components
+│   │   ├── hooks/        # Custom React hooks
+│   │   ├── pages/        # HomePage, AlgorithmWorkspace
+│   │   └── types/        # TypeScript definitions
+│   └── package.json
+├── assets/               # Screenshot images
+├── DEVELOPMENT.md        # Developer documentation
+├── CHANGELOG.md          # Version history
+├── LICENSE.md            # License terms
+└── README.md
+```
 
 ---
 
-## 🤝 Contributing
+## 📚 Documentation
 
-Contributions are welcome! Please feel free to submit a Pull Request.
-
-1.  Fork the project
-2.  Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3.  Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4.  Push to the branch (`git push origin feature/AmazingFeature`)
-5.  Open a Pull Request
+| Document | Description |
+|----------|-------------|
+| [DEVELOPMENT.md](DEVELOPMENT.md) | Architecture, setup, API reference |
+| [CHANGELOG.md](CHANGELOG.md) | Version history and release notes |
+| [LICENSE.md](LICENSE.md) | License terms and attribution |
+| [TASKS.md](TASKS.md) | Project tasks and roadmap |
 
 ---
 
-Designed & Developed by **Tremors** with 💖
+## 📄 License
+
+**Tremors Source License (TSL)** - Source-available license allowing viewing, forking, and derivative works with **mandatory attribution**. Commercial use requires written permission.
+
+See [LICENSE.md](LICENSE.md) for full terms.
+
+---
+
+<p align="center">
+  Made with ❤️ by <a href="https://github.com/qtremors">Tremors</a>
+</p>
