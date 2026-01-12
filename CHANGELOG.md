@@ -1,10 +1,14 @@
 # AlgoVisualizer Changelog
 
 > **Project:** AlgoVisualizer
-> **Version:** 0.0.7
-> **Last Updated:** 2025-12-18
+> **Version:** 0.0.8
+> **Last Updated:** 2026-01-12
 
 ---
+
+## [0.0.8] - 2026-01-12
+
+- **Add Graph Editing And Navigation Layout**: Add graph input, graph rendering, SVG interactions, and the shared navigation layout.
 
 ## [0.0.7] - 2025-12-18
 
