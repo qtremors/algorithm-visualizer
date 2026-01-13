@@ -1,8 +1,23 @@
 # Changelog
 
 > **Project:** AlgoVisualizer  
-> **Version:** 1.1.2  
+> **Version:** 1.1.3  
 > **Last Updated:** 2026-01-13
+
+---
+
+## [1.1.3] - 2026-01-13
+
+### Added
+- **P3 Code Quality**: Configured `pytest` for backend with initial Bubble Sort tests.
+- **P3 Code Quality**: Configured `Vitest` and `@testing-library/react` for frontend with `usePlayback` hook tests.
+- **P3 Code Quality**: Implemented decorator-based algorithm auto-discovery (`AlgorithmRegistry`).
+- **P3 Type Safety**: Replaced `any` types in `AlgorithmStep` with strict `SortingPayload`, `PathfindingPayload`, `GridSnapshot`, and `GraphSnapshot` interfaces.
+- **P2 UX**: Added "Estimated Time Remaining" display to playback controls.
+
+### Fixed
+- **Backend**: Renamed FastAPI instance from `app` to `api` to resolve package shadowing conflicts. Use `uv run uvicorn app.main:api --reload`.
+- **Frontend**: Fixed TypeScript build errors in visualizer components by implementing proper type assertions.
 
 ---
 

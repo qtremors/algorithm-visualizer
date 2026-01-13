@@ -26,6 +26,7 @@ type PlaybackControlsProps = {
   onTogglePath: () => void;
   showEdgeColors: boolean;
   onToggleEdgeColors: () => void;
+  estimatedRemainingTime?: number;
 };
 
 const MIN_SPEED = 10;
@@ -37,7 +38,8 @@ export default function PlaybackControls({
   isPlaying, onPlay, onPause, onNext, onPrev, onReset,
   speed, onSpeedChange, disabled, onVisualize, isVisualizing, onOpenCombined,
   hasViewControls, isGraphView, zoom, onZoomChange, isFitToScreen, onToggleFit,
-  showPath, onTogglePath, showEdgeColors, onToggleEdgeColors
+  showPath, onTogglePath, showEdgeColors, onToggleEdgeColors,
+  estimatedRemainingTime
 }: PlaybackControlsProps) {
 
   const sliderValue = speedToSlider(speed);
@@ -93,6 +95,11 @@ export default function PlaybackControls({
           className="w-full h-1.5 bg-gray-700 rounded-lg appearance-none cursor-pointer accent-blue-500"
           disabled={disabled}
         />
+        {estimatedRemainingTime !== undefined && estimatedRemainingTime > 0 && (
+          <div className="absolute top-full mt-1 text-[9px] font-mono text-gray-500 whitespace-nowrap">
+            ~{(estimatedRemainingTime / 1000).toFixed(1)}s left
+          </div>
+        )}
       </div>
 
       {/* 3. View Controls */}

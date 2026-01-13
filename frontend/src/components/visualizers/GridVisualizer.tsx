@@ -19,7 +19,7 @@ export default function GridVisualizer({
   const containerRef = useRef<HTMLDivElement>(null);
   const [cellSize, setCellSize] = useState(24);
 
-  const gridData = step?.snapshot?.grid || initialData?.grid;
+  const gridData = (step?.snapshot as any)?.grid || initialData?.grid;
 
   useEffect(() => {
     if (!isFitToScreen || !containerRef.current || !gridData) return;
@@ -48,11 +48,11 @@ export default function GridVisualizer({
 
   const renderSize = isFitToScreen ? cellSize : (24 * zoom);
 
-  const startNode = step?.payload?.start || initialData?.start || { row: 0, col: 0 };
-  const endNode = step?.payload?.end || initialData?.end || { row: 0, col: 0 };
+  const startNode = (step?.payload as any)?.start || initialData?.start || { row: 0, col: 0 };
+  const endNode = (step?.payload as any)?.end || initialData?.end || { row: 0, col: 0 };
 
-  const visited = new Set(step?.snapshot?.visited?.map((n: number[]) => `${n[0]}-${n[1]}`) || []);
-  const path = new Set(step?.snapshot?.path?.map((n: number[]) => `${n[0]}-${n[1]}`) || []);
+  const visited = new Set((step?.snapshot as any)?.visited?.map((n: number[]) => `${n[0]}-${n[1]}`) || []);
+  const path = new Set((step?.snapshot as any)?.path?.map((n: number[]) => `${n[0]}-${n[1]}`) || []);
 
   const startId = `${startNode.row}-${startNode.col}`;
   const endId = `${endNode.row}-${endNode.col}`;

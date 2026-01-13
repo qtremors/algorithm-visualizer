@@ -18,35 +18,35 @@ export default function SortingVisualizer({ step, initialData }: SortingVisualiz
 
   // 3. Dynamic Bar Coloring Logic
   const getBarColor = (index: number): string => {
-    if (!step) return 'bg-sky-500'; 
+    if (!step) return 'bg-sky-500';
 
     const { type, payload } = step;
-    
+
     if (type === 'sorted') return 'bg-green-500';
-    
-    if (payload.indices && payload.indices.includes(index)) {
+
+    if (payload?.indices && payload.indices.includes(index)) {
       if (type === 'compare') return 'bg-yellow-500';
       if (type === 'swap') return 'bg-red-500';
     }
-    
+
     return 'bg-sky-500';
   };
 
   return (
     <div className="flex-grow flex items-end justify-center gap-[2px] w-full h-full p-4">
       {arrayState.map((value, index) => (
-        <div 
-          key={index} 
-          className="flex-grow flex flex-col items-center justify-end h-full" 
-          style={{ maxWidth: '80px' }} 
+        <div
+          key={index}
+          className="flex-grow flex flex-col items-center justify-end h-full"
+          style={{ maxWidth: '80px' }}
         >
-          <div 
+          <div
             className={cn("w-full rounded-t-md transition-colors duration-200", getBarColor(index))}
-            style={{ 
+            style={{
               // Use CSS percentage instead of pixel calculation
               height: `${(value / maxArrayValue) * 100}%`,
               minHeight: '2px'
-            }} 
+            }}
           ></div>
           {/* Hide numbers if array is too large to prevent clutter */}
           {arrayState.length <= 40 && (

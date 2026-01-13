@@ -83,6 +83,7 @@ export default function AlgorithmWorkspace() {
     prevStep,
     reset,
     setSpeed,
+    estimatedRemainingTime,
   } = usePlayback(steps as AlgorithmStep[]);
 
   // --- HANDLERS ---
@@ -338,6 +339,7 @@ export default function AlgorithmWorkspace() {
         <PlaybackControls
           isPlaying={isPlaying} onPlay={play} onPause={pause} onNext={nextStep} onPrev={prevStep} onReset={handleReset}
           speed={speed} onSpeedChange={setSpeed} disabled={isRunning || !steps || steps.length === 0} onVisualize={() => handleRun(null)} isVisualizing={isRunning} onOpenCombined={() => setIsCombinedModalOpen(true)}
+          estimatedRemainingTime={estimatedRemainingTime}
           hasViewControls={category === 'pathfinding'} isGraphView={viewMode === 'graph'}
           zoom={zoom} onZoomChange={setZoom} isFitToScreen={isFitToScreen} onToggleFit={() => setIsFitToScreen(!isFitToScreen)}
           showPath={showPath} onTogglePath={() => setShowPath(!showPath)} showEdgeColors={showEdgeColors} onToggleEdgeColors={() => setShowEdgeColors(!showEdgeColors)}

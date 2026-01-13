@@ -1,34 +1,12 @@
 # AlgoVisualizer - Tasks
 
 > **Project:** AlgoVisualizer  
-> **Version:** 1.1.2  
+> **Version:** 1.1.3  
 > **Last Updated:** January 13, 2026
 
 ---
 
-##  P2 - Medium Priority
-
-### Progress Indicator Missing
-**File:** `frontend/src/components/core/PlaybackControls.tsx`
-- [ ] Consider adding estimated time remaining
-
----
-
 ## 🟣 P3 - Code Quality
-
-### No Tests Configured
-**Issue:** No test framework set up for either frontend or backend
-- [ ] Add `pytest` to `backend/pyproject.toml` dependencies
-- [ ] Create `backend/tests/` directory with algorithm tests
-- [ ] Add `vitest` to `frontend/package.json` devDependencies
-- [ ] Create tests for `usePlayback` and `useAlgorithmRunner` hooks
-
-### Type Safety Gaps
-**File:** `frontend/src/types/index.ts`
-- [ ] `AlgorithmStep.payload` is `any` (line 32)
-- [ ] `AlgorithmStep.snapshot` is `any` (line 33)
-- [ ] Create typed interfaces: `SortingPayload`, `PathfindingPayload`, etc.
-- [ ] Create typed snapshots: `SortingSnapshot`, `GridSnapshot`, `GraphSnapshot`
 
 ### Component Props Using `any`
 - [ ] `GridVisualizer.tsx:7` - `initialData: any`
@@ -36,18 +14,9 @@
 - [ ] `FeatureItem` in `HomePage.tsx:148` - `icon: any`
 - [ ] Replace with proper TypeScript interfaces
 
-### Algorithm Auto-Discovery
-**File:** `backend/app/main.py:18-48`
-- [ ] Hardcoded `ALGORITHMS` dictionary requires manual updates
-- [ ] Implement decorator-based algorithm registration
-- [ ] Auto-discover algorithms from `algorithms/` directory
-
 ### Incomplete Project Config
 **File:** `backend/pyproject.toml:4`
-- [ ] Description is placeholder: `"Add your description here"`
 - [ ] Add project keywords, author, license
-- [ ] Fix version mismatch: `package.json` (0.0.0) vs `CHANGELOG.md` (1.1.1)
-- [ ] Synchronize `backend/pyproject.toml` version with `frontend/package.json`
 
 ---
 
@@ -58,7 +27,6 @@
 - [ ] Single large component handles too much state
 - [ ] Split into smaller components (Header, VisualizerPanel, ControlPanel)
 - [ ] Add `React.memo` to pure child components
-- [ ] Use `useMemo` for `algorithmMetadata` (already done ✓)
 
 ### Large Dataset Support
 **Issue:** No virtualization for large arrays/grids
@@ -87,7 +55,6 @@
 
 ### Missing Documentation Files
 - [ ] Create `CONTRIBUTING.md` with code style guidelines
-- [ ] Create `CHANGELOG.md` with version history
 - [ ] Create `ARCHITECTURE.md` with detailed system design
 - [ ] Add JSDoc comments to frontend hooks and core components
 - [ ] Add docstrings to all backend algorithms and helper methods

@@ -80,5 +80,6 @@ export const usePlayback = (steps: AlgorithmStep[]) => {
     prevStep,
     reset,
     setSpeed,
+    estimatedRemainingTime: Math.max(0, (steps.length - currentStepIndex - 1) * speed)
   };
 };
