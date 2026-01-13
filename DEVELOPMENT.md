@@ -2,7 +2,7 @@
 
 > Comprehensive documentation for developers working on AlgoVisualizer.
 
-**Version:** 1.1.1 | **Last Updated:** January 12, 2026
+**Version:** 1.1.5 | **Last Updated:** January 13, 2026
 
 ---
 

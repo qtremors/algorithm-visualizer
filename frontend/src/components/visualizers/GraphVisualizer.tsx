@@ -1,5 +1,6 @@
 import React, { useMemo } from 'react';
 import type { AlgorithmStep } from '../../types';
+import type { GraphInputData } from '../../types/input';
 import { cn } from '../../lib/utils';
 
 const EDGE_COLORS = [
@@ -12,7 +13,7 @@ const EDGE_COLORS = [
 
 type GraphVisualizerProps = {
   step: AlgorithmStep | null;
-  initialData: any;
+  initialData: GraphInputData | null;
   isInteracting?: boolean;
   onNodeClick?: (nodeId: string) => void;
   onNodeDragStart?: (nodeId: string, e: React.MouseEvent) => void;

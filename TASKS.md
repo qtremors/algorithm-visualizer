@@ -1,32 +1,15 @@
 # AlgoVisualizer - Tasks
 
 > **Project:** AlgoVisualizer  
-> **Version:** 1.1.4  
-> **Last Updated:** January 15, 2026 (Refactoring Complete)
-
----
-
-## 🟠 P2 - High Priority
-
-### Frontend Performance
-**File:** `frontend/src/components/visualizers/GridVisualizer.tsx`
-- [ ] **Excessive Re-rendering**: `visited` and `path` Sets are recreated on every render.
-- [ ] **Optimization**: Memoize derived state or move to Canvas-based rendering for larger grids.
-
-### Type Safety
-**Files:** `AlgorithmWorkspace.tsx`, `GridVisualizer.tsx`
-- [ ] `GridVisualizerProps.initialData` is `any`.
-- [ ] `AlgorithmWorkspace` uses `any` for `inputData`.
-- [ ] **Action**: Define strict discriminative unions for `InputData` (Array vs Grid vs Graph).
+> **Version:** 1.1.5  
+> **Last Updated:** January 13, 2026
 
 ---
 
 ## 🟣 P3 - Code Quality
-### Component Props Using `any`
-- [ ] `GridVisualizer.tsx:7` - `initialData: any`
-- [ ] `GraphVisualizerProps` - `initialData: any` 
-- [ ] `FeatureItem` in `HomePage.tsx:148` - `icon: any`
-- [ ] Replace with proper TypeScript interfaces
+- [ ] **Frontend**: Add virtualization for `LogPanel` to handle large history.
+- [ ] **Accessibility**: Add ARIA labels to playback controls.
+- [ ] **Testing**: Add backend tests for pathfinding algorithms.
 
 ---
 
@@ -45,21 +28,6 @@
 - [ ] Add `role="button"` where missing
 - [ ] Ensure focus indicators are visible
 - [ ] Add skip-to-content link
-
----
-
-## 📚 P5 - Documentation
-
-### README Issues
-**File:** `README.md`
-- [ ] Missing troubleshooting section
-- [ ] No WebSocket protocol/API documentation
-- [ ] No architecture diagram
-
-### Missing Documentation Files
-- [ ] Add JSDoc comments to frontend hooks and core components
-- [ ] Add docstrings to all backend algorithms and helper methods
-- [ ] Document internal `AlgorithmStep` message types and payload structures
 
 ---
 

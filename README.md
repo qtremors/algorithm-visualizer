@@ -121,7 +121,7 @@ algorithm-visualizer/
 
 | Document | Description |
 |----------|-------------|
-| [DEVELOPMENT.md](DEVELOPMENT.md) | Architecture, setup, API reference |
+| [DEVELOPMENT.md](DEVELOPMENT.md) | Architecture, API, Troubleshooting |
 | [CHANGELOG.md](CHANGELOG.md) | Version history and release notes |
 | [LICENSE.md](LICENSE.md) | License terms and attribution |
 | [TASKS.md](TASKS.md) | Project tasks and roadmap |

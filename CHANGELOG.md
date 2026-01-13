@@ -1,10 +1,15 @@
 # Changelog
 
 > **Project:** AlgoVisualizer  
-> **Version:** 1.1.3  
+> **Version:** 1.1.5
 > **Last Updated:** 2026-01-13
 
 ---
+
+## [1.1.5] - 2026-01-13
+### Changed
+- **Frontend**: Optimized `GridVisualizer` performance by memoizing `visited` and `path` sets to reduce re-renders.
+- **Frontend**: Enforced strict type safety for algorithm inputs (`GridInputData`, `GraphInputData`) across key components (`AlgorithmWorkspace`, `GridVisualizer`, `GraphVisualizer`), removing `any` types.
 
 ## [1.1.4] - 2026-01-13
 

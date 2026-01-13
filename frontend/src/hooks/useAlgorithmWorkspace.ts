@@ -4,6 +4,7 @@ import { useAlgorithms } from '../contexts/AlgorithmContext';
 import { useAlgorithmRunner } from './useAlgorithmRunner';
 import { usePlayback } from './usePlayback';
 import type { AlgorithmStep } from '../types';
+import type { InputData, GraphInputData } from '../types/input';
 
 export function useAlgorithmWorkspace() {
     const { category } = useParams<{ category: string }>();
@@ -18,7 +19,7 @@ export function useAlgorithmWorkspace() {
 
     // --- STATE ---
     const [selectedAlgoName, setSelectedAlgoName] = useState<string>('');
-    const [inputData, setInputData] = useState<any>(null);
+    const [inputData, setInputData] = useState<InputData | null>(null);
 
     const [visualizationMode, setVisualizationMode] = useState<string>('wall');
     const [viewMode, setViewMode] = useState<'grid' | 'graph'>('grid');
@@ -113,7 +114,8 @@ export function useAlgorithmWorkspace() {
 
     // Graph Interactions
     const handleWeightChange = (sourceId: string, targetId: string, currentWeight: number) => {
-        const newData = structuredClone(inputData);
+        if (!inputData || !('adjacency' in inputData)) return;
+        const newData = structuredClone(inputData) as GraphInputData;
         if (graphTool === 'delete') {
             if (newData.adjacency[sourceId]) delete newData.adjacency[sourceId][targetId];
             if (newData.adjacency[targetId]) delete newData.adjacency[targetId][sourceId];
@@ -132,8 +134,8 @@ export function useAlgorithmWorkspace() {
     };
 
     const handleGraphInteraction = (action: string, payload: any) => {
-        if (!inputData) return;
-        const newData = structuredClone(inputData);
+        if (!inputData || !('nodes' in inputData)) return;
+        const newData = structuredClone(inputData) as GraphInputData;
 
         if (action === 'addNode' && graphTool === 'node') {
             const existingIds = Object.keys(newData.nodes).map(id => parseInt(id, 10)).filter(id => !isNaN(id));
@@ -149,8 +151,8 @@ export function useAlgorithmWorkspace() {
                 delete newData.nodes[nodeId];
                 delete newData.adjacency[nodeId];
                 Object.keys(newData.adjacency).forEach(key => { if (newData.adjacency[key][nodeId]) delete newData.adjacency[key][nodeId]; });
-                if (newData.start === nodeId) newData.start = null;
-                if (newData.end === nodeId) newData.end = null;
+                if (newData.start === nodeId) newData.start = undefined;
+                if (newData.end === nodeId) newData.end = undefined;
                 handleInputUpdate(newData);
             } else if (graphTool === 'start') {
                 newData.start = nodeId; handleInputUpdate(newData);
@@ -161,8 +163,8 @@ export function useAlgorithmWorkspace() {
         else if (action === 'connectStart' && graphTool === 'edge') {
             setDraggedNode(payload.nodeId);
         }
-        else if (action === 'connectMove' && graphTool === 'edge' && draggedNode && inputData.nodes[draggedNode]) {
-            const startNode = inputData.nodes[draggedNode];
+        else if (action === 'connectMove' && graphTool === 'edge' && draggedNode && (inputData as GraphInputData).nodes[draggedNode]) {
+            const startNode = (inputData as GraphInputData).nodes[draggedNode];
             setTempLine({ start: { x: startNode.x, y: startNode.y }, end: { x: payload.x, y: payload.y } });
         }
         else if (action === 'connectEnd' && graphTool === 'edge' && draggedNode && payload.nodeId) {

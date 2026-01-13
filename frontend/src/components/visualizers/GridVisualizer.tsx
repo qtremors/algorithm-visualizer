@@ -1,10 +1,11 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useMemo } from 'react';
 import type { AlgorithmStep } from '../../types';
+import type { GridInputData } from '../../types/input';
 import { cn } from '../../lib/utils';
 
 type GridVisualizerProps = {
   step: AlgorithmStep | null;
-  initialData: any;
+  initialData: GridInputData | null;
   mode?: string;
   onUpdate?: (newData: any) => void;
   isInteracting?: boolean;
@@ -20,6 +21,9 @@ export default function GridVisualizer({
   const [cellSize, setCellSize] = useState(24);
 
   const gridData = (step?.snapshot as any)?.grid || initialData?.grid;
+
+  const visited = useMemo(() => new Set((step?.snapshot as any)?.visited?.map((n: number[]) => `${n[0]}-${n[1]}`) || []), [step?.snapshot]);
+  const path = useMemo(() => new Set((step?.snapshot as any)?.path?.map((n: number[]) => `${n[0]}-${n[1]}`) || []), [step?.snapshot]);
 
   useEffect(() => {
     if (!isFitToScreen || !containerRef.current || !gridData) return;
@@ -51,8 +55,7 @@ export default function GridVisualizer({
   const startNode = (step?.payload as any)?.start || initialData?.start || { row: 0, col: 0 };
   const endNode = (step?.payload as any)?.end || initialData?.end || { row: 0, col: 0 };
 
-  const visited = new Set((step?.snapshot as any)?.visited?.map((n: number[]) => `${n[0]}-${n[1]}`) || []);
-  const path = new Set((step?.snapshot as any)?.path?.map((n: number[]) => `${n[0]}-${n[1]}`) || []);
+
 
   const startId = `${startNode.row}-${startNode.col}`;
   const endId = `${endNode.row}-${endNode.col}`;
