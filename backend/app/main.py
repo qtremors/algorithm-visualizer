@@ -1,5 +1,6 @@
 import importlib
 import json
+import os
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 from typing import Dict, Any
@@ -7,9 +8,13 @@ from typing import Dict, Any
 app = FastAPI()
 
 # --- CORS Middleware ---
+# Get origins from environment variable or default to wildcard (for dev)
+allowed_origins_env = os.getenv("ALLOWED_ORIGINS", "*")
+allow_origins = allowed_origins_env.split(",") if allowed_origins_env != "*" else ["*"]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"], # In production, restrict this to your frontend's domain
+    allow_origins=allow_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

@@ -1,10 +1,28 @@
 # Changelog
 
 > **Project:** AlgoVisualizer  
-> **Version:** 1.1.1  
-> **Last Updated:** 2026-01-12
+> **Version:** 1.1.2  
+> **Last Updated:** 2026-01-13
 
 ---
+
+## [1.1.2] - 2026-01-13
+
+### Fixed
+- **P0 Critical**: Fixed WebSocket memory leaks with proper cleanup in `useAlgorithmRunner`.
+- **P0 Critical**: Resolved backend silent failures by raising explicit `ValueError` for invalid inputs.
+- **P1 High**: Implemented numeric node IDs in Graph View, removing the 26-node limit and fixing ID collisions.
+- **P1 High**: Fixed broken pathfinding imports in backend by switching to absolute module paths.
+- **P2 Medium**: Replaced inefficient `JSON.parse(JSON.stringify())` with native `structuredClone()`.
+
+### Added
+- **P0 Critical**: Global `ErrorBoundary` to prevent application crashes.
+- **P1 High**: Robust input validation for all pathfinding algorithms.
+- **P1 High**: Configurable CORS security via environment variables.
+- **P2 Medium**: `BasePathfindingAlgorithm` class to consolidate shared logic and reduce duplication.
+- **P2 Medium**: Keyboard shortcuts for playback (Space, Arrows, R, Esc).
+- **P2 Medium**: Mobile warning overlay for desktop-optimized experience.
+- **P2 Medium**: Step progress indicator ("Step X of Y") in the status log.
 
 ## [1.1.1] - 2025-12-18
 

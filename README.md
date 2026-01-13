@@ -67,6 +67,7 @@ cd algorithm-visualizer
 
 # Start Backend (Terminal 1)
 cd backend
+uv sync
 uv run uvicorn app.main:app --reload
 
 # Start Frontend (Terminal 2)

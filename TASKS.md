@@ -1,109 +1,16 @@
 # AlgoVisualizer - Tasks
 
 > **Project:** AlgoVisualizer  
-> **Version:** 1.1.1  
-> **Last Updated:** January 12, 2026
+> **Version:** 1.1.2  
+> **Last Updated:** January 13, 2026
 
 ---
 
-## 🔴 P0 - Critical (Fix Immediately)
-
-### WebSocket Memory Leak
-**File:** `frontend/src/hooks/useAlgorithmRunner.ts`
-- [ ] Store WebSocket reference in `useRef` to persist across renders
-- [ ] Add cleanup function to close WebSocket on component unmount
-- [ ] Implement `AbortController` pattern for proper cleanup
-- [ ] Handle case where component unmounts while WebSocket is connecting
-
-### Missing Error Boundary
-**File:** `frontend/src/pages/AlgorithmWorkspace.tsx`
-- [ ] Create `ErrorBoundary` component wrapping `AlgorithmWorkspace`
-- [ ] Add fallback UI with "Reset" functionality
-- [ ] Log errors to console/monitoring service
-
-### Backend Silent Failures
-**Files:** `backend/app/algorithms/pathfinding/*.py`
-- [ ] `dijkstra.py:105-106` - Silent `return` on invalid input; should yield error step
-- [ ] `bfs.py:72-73` - Silent `return` on invalid input; should yield error step  
-- [ ] `dfs.py:66-67` - Silent `return` on invalid input; should yield error step
-- [ ] Return meaningful error messages for invalid input (empty grid, missing start/end)
-
----
-
-## 🟠 P1 - High Priority
-
-### Dead Code: useGraphEditor Hook
-**File:** `frontend/src/hooks/useGraphEditor.ts`
-- [ ] Hook is unused - all logic duplicated in `AlgorithmWorkspace.tsx` (lines 95-193)
-- [ ] Either delete the hook or refactor workspace to use it
-- [ ] `useGraphEditor.ts` lacks delete node/edge functionality that workspace has
-
-### Input Validation Inconsistency
-**Issue:** Sorting algorithms validate input, pathfinding algorithms don't
-- [ ] `bubble_sort.py:44-46` - Has proper validation ✓
-- [ ] `insertion_sort.py:42-44` - Has proper validation ✓
-- [ ] `dijkstra.py:34` - Missing validation (only calls `super().__init__`)
-- [ ] `bfs.py:33-50` - Missing validation
-- [ ] `dfs.py:26-43` - Missing validation
-- [ ] Standardize error messages across all algorithms
-
-### CORS Security
-**File:** `backend/app/main.py:11-16`
-- [ ] Currently allows all origins: `allow_origins=["*"]`
-- [ ] Create environment variable for allowed origins
-- [ ] Restrict CORS in production deployment
-- [ ] Document CORS configuration in README
-
-### Graph Node ID Limitation
-**Files:** `AlgorithmWorkspace.tsx:125`, `useGraphEditor.ts:30`
-- [ ] Node IDs limited to A-Z (26 nodes max): `String.fromCharCode(65 + length)`
-- [ ] Implement UUID-based or numeric node IDs
-- [ ] Handle node deletion/recreation properly (IDs don't recycle)
-
----
-
-## 🟡 P2 - Medium Priority
-
-### Duplicated Deep Clone Pattern
-**Issue:** Using inefficient `JSON.parse(JSON.stringify())` throughout
-- [ ] `AlgorithmWorkspace.tsx:96, 121` - Object cloning
-- [ ] `GridVisualizer.tsx:62` - Grid state cloning  
-- [ ] `useGraphEditor.ts:14, 26` - Graph data cloning
-- [ ] Replace with `structuredClone()` or `immer` library
-
-### Duplicated Pathfinding Code
-**Issue:** `get_neighbors()` and `get_snapshot()` duplicated across algorithms
-- [ ] `dijkstra.py:60-86, 88-101` - Base implementation
-- [ ] `bfs.py:52-64, 66-69` - Nearly identical
-- [ ] `dfs.py:45-58, 60-63` - Nearly identical
-- [ ] Extract to `BasePathfindingAlgorithm` class
-
-### Missing Keyboard Shortcuts
-**File:** `frontend/src/pages/AlgorithmWorkspace.tsx`
-- [ ] Add `Space` for Play/Pause toggle
-- [ ] Add `←/→` for Prev/Next step
-- [ ] Add `R` for Reset
-- [ ] Add `Escape` to close modals
-- [ ] Add keyboard shortcut help tooltip
-
-### Mobile Warning
-**File:** `frontend/src/pages/AlgorithmWorkspace.tsx` or `Layout.tsx`
-- [ ] README mentions "desktop only" but app doesn't warn mobile users
-- [ ] Detect mobile viewport on load
-- [ ] Show modal/banner warning on mobile devices
+##  P2 - Medium Priority
 
 ### Progress Indicator Missing
 **File:** `frontend/src/components/core/PlaybackControls.tsx`
-- [ ] No step counter visible (`Step X of Y`)
-- [ ] No progress bar for visualization
 - [ ] Consider adding estimated time remaining
-
-### Pseudocode Line Number Mismatch
-**Issue:** Some algorithm `line` references may not match pseudocode indices (0-indexed vs 1-indexed)
-- [ ] Audit `bubble_sort.py` line references against pseudocode
-- [ ] Audit `insertion_sort.py` line references
-- [ ] Audit `dijkstra.py` line references
-- [ ] Audit `bfs.py` / `dfs.py` line references
 
 ---
 
@@ -139,6 +46,8 @@
 **File:** `backend/pyproject.toml:4`
 - [ ] Description is placeholder: `"Add your description here"`
 - [ ] Add project keywords, author, license
+- [ ] Fix version mismatch: `package.json` (0.0.0) vs `CHANGELOG.md` (1.1.1)
+- [ ] Synchronize `backend/pyproject.toml` version with `frontend/package.json`
 
 ---
 
@@ -180,8 +89,9 @@
 - [ ] Create `CONTRIBUTING.md` with code style guidelines
 - [ ] Create `CHANGELOG.md` with version history
 - [ ] Create `ARCHITECTURE.md` with detailed system design
-- [ ] Add JSDoc comments to frontend hooks
-- [ ] Add docstrings to backend algorithms
+- [ ] Add JSDoc comments to frontend hooks and core components
+- [ ] Add docstrings to all backend algorithms and helper methods
+- [ ] Document internal `AlgorithmStep` message types and payload structures
 
 ---
 
