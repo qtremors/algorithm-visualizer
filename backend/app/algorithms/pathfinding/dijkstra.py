@@ -1,7 +1,9 @@
 from typing import Dict, Any, Generator, List, Tuple
 import heapq
 from app.algorithms.pathfinding.base_pathfinding import BasePathfindingAlgorithm
+from app.registry import registry
 
+@registry.register("pathfinding", "dijkstra")
 class Dijkstra(BasePathfindingAlgorithm):
     metadata = {
         "name": "Dijkstra's Algorithm",

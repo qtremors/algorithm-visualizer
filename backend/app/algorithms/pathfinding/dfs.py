@@ -1,6 +1,8 @@
 from typing import Dict, Any, Generator, List
 from app.algorithms.pathfinding.base_pathfinding import BasePathfindingAlgorithm
+from app.registry import registry
 
+@registry.register("pathfinding", "dfs")
 class DFS(BasePathfindingAlgorithm):
     metadata = {
         "name": "Depth-First Search (DFS)",

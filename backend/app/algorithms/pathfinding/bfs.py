@@ -1,7 +1,9 @@
 from typing import Dict, Any, Generator, List
 from collections import deque
 from app.algorithms.pathfinding.base_pathfinding import BasePathfindingAlgorithm
+from app.registry import registry
 
+@registry.register("pathfinding", "bfs")
 class BFS(BasePathfindingAlgorithm):
     metadata = {
         "name": "Breadth-First Search (BFS)",

@@ -1,6 +1,8 @@
 from typing import List, Dict, Any, Generator
-from ...base_algorithm import BaseAlgorithm
+from app.base_algorithm import BaseAlgorithm
+from app.registry import registry
 
+@registry.register("sorting", "bubble_sort")
 class BubbleSort(BaseAlgorithm):
     """
     Implements the Bubble Sort algorithm for visualization.

@@ -1,6 +1,8 @@
 from typing import List, Dict, Any, Generator
-from ...base_algorithm import BaseAlgorithm
+from app.base_algorithm import BaseAlgorithm
+from app.registry import registry
 
+@registry.register("sorting", "insertion_sort")
 class InsertionSort(BaseAlgorithm):
     """
     Implements Insertion Sort.
