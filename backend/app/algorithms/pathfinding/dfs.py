@@ -1,7 +1,9 @@
 from typing import Dict, Any, Generator, List
-from ...base_algorithm import BaseAlgorithm
+from app.algorithms.pathfinding.base_pathfinding import BasePathfindingAlgorithm
+from app.registry import registry
 
-class DFS(BaseAlgorithm):
+@registry.register("pathfinding", "dfs")
+class DFS(BasePathfindingAlgorithm):
     metadata = {
         "name": "Depth-First Search (DFS)",
         "pseudocode": [
@@ -23,49 +25,8 @@ class DFS(BaseAlgorithm):
         "cons": ["Does not guarantee shortest path.", "Can get lost in deep paths."]
     }
 
-    def __init__(self, data: Any):
-        super().__init__(data)
-        self.mode = "grid"
-        if "adjacency" in data:
-            self.mode = "graph"
-            self.adjacency = data["adjacency"]
-            self.start = data["start"]
-            self.end = data["end"]
-        else:
-            self.mode = "grid"
-            if data and "grid" in data:
-                self.grid = data["grid"]
-                self.start = (data["start"]["row"], data["start"]["col"])
-                self.end = (data["end"]["row"], data["end"]["col"])
-                self.rows = len(self.grid)
-                self.cols = len(self.grid[0]) if self.rows > 0 else 0
-            else:
-                self.grid = []
-
-    def get_neighbors(self, node) -> List[Any]:
-        neighbors = []
-        if self.mode == "graph":
-            if node in self.adjacency:
-                neighbors = list(self.adjacency[node].keys())
-        else:
-            r, c = node
-            # Order: Up, Left, Down, Right (Stack reverses visual order)
-            for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
-                nr, nc = r + dr, c + dc
-                if 0 <= nr < self.rows and 0 <= nc < self.cols:
-                    if self.grid[nr][nc] != 1:
-                        neighbors.append((nr, nc))
-        return neighbors
-
-    def get_snapshot(self, processed, path):
-        if self.mode == "graph":
-            return { "type": "graph", "visited": list(processed), "path": list(path) }
-        return { "type": "grid", "visited": list(processed), "path": list(path), "grid": self.grid }
-
     def run(self) -> Generator[Dict[str, Any], None, None]:
-        if self.mode == "grid" and not self.grid: return
-        if self.mode == "graph" and not self.adjacency: return
-
+        # Validation handled by base class
         stack = [self.start]
         visited = set()
         processed = set()
@@ -91,7 +52,7 @@ class DFS(BaseAlgorithm):
                 yield { "type": "found_path", "payload": {"path": path}, "snapshot": self.get_snapshot(processed, path), "message": "Target found!", "line": 3 }
                 return
 
-            for neighbor in self.get_neighbors(curr):
+            for neighbor, _ in self.get_neighbors(curr):
                 if neighbor not in processed and neighbor not in visited:
                     visited.add(neighbor)
                     came_from[neighbor] = curr

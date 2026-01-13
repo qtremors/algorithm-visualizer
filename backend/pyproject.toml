@@ -1,11 +1,22 @@
 [project]
 name = "backend"
-version = "0.1.0"
-description = "Add your description here"
+version = "1.1.5"
+description = "High-performance algorithm visualizer with real-time streaming."
 readme = "README.md"
 requires-python = ">=3.11"
+authors = [
+    { name = "Tremors", email = "hello@tremors.dev" }
+]
+license = { text = "TSL" }
+keywords = ["algorithm", "visualization", "fastapi", "react", "sorting", "pathfinding"]
 dependencies = [
     "fastapi>=0.121.2",
     "uvicorn[standard]>=0.38.0",
     "websockets>=15.0.1",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.0.0",
+    "pytest-asyncio>=0.23.0",
 ]

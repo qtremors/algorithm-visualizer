@@ -1,87 +1,48 @@
 from typing import Dict, Any, Generator, List
-from ...base_algorithm import BaseAlgorithm
 from collections import deque
+from app.algorithms.pathfinding.base_pathfinding import BasePathfindingAlgorithm
+from app.registry import registry
 
-class BFS(BaseAlgorithm):
+@registry.register("pathfinding", "bfs")
+class BFS(BasePathfindingAlgorithm):
     metadata = {
         "name": "Breadth-First Search (BFS)",
         "pseudocode": [
-            "procedure BFS(G, start_node)",
+            "procedure BFS(G, start_v)",
             "  let Q be a queue",
-            "  Q.enqueue(start_node)",
-            "  mark start_node as visited",
-            "  while Q is not empty do",
-            "    v = Q.dequeue()",
-            "    if v is the goal then return v",
-            "    for all neighbors w of v do",
-            "      if w is not visited then",
+            "  label start_v as visited",
+            "  Q.enqueue(start_v)",
+            "  while Q is not empty",
+            "    v := Q.dequeue()",
+            "    if v is goal then return v",
+            "    for all edges from v to w in G.adjacentEdges(v) do",
+            "      if w is not labeled as visited then",
+            "        label w as visited",
             "        Q.enqueue(w)",
-            "        mark w as visited",
             "      end if",
-            "    end for",
             "  end while",
             "end procedure"
         ],
         "input_type": "graph_grid",
         "visualizer": "grid_2d",
-        "description": "BFS explores layer by layer. Great for unweighted grids or social network connections.",
+        "description": "BFS explores all neighbor nodes at the present depth before moving to the next level.",
         "complexity": { "time": "O(V + E)", "space": "O(V)" },
-        "pros": ["Guarantees shortest path in unweighted graphs.", "Complete."],
-        "cons": ["Does not consider edge weights.", "High memory usage on large graphs."]
+        "pros": ["Guarantees shortest path on unweighted graphs.", "Simple to implement."],
+        "cons": ["High memory usage (stores all nodes at depth).", "Doesn't work for weighted graphs."]
     }
 
-    def __init__(self, data: Any):
-        super().__init__(data)
-        self.mode = "grid"
-        if "adjacency" in data:
-            self.mode = "graph"
-            self.adjacency = data["adjacency"]
-            self.start = data["start"]
-            self.end = data["end"]
-        else:
-            self.mode = "grid"
-            if data and "grid" in data:
-                self.grid = data["grid"]
-                self.start = (data["start"]["row"], data["start"]["col"])
-                self.end = (data["end"]["row"], data["end"]["col"])
-                self.rows = len(self.grid)
-                self.cols = len(self.grid[0]) if self.rows > 0 else 0
-            else:
-                self.grid = []
-
-    def get_neighbors(self, node) -> List[Any]:
-        neighbors = []
-        if self.mode == "graph":
-            if node in self.adjacency:
-                neighbors = list(self.adjacency[node].keys())
-        else:
-            r, c = node
-            for dr, dc in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
-                nr, nc = r + dr, c + dc
-                if 0 <= nr < self.rows and 0 <= nc < self.cols:
-                    if self.grid[nr][nc] != 1: # 1 is Wall
-                        neighbors.append((nr, nc))
-        return neighbors
-
-    def get_snapshot(self, visited, path):
-        if self.mode == "graph":
-            return { "type": "graph", "visited": list(visited), "path": list(path) }
-        return { "type": "grid", "visited": list(visited), "path": list(path), "grid": self.grid }
-
     def run(self) -> Generator[Dict[str, Any], None, None]:
-        if self.mode == "grid" and not self.grid: return
-        if self.mode == "graph" and not self.adjacency: return
-
+        # Validation handled by base class
         queue = deque([self.start])
         visited = {self.start}
-        came_from = {} 
+        came_from = {}
         
-        yield { "type": "info", "payload": {}, "snapshot": self.get_snapshot(visited, []), "message": "Starting BFS...", "line": 2 }
+        yield { "type": "info", "payload": {}, "snapshot": self.get_snapshot(visited, []), "message": "Starting BFS...", "line": 1 }
 
         while queue:
             curr = queue.popleft()
             
-            yield { "type": "visit_node", "payload": {"node": curr}, "snapshot": self.get_snapshot(visited, []), "message": f"Visiting {curr}", "line": 6 }
+            yield { "type": "visit_node", "payload": {"node": curr}, "snapshot": self.get_snapshot(visited, []), "message": f"Processing {curr}", "line": 6 }
 
             if curr == self.end:
                 path = []
@@ -94,11 +55,11 @@ class BFS(BaseAlgorithm):
                 yield { "type": "found_path", "payload": {"path": path}, "snapshot": self.get_snapshot(visited, path), "message": "Target found!", "line": 7 }
                 return
 
-            for neighbor in self.get_neighbors(curr):
+            for neighbor, _ in self.get_neighbors(curr):
                 if neighbor not in visited:
                     visited.add(neighbor)
                     came_from[neighbor] = curr
                     queue.append(neighbor)
-                    yield { "type": "visit_node", "payload": {"node": neighbor}, "snapshot": self.get_snapshot(visited, []), "message": f"Queuing {neighbor}", "line": 10 }
+                    yield { "type": "visit_node", "payload": {"node": neighbor}, "snapshot": self.get_snapshot(visited, []), "message": f"Enqueuing {neighbor}", "line": 11 }
 
         yield { "type": "info", "payload": {}, "snapshot": self.get_snapshot(visited, []), "message": "No path found.", "line": 14 }

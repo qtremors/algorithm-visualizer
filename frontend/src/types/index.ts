@@ -25,12 +25,49 @@ export interface AlgorithmsData {
 }
 
 /**
+ * Specific payloads for different algorithm categories
+ */
+export interface SortingPayload {
+  comparision?: [number, number]; // legacy support if needed
+  comparing?: [number, number];
+  swapped?: boolean;
+  indices?: number[];
+}
+
+export interface PathfindingPayload {
+  current?: [number, number] | string;
+  neighbors?: ([number, number] | string)[];
+  weight?: number;
+  start?: { row: number, col: number };
+  end?: { row: number, col: number };
+  node?: string;
+  indices?: number[]; // For generic handling
+}
+
+/**
+ * Snapshots for different visualizers
+ */
+export type SortingSnapshot = number[];
+
+export interface GridSnapshot {
+  grid: number[][];
+  visited: [number, number][];
+  path: [number, number][];
+}
+
+export interface GraphSnapshot {
+  visited: string[];
+  path: string[];
+  type?: 'graph';
+}
+
+/**
  * A single, generic step from the WebSocket
  */
 export interface AlgorithmStep {
   type: string;
-  payload: any;
-  snapshot: any;
+  payload: SortingPayload | PathfindingPayload | null;
+  snapshot: SortingSnapshot | GridSnapshot | GraphSnapshot;
   message: string;
   line: number;
 }

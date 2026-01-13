@@ -1,6 +1,8 @@
 from typing import List, Dict, Any, Generator
-from ...base_algorithm import BaseAlgorithm
+from app.base_algorithm import BaseAlgorithm
+from app.registry import registry
 
+@registry.register("sorting", "bubble_sort")
 class BubbleSort(BaseAlgorithm):
     """
     Implements the Bubble Sort algorithm for visualization.
@@ -52,31 +54,31 @@ class BubbleSort(BaseAlgorithm):
         limit = n
         
         yield {
-            "type": "info", "payload": {}, "snapshot": self.data.copy(),
+            "type": "info", "payload": {}, "snapshot": self.data,
             "message": "Starting Bubble Sort...", "line": 1
         }
         
         while swapped:
             swapped = False
             yield {
-                "type": "info", "payload": {"indices": list(range(limit))}, "snapshot": self.data.copy(),
+                "type": "info", "payload": {"indices": list(range(limit))}, "snapshot": self.data,
                 "message": "Starting new pass...", "line": 3
             }
             for i in range(1, limit):
                 yield {
-                    "type": "compare", "payload": {"indices": [i - 1, i]}, "snapshot": self.data.copy(),
+                    "type": "compare", "payload": {"indices": [i - 1, i]}, "snapshot": self.data,
                     "message": f"Comparing {self.data[i-1]} and {self.data[i]}", "line": 6
                 }
                 if self.data[i - 1] > self.data[i]:
                     self.data[i - 1], self.data[i] = self.data[i], self.data[i - 1]
                     swapped = True
                     yield {
-                        "type": "swap", "payload": {"indices": [i - 1, i]}, "snapshot": self.data.copy(),
+                        "type": "swap", "payload": {"indices": [i - 1, i]}, "snapshot": self.data,
                         "message": f"Swapping {self.data[i]} and {self.data[i-1]}", "line": 7
                     }
             limit -= 1
         
         yield {
-            "type": "sorted", "payload": {"indices": list(range(len(self.data)))}, "snapshot": self.data.copy(),
+            "type": "sorted", "payload": {"indices": list(range(len(self.data)))}, "snapshot": self.data,
             "message": "Array is fully sorted!", "line": 13
         }

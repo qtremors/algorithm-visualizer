@@ -1,6 +1,8 @@
 from typing import List, Dict, Any, Generator
-from ...base_algorithm import BaseAlgorithm
+from app.base_algorithm import BaseAlgorithm
+from app.registry import registry
 
+@registry.register("sorting", "selection_sort")
 class SelectionSort(BaseAlgorithm):
     """
     Implements the Selection Sort algorithm for visualization.
@@ -49,36 +51,36 @@ class SelectionSort(BaseAlgorithm):
         n = len(self.data)
         
         yield {
-            "type": "info", "payload": {}, "snapshot": self.data.copy(),
+            "type": "info", "payload": {}, "snapshot": self.data,
             "message": "Starting Selection Sort...", "line": 1
         }
 
         for i in range(n):
             min_idx = i
             yield {
-                "type": "info", "payload": {"indices": [i]}, "snapshot": self.data.copy(),
+                "type": "info", "payload": {"indices": [i]}, "snapshot": self.data,
                 "message": f"Pass {i+1}: Finding minimum for rest of array.", "line": 3
             }
             
             for j in range(i + 1, n):
                 yield {
-                    "type": "compare", "payload": {"indices": [j, min_idx]}, "snapshot": self.data.copy(),
+                    "type": "compare", "payload": {"indices": [j, min_idx]}, "snapshot": self.data,
                     "message": f"Comparing {self.data[j]} and {self.data[min_idx]}", "line": 6
                 }
                 if self.data[j] < self.data[min_idx]:
                     min_idx = j
                     yield {
-                        "type": "info", "payload": {"indices": [min_idx]}, "snapshot": self.data.copy(),
+                        "type": "info", "payload": {"indices": [min_idx]}, "snapshot": self.data,
                         "message": f"New minimum found: {self.data[min_idx]}", "line": 7
                     }
 
             self.data[i], self.data[min_idx] = self.data[min_idx], self.data[i]
             yield {
-                "type": "swap", "payload": {"indices": [i, min_idx]}, "snapshot": self.data.copy(),
+                "type": "swap", "payload": {"indices": [i, min_idx]}, "snapshot": self.data,
                 "message": f"Swapping {self.data[min_idx]} with {self.data[i]}", "line": 10
             }
 
         yield {
-            "type": "sorted", "payload": {"indices": list(range(n))}, "snapshot": self.data.copy(),
+            "type": "sorted", "payload": {"indices": list(range(n))}, "snapshot": self.data,
             "message": "Array is fully sorted!", "line": 12
         }

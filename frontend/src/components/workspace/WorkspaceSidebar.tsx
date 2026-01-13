@@ -31,24 +31,25 @@ export default function WorkspaceSidebar({
     <div className="w-full lg:w-96 flex-shrink-0 flex flex-col gap-4 h-full">
       {/* Pseudocode Panel */}
       <div className="bg-gray-800 p-4 rounded-xl border border-gray-700 shadow-lg flex-1 flex flex-col min-h-0 overflow-hidden">
-        <Pseudocode 
-            code={algorithmMetadata?.pseudocode || []} 
-            highlightedLine={currentStep?.line || 0} 
+        <Pseudocode
+          code={algorithmMetadata?.pseudocode || []}
+          highlightedLine={currentStep?.line || 0}
         />
       </div>
-      
+
       {/* Status Log Panel */}
       <div className="bg-gray-800 p-4 rounded-xl border border-gray-700 shadow-lg h-auto flex-shrink-0 flex flex-col">
-         <StatusLog 
-            currentMessage={currentStep?.message || (isRunning ? 'Running...' : 'Ready.')} 
-            steps={steps} 
-            error={error} 
-            isRunning={isRunning} 
-            isFinished={!isPlaying && currentStepIndex === (steps?.length || 0) - 1} 
-            category={category || ''} 
-            resetKey={resetKey}
-            logHistory={logHistory}
-         />
+        <StatusLog
+          currentMessage={currentStep?.message || (isRunning ? 'Running...' : 'Ready.')}
+          steps={steps}
+          currentStepIndex={currentStepIndex}
+          error={error}
+          isRunning={isRunning}
+          isFinished={!isPlaying && currentStepIndex === (steps?.length || 0) - 1}
+          category={category || ''}
+          resetKey={resetKey}
+          logHistory={logHistory}
+        />
       </div>
     </div>
   );
