@@ -54,8 +54,6 @@
 - [ ] No architecture diagram
 
 ### Missing Documentation Files
-- [ ] Create `CONTRIBUTING.md` with code style guidelines
-- [ ] Create `ARCHITECTURE.md` with detailed system design
 - [ ] Add JSDoc comments to frontend hooks and core components
 - [ ] Add docstrings to all backend algorithms and helper methods
 - [ ] Document internal `AlgorithmStep` message types and payload structures

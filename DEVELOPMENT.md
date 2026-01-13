@@ -286,7 +286,7 @@ npm test
 pip install -r requirements.txt
 
 # Start command
-uvicorn app.main:app --host 0.0.0.0 --port $PORT
+uvicorn app.main:api --host 0.0.0.0 --port $PORT
 ```
 
 ### Frontend (Vercel, Netlify, etc.)
@@ -324,7 +324,7 @@ dist/
 Enable FastAPI debug output:
 
 ```bash
-uv run uvicorn app.main:app --reload --log-level debug
+uv run uvicorn app.main:api --reload --log-level debug
 ```
 
 ---
