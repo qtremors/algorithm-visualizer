@@ -1,10 +1,14 @@
 # AlgoVisualizer Changelog
 
 > **Project:** AlgoVisualizer
-> **Version:** 0.0.8
-> **Last Updated:** 2026-01-12
+> **Version:** 0.0.9
+> **Last Updated:** 2026-01-13
 
 ---
+
+## [0.0.9] - 2026-01-13
+
+- **Add Browser Regressions And Error Boundaries**: Add browser regression scenarios, backend WebSocket tests, browser test configuration, and frontend error boundaries.
 
 ## [0.0.8] - 2026-01-12
 
