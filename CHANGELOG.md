@@ -6,6 +6,15 @@
 
 ---
 
+## [1.1.4] - 2026-01-13
+
+### Changed
+- **P1 Performance**: Optimized `Bubble Sort`, `Selection Sort`, and `Insertion Sort` by removing O(N) snapshot copying in every step. This drastically improves performance for large datasets and reduces memory pressure.
+- **P1 Architecture**: Refactored `AlgorithmWorkspace` God Component into a modular structure:
+    - Extracted state logic to `useAlgorithmWorkspace` hook.
+    - Split UI into `WorkspaceHeader` and `VisualizerPanel`.
+- **Backend Testing**: Validated sorting algorithms with `pytest`.
+
 ## [1.1.3] - 2026-01-13
 
 ### Added

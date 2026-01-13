@@ -49,20 +49,20 @@ class InsertionSort(BaseAlgorithm):
     def run(self) -> Generator[Dict[str, Any], None, None]:
         n = len(self.data)
         
-        yield { "type": "info", "payload": {}, "snapshot": self.data.copy(), "message": "Starting Insertion Sort...", "line": 1 }
+        yield { "type": "info", "payload": {}, "snapshot": self.data, "message": "Starting Insertion Sort...", "line": 1 }
 
         for i in range(1, n):
             j = i
-            yield { "type": "info", "payload": {"indices": [i]}, "snapshot": self.data.copy(), "message": f"Processing index {i}", "line": 3 }
+            yield { "type": "info", "payload": {"indices": [i]}, "snapshot": self.data, "message": f"Processing index {i}", "line": 3 }
 
             while j > 0:
-                yield { "type": "compare", "payload": {"indices": [j-1, j]}, "snapshot": self.data.copy(), "message": f"Comparing {self.data[j]} with {self.data[j-1]}", "line": 5 }
+                yield { "type": "compare", "payload": {"indices": [j-1, j]}, "snapshot": self.data, "message": f"Comparing {self.data[j]} with {self.data[j-1]}", "line": 5 }
 
                 if self.data[j-1] > self.data[j]:
                     self.data[j-1], self.data[j] = self.data[j], self.data[j-1]
-                    yield { "type": "swap", "payload": {"indices": [j-1, j]}, "snapshot": self.data.copy(), "message": "Swapping...", "line": 6 }
+                    yield { "type": "swap", "payload": {"indices": [j-1, j]}, "snapshot": self.data, "message": "Swapping...", "line": 6 }
                     j -= 1
                 else:
                     break
         
-        yield { "type": "sorted", "payload": {"indices": list(range(n))}, "snapshot": self.data.copy(), "message": "Array is sorted!", "line": 11 }
+        yield { "type": "sorted", "payload": {"indices": list(range(n))}, "snapshot": self.data, "message": "Array is sorted!", "line": 11 }

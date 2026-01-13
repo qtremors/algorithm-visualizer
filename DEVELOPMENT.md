@@ -272,7 +272,7 @@ npm test
 
 | Component | Status |
 |-----------|--------|
-| Backend algorithms | ⚠️ Not yet implemented |
+| Backend algorithms | ✅ Passing (Sorting) |
 | Frontend hooks | ⚠️ Not yet implemented |
 
 ---

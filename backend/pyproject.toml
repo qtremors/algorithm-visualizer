@@ -4,6 +4,11 @@ version = "1.1.3"
 description = "High-performance algorithm visualizer with real-time streaming."
 readme = "README.md"
 requires-python = ">=3.11"
+authors = [
+    { name = "Tremors", email = "hello@tremors.dev" }
+]
+license = { text = "TSL" }
+keywords = ["algorithm", "visualization", "fastapi", "react", "sorting", "pathfinding"]
 dependencies = [
     "fastapi>=0.121.2",
     "uvicorn[standard]>=0.38.0",

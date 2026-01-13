@@ -1,32 +1,36 @@
 # AlgoVisualizer - Tasks
 
 > **Project:** AlgoVisualizer  
-> **Version:** 1.1.3  
-> **Last Updated:** January 13, 2026
+> **Version:** 1.1.4  
+> **Last Updated:** January 15, 2026 (Refactoring Complete)
+
+---
+
+## 🟠 P2 - High Priority
+
+### Frontend Performance
+**File:** `frontend/src/components/visualizers/GridVisualizer.tsx`
+- [ ] **Excessive Re-rendering**: `visited` and `path` Sets are recreated on every render.
+- [ ] **Optimization**: Memoize derived state or move to Canvas-based rendering for larger grids.
+
+### Type Safety
+**Files:** `AlgorithmWorkspace.tsx`, `GridVisualizer.tsx`
+- [ ] `GridVisualizerProps.initialData` is `any`.
+- [ ] `AlgorithmWorkspace` uses `any` for `inputData`.
+- [ ] **Action**: Define strict discriminative unions for `InputData` (Array vs Grid vs Graph).
 
 ---
 
 ## 🟣 P3 - Code Quality
-
 ### Component Props Using `any`
 - [ ] `GridVisualizer.tsx:7` - `initialData: any`
 - [ ] `GraphVisualizerProps` - `initialData: any` 
 - [ ] `FeatureItem` in `HomePage.tsx:148` - `icon: any`
 - [ ] Replace with proper TypeScript interfaces
 
-### Incomplete Project Config
-**File:** `backend/pyproject.toml:4`
-- [ ] Add project keywords, author, license
-
 ---
 
 ## 🟢 P4 - Performance
-
-### Large Component Re-renders
-**File:** `frontend/src/pages/AlgorithmWorkspace.tsx` (350 lines)
-- [ ] Single large component handles too much state
-- [ ] Split into smaller components (Header, VisualizerPanel, ControlPanel)
-- [ ] Add `React.memo` to pure child components
 
 ### Large Dataset Support
 **Issue:** No virtualization for large arrays/grids
@@ -48,7 +52,6 @@
 
 ### README Issues
 **File:** `README.md`
-- [ ] Clone URL references `StartLedger/algorithm-visualizer` - verify correct
 - [ ] Missing troubleshooting section
 - [ ] No WebSocket protocol/API documentation
 - [ ] No architecture diagram
