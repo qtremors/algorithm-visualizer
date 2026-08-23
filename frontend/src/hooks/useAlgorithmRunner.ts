@@ -2,7 +2,8 @@ import { useState, useCallback, useEffect, useRef } from 'react';
 import type { AlgorithmStep } from '../types';
 
 // --- DYNAMIC CONFIGURATION ---
-const HOST = import.meta.env.VITE_API_BASE_URL || '127.0.0.1:8000';
+const HOST = import.meta.env.VITE_API_BASE_URL || 
+  (import.meta.env.PROD && typeof window !== 'undefined' ? window.location.host : '127.0.0.1:8000');
 // If on HTTPS, use WSS (Secure WebSocket), otherwise use WS
 const PROTOCOL = window.location.protocol === 'https:' ? 'wss://' : 'ws://';
 const WS_URL = `${PROTOCOL}${HOST}/ws/visualize`;

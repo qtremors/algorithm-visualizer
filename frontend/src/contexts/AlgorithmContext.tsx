@@ -11,7 +11,8 @@ interface AlgorithmContextType {
 const AlgorithmContext = createContext<AlgorithmContextType | undefined>(undefined);
 
 // Dynamic Environment Configuration
-const HOST = import.meta.env.VITE_API_BASE_URL || '127.0.0.1:8000';
+const HOST = import.meta.env.VITE_API_BASE_URL || 
+  (import.meta.env.PROD && typeof window !== 'undefined' ? window.location.host : '127.0.0.1:8000');
 const PROTOCOL = window.location.protocol === 'https:' ? 'https://' : 'http://'; 
 const API_URL = `${PROTOCOL}${HOST}/api/algorithms`;
 

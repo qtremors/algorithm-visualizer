@@ -1,10 +1,21 @@
 # Changelog
 
 > **Project:** AlgoVisualizer  
-> **Version:** 1.1.5
-> **Last Updated:** 2026-01-13
+> **Version:** 1.2.0
+> **Last Updated:** 2026-08-23
 
 ---
+
+## [1.2.0] - 2026-08-23
+### Added
+- **Deployment**: Added unified fullstack Vercel deployment configuration (`vercel.json`, `api/index.py`, `requirements.txt`) leveraging native Python ASGI WebSocket streaming.
+
+### Security
+- **Frontend**: Remediated all Node dependency vulnerabilities across packages, updating Vitest, Vite, Rollup, and React Router.
+- **Backend**: Upgraded Python core stack (FastAPI 0.141.1, Starlette 1.6.0, Uvicorn 0.52.4, WebSockets 17.0.1) addressing Starlette CVE-2026-48710 and CVE-2026-48817.
+
+### Changed
+- **Frontend**: Enabled dynamic same-origin host and protocol resolution in `useAlgorithmRunner` and `AlgorithmContext` for unified production deployments.
 
 ## [1.1.5] - 2026-01-13
 ### Changed

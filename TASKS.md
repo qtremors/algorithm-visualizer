@@ -1,8 +1,8 @@
 # AlgoVisualizer - Tasks
 
 > **Project:** AlgoVisualizer  
-> **Version:** 1.1.5  
-> **Last Updated:** February 18, 2026
+> **Version:** 1.2.0  
+> **Last Updated:** August 23, 2026
 
 ---
 
@@ -229,14 +229,11 @@
 
 ---
 
-## ✅ Recently Completed (v1.1.5)
+## ✅ Recently Completed (v1.2.0)
 
-- [x] Optimized `GridVisualizer` performance with memoized `visited`/`path` sets
-- [x] Enforced strict type safety for algorithm inputs (`GridInputData`, `GraphInputData`)
-- [x] Optimized sorting algorithms by removing O(N) snapshot copying
-- [x] Refactored `AlgorithmWorkspace` God Component into modular structure
-- [x] Configured pytest for backend and Vitest for frontend
-- [x] Fixed WebSocket memory leaks with proper cleanup
-- [x] Added global `ErrorBoundary` to prevent crashes
-- [x] Added keyboard shortcuts for playback
-- [x] Added mobile warning overlay
+- [x] Configured unified fullstack deployment for Vercel (`vercel.json`, `api/index.py`, root `requirements.txt`)
+- [x] Implemented native Python ASGI WebSocket streaming support on Vercel
+- [x] Added dynamic same-origin host and protocol resolution in frontend hooks
+- [x] Upgraded core Python backend dependencies and patched CVE-2026-48710 & CVE-2026-48817
+- [x] Remediated 17 Node dependency vulnerabilities (Vitest, Vite, Rollup, React Router, etc.)
+- [x] Bumped codebase version to `1.2.0` across all metadata, lockfiles, and documentation
