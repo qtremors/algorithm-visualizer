@@ -1,6 +1,6 @@
 [project]
 name = "backend"
-version = "1.1.5"
+version = "1.2.0"
 description = "High-performance algorithm visualizer with real-time streaming."
 readme = "README.md"
 requires-python = ">=3.11"
@@ -10,9 +10,9 @@ authors = [
 license = { text = "TSL" }
 keywords = ["algorithm", "visualization", "fastapi", "react", "sorting", "pathfinding"]
 dependencies = [
-    "fastapi>=0.121.2",
-    "uvicorn[standard]>=0.38.0",
-    "websockets>=15.0.1",
+    "fastapi>=0.141.1",
+    "uvicorn[standard]>=0.52.4",
+    "websockets>=17.0.1",
 ]
 
 [dependency-groups]

@@ -2,7 +2,7 @@
 
 > Comprehensive documentation for developers working on AlgoVisualizer.
 
-**Version:** 1.1.5 | **Last Updated:** January 13, 2026
+**Version:** 1.2.0 | **Last Updated:** August 23, 2026
 
 ---
 
@@ -279,17 +279,31 @@ npm test
 
 ## Deployment
 
-### Backend (Render, Railway, etc.)
+### Vercel (Unified Fullstack - Recommended)
+
+AlgoVisualizer is configured for zero-config unified deployment on Vercel with native Python ASGI WebSocket streaming:
+
+```bash
+# Preview deployment
+vercel
+
+# Production deployment
+vercel --prod
+```
+
+Or connect the repository on [Vercel Dashboard](https://vercel.com/new). The root `vercel.json` automatically builds the Vite frontend, routes API requests to `api/index.py`, and maintains native WebSocket streaming on Vercel's Fluid compute.
+
+### Backend (Standalone: Render, Railway, etc.)
 
 ```bash
 # Build command
-pip install -r requirements.txt
+pip install -r backend/requirements.txt
 
 # Start command
 uvicorn app.main:api --host 0.0.0.0 --port $PORT
 ```
 
-### Frontend (Vercel, Netlify, etc.)
+### Frontend (Standalone: Netlify, etc.)
 
 ```bash
 # Build command
@@ -301,9 +315,9 @@ dist/
 
 ### Production Checklist
 
-- [ ] Set `VITE_API_BASE_URL` to production backend URL
-- [ ] Restrict CORS origins in `main.py`
-- [ ] Add HTTPS (handled by hosting platform)
+- [ ] (Standalone only) Set `VITE_API_BASE_URL` to production backend URL if not hosted together
+- [ ] (Standalone only) Restrict CORS origins in `main.py`
+- [ ] Add HTTPS/WSS (handled automatically on Vercel)
 - [ ] Review algorithm input validation
 
 ---
