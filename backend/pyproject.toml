@@ -1,6 +1,6 @@
 [project]
 name = "backend"
-version = "0.0.9"
+version = "0.1.0"
 description = "High-performance algorithm visualizer with real-time streaming."
 readme = "../README.md"
 requires-python = ">=3.11"

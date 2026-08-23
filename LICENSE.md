@@ -171,7 +171,7 @@ If You publicly distribute or host a fork or Derivative Work in source code form
 
 The attribution must include a direct link to the original Tremors repository:
 
-`https://github.com/qtremors/<algorithm-visualizer>`
+`https://github.com/qtremors/algorithm-visualizer`
 
 ### 5.3 Placement
 Required Attribution must appear prominently in:

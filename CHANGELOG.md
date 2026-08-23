@@ -1,10 +1,14 @@
 # AlgoVisualizer Changelog
 
 > **Project:** AlgoVisualizer
-> **Version:** 0.0.9
-> **Last Updated:** 2026-01-13
+> **Version:** 0.1.0
+> **Last Updated:** 2026-08-23
 
 ---
+
+## [0.1.0] - 2026-08-23
+
+- **Complete Home Experience And Project Documentation**: Add the home page, usage and about dialogs, branding and screenshots, and project documentation.
 
 ## [0.0.9] - 2026-01-13
 

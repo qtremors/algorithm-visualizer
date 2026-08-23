@@ -1,0 +1,105 @@
+<svg xmlns="http://www.w3.org/2000/svg"
+     viewBox="500 100 600 600"
+     width="600"
+     height="600"
+     fill="none"
+     role="img"
+     aria-labelledby="title desc">
+  <title id="title">Algorithm Visualizer</title>
+  <desc id="desc">Rising sorting bar chart columns with an interconnected network graph and data nodes above.</desc>
+
+  <defs>
+    <!-- Bar Vertical Gradients (Cyan to Purple/Blue) -->
+    <linearGradient id="bar-0" x1="0" y1="485" x2="0" y2="630" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#12F0F6" />
+      <stop offset="50%" stop-color="#5A9EF0" />
+      <stop offset="100%" stop-color="#A265F2" />
+    </linearGradient>
+
+    <linearGradient id="bar-1" x1="0" y1="421" x2="0" y2="630" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#08EFF5" />
+      <stop offset="50%" stop-color="#4F9EF2" />
+      <stop offset="100%" stop-color="#9A55EB" />
+    </linearGradient>
+
+    <linearGradient id="bar-2" x1="0" y1="392" x2="0" y2="630" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#08EFF5" />
+      <stop offset="50%" stop-color="#6693F0" />
+      <stop offset="100%" stop-color="#A04BE7" />
+    </linearGradient>
+
+    <linearGradient id="bar-3" x1="0" y1="323" x2="0" y2="630" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#08ECF4" />
+      <stop offset="50%" stop-color="#345FD0" />
+      <stop offset="100%" stop-color="#4D3EC4" />
+    </linearGradient>
+
+    <linearGradient id="bar-4" x1="0" y1="292" x2="0" y2="630" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#08ECF4" />
+      <stop offset="50%" stop-color="#2B7FE0" />
+      <stop offset="100%" stop-color="#4236C0" />
+    </linearGradient>
+
+    <!-- Network Mesh Gradient -->
+    <linearGradient id="mesh-line" x1="968" y1="194" x2="630" y2="460" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#23CBF6" />
+      <stop offset="45%" stop-color="#4B9FF4" />
+      <stop offset="100%" stop-color="#8868F2" />
+    </linearGradient>
+  </defs>
+
+  <!-- Network Connecting Edges -->
+  <g id="network-edges" stroke="url(#mesh-line)" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round">
+    <!-- Outer Envelope & Major Pathways -->
+    <line x1="630.5" y1="388.0" x2="714.5" y2="324.0" />
+    <line x1="714.5" y1="324.0" x2="800.0" y2="361.0" />
+    <line x1="800.0" y1="361.0" x2="884.5" y2="224.0" />
+    <line x1="884.5" y1="224.0" x2="968.5" y2="194.0" />
+
+    <!-- Vertical Column Connections -->
+    <line x1="630.5" y1="388.0" x2="630.5" y2="459.0" />
+    <line x1="714.5" y1="324.0" x2="714.5" y2="397.0" />
+    <line x1="800.0" y1="287.0" x2="800.0" y2="361.0" />
+    <line x1="884.5" y1="224.0" x2="884.5" y2="298.0" />
+    <line x1="968.5" y1="194.0" x2="968.5" y2="267.0" />
+
+    <!-- Cross & Diagonal Mesh Braces -->
+    <line x1="630.5" y1="388.0" x2="714.5" y2="397.0" />
+    <line x1="714.5" y1="324.0" x2="630.5" y2="459.0" />
+    <line x1="630.5" y1="459.0" x2="714.5" y2="397.0" />
+
+    <line x1="800.0" y1="287.0" x2="884.5" y2="224.0" />
+    <line x1="800.0" y1="287.0" x2="884.5" y2="298.0" />
+    <line x1="800.0" y1="361.0" x2="884.5" y2="298.0" />
+
+    <line x1="884.5" y1="224.0" x2="968.5" y2="267.0" />
+    <line x1="968.5" y1="194.0" x2="884.5" y2="298.0" />
+  </g>
+
+  <!-- Network Nodes: Hexagons -->
+  <g id="hex-nodes">
+    <polygon points="649.5,388.0 640.0,404.5 621.0,404.5 611.5,388.0 621.0,371.5 640.0,371.5" fill="#5BA1F2" />
+    <polygon points="733.5,324.0 724.0,340.5 705.0,340.5 695.5,324.0 705.0,307.5 724.0,307.5" fill="#22D5F6" />
+    <polygon points="819.0,361.0 809.5,377.5 790.5,377.5 781.0,361.0 790.5,344.5 809.5,344.5" fill="#9763F7" />
+    <polygon points="903.5,224.0 894.0,240.5 875.0,240.5 865.5,224.0 875.0,207.5 894.0,207.5" fill="#19D8FC" />
+    <polygon points="987.5,194.0 978.0,210.5 959.0,210.5 949.5,194.0 959.0,177.5 978.0,177.5" fill="#3FBAF1" />
+  </g>
+
+  <!-- Network Nodes: Data Circles -->
+  <g id="circle-nodes">
+    <circle cx="630.5" cy="459.0" r="15" fill="#985BF5" />
+    <circle cx="714.5" cy="397.0" r="15" fill="#7294F3" />
+    <circle cx="800.0" cy="287.0" r="15" fill="#3EBFF8" />
+    <circle cx="884.5" cy="298.0" r="15" fill="#7F79F7" />
+    <circle cx="968.5" cy="267.0" r="15" fill="#8C6DF7" />
+  </g>
+
+  <!-- Algorithm Sorting Columns (Bar Chart) -->
+  <g id="sorting-bars">
+    <rect x="602" y="485" width="58" height="145" rx="29" fill="url(#bar-0)" />
+    <rect x="686" y="421" width="58" height="209" rx="29" fill="url(#bar-1)" />
+    <rect x="771" y="392" width="58" height="238" rx="29" fill="url(#bar-2)" />
+    <rect x="856" y="323" width="58" height="307" rx="29" fill="url(#bar-3)" />
+    <rect x="940" y="292" width="58" height="338" rx="29" fill="url(#bar-4)" />
+  </g>
+</svg>
