@@ -174,3 +174,22 @@ async def test_idle_socket_times_out_and_releases_admission(monkeypatch):
     assert sent[-1]["code"] == 1008
     assert json.loads(sent[-2]["text"])["code"] == "timeout"
     assert not main.admission.active
+
+
+@pytest.mark.asyncio
+async def test_transport_failure_releases_slot_without_attempting_success(monkeypatch):
+    incoming = iter([{"type": "websocket.connect"}, {"type": "websocket.receive", "text": "[2,1]"}])
+    sent = []
+
+    async def receive():
+        return next(incoming)
+
+    async def send(event):
+        if event["type"] == "websocket.send":
+            raise OSError("Connection lost")
+        sent.append(event)
+
+    socket = WebSocket({"type": "websocket", "query_string": b"", "path": "/", "headers": [], "client": ("lost", 1)}, receive, send)
+    await main.websocket_endpoint(socket, "sorting", "bubble_sort")
+    assert not main.admission.active
+    assert [event["type"] for event in sent] == ["websocket.accept"]

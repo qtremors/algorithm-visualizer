@@ -101,3 +101,28 @@ it('holds the shared playhead behind a slower unfinished stream', () => {
   rerender();
   expect(result.current.count).toBe(4);
 });
+
+it('steps to operations in either lane and does not repeat a held terminal frame', () => {
+  lanes.left.status = lanes.right.status = 'completed';
+  lanes.left.steps = [frame(0), { ...frame(1), type: 'swap' }];
+  lanes.right.steps = [
+    frame(0),
+    frame(1),
+    frame(2),
+    { ...frame(3), type: 'swap' },
+    frame(4),
+  ];
+  const { result } = renderHook(() =>
+    useComparison('sorting', 'left', 'right'),
+  );
+  act(() => result.current.playback.setOperation('swap'));
+  act(() => result.current.playback.nextStep());
+  expect(result.current.playback.currentStepIndex).toBe(1);
+  act(() => result.current.playback.nextStep());
+  expect(result.current.playback.currentStepIndex).toBe(3);
+  act(() => result.current.playback.prevStep());
+  expect(result.current.playback.currentStepIndex).toBe(1);
+  act(() => result.current.playback.nextStep());
+  act(() => result.current.playback.nextStep());
+  expect(result.current.playback.currentStepIndex).toBe(4);
+});

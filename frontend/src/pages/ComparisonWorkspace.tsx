@@ -24,7 +24,7 @@ import VisualizerLegend from '../components/core/VisualizerLegend';
 
 export default function ComparisonWorkspace() {
   const { category = 'sorting' } = useParams();
-  const { algorithms, isLoading, error } = useAlgorithms();
+  const { algorithms, isLoading } = useAlgorithms();
   const editor = useEditorSession(category);
   const [leftSelection, setLeft] = useState(editor.session.selection);
   const [rightSelection, setRight] = useState('');
@@ -71,7 +71,7 @@ export default function ComparisonWorkspace() {
     reset: comparison.reset,
   });
   if (isLoading) return <p role="status">Loading algorithms...</p>;
-  if (!available || error)
+  if (!available)
     return (
       <p>
         Comparison is unavailable. <Link to="/">Return home</Link>

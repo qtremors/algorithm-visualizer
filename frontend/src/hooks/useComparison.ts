@@ -1,6 +1,6 @@
-import { useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 import { useAlgorithmRunner } from './useAlgorithmRunner';
-import { usePlayback } from './usePlayback';
+import { usePlayback, type PlaybackOperation } from './usePlayback';
 import type { InputData } from '../types/input';
 
 /** One received step per lane per tick; finished lanes retain their final frame. */
@@ -27,7 +27,13 @@ export function useComparison(
       (_, index) => left.steps[index] || right.steps[index],
     );
   }, [left.steps, right.steps, left.status, right.status]);
-  const playback = usePlayback(timeline, streaming, failed);
+  const matchesOperation = useCallback(
+    (index: number, operation: PlaybackOperation) =>
+      left.steps[index]?.type === operation ||
+      right.steps[index]?.type === operation,
+    [left.steps, right.steps],
+  );
+  const playback = usePlayback(timeline, streaming, failed, matchesOperation);
   const reset = () => {
     playback.reset();
     left.resetSteps();

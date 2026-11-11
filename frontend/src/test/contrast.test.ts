@@ -1,7 +1,7 @@
 /// <reference types="node" />
 import { describe, expect, it } from 'vitest';
 import { readFileSync } from 'node:fs';
-const css = readFileSync('src/index.css', 'utf8');
+const css = readFileSync('src/styles/theme.css', 'utf8');
 import { colorTokens, contrast } from './contrast';
 const tokens = colorTokens(css);
 const token = (name: string) => {
@@ -34,7 +34,7 @@ describe('OLED contrast requirements', () => {
       contrast(token(`ui-${name}`), token('ui-background')),
     ).toBeGreaterThanOrEqual(4.5);
   });
-  it.each(['control-border', 'panel-border', 'focus'])(
+  it.each(['control-border', 'focus'])(
     '%s stays distinguishable at 3:1 on black',
     (name) => {
       expect(

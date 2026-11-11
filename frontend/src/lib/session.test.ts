@@ -102,3 +102,15 @@ describe('session boundaries', () => {
     expect(loaded.session.version).toBe(1);
   });
 });
+
+it('preserves saved work when a shared session link is malformed', () => {
+  const session = defaultSession('sorting');
+  session.drafts.array = [8, 3, 1];
+  session.seed = 'work-to-keep';
+  localStorage.setItem(SESSION_KEY, serializeSession(session));
+  window.history.replaceState(null, '', '/sorting#session=not-valid-json');
+  const restored = initialSession('sorting');
+  expect(restored.session.drafts.array).toEqual([8, 3, 1]);
+  expect(restored.session.seed).toBe('work-to-keep');
+  expect(restored.notice).toBeTruthy();
+});

@@ -16,12 +16,12 @@ export function AlgorithmProvider({ children }: { children: ReactNode }) {
     error: null as string | null,
   });
   const retry = useCallback(() => {
-    setState({
-      algorithms: null,
-      isLoading: true,
+    setState((previous) => ({
+      ...previous,
+      isLoading: !previous.algorithms,
       isServerWaking: false,
       error: null,
-    });
+    }));
     setAttempt((n) => n + 1);
   }, []);
   useEffect(() => {
@@ -54,22 +54,23 @@ export function AlgorithmProvider({ children }: { children: ReactNode }) {
           });
       } catch (error) {
         if (active)
-          setState({
-            algorithms: cached,
+          setState((previous) => ({
+            algorithms: previous.algorithms || readCatalog() || cached,
             isLoading: false,
             isServerWaking: false,
             error:
               error instanceof Error
                 ? error.message
                 : 'Cannot connect to the server. Please retry.',
-          });
+          }));
       } finally {
         clearTimeout(wake);
-        clearTimeout(deadline);
       }
     }
-    void fetchMetadata();
-    void fetch(apiUrl('/api/capabilities'), { signal: controller.signal })
+    const metadataRequest = fetchMetadata();
+    const capabilitiesRequest = fetch(apiUrl('/api/capabilities'), {
+      signal: controller.signal,
+    })
       .then((response) => (response.ok ? response.json() : null))
       .then((value) => {
         if (active && value) applyCapabilities(value);
@@ -77,6 +78,9 @@ export function AlgorithmProvider({ children }: { children: ReactNode }) {
       .catch(() => {
         /* Legacy servers retain conservative client caps. */
       });
+    void Promise.allSettled([metadataRequest, capabilitiesRequest]).then(() =>
+      clearTimeout(deadline),
+    );
     return () => {
       active = false;
       controller.abort();

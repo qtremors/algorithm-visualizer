@@ -1,13 +1,11 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { NavLink, Outlet, useLocation } from 'react-router-dom';
 import { useAlgorithms } from '../../contexts/algorithm-context';
 import Footer from './Footer';
 import { comparisonCategory } from '../../lib/presentation';
-import { cn } from '../../lib/utils';
 export default function Layout() {
   const { algorithms, isLoading, error, retry } = useAlgorithms();
   const { pathname } = useLocation();
-  const [dismissed, setDismissed] = useState(false);
   useEffect(() => {
     window.scrollTo(0, 0);
     const names: Record<string, string> = {
@@ -50,14 +48,7 @@ export default function Layout() {
                 <NavLink
                   key={category}
                   to={`/${category}`}
-                  className={({ isActive }) =>
-                    cn(
-                      'app-nav-link capitalize',
-                      isActive
-                        ? 'bg-blue-600 text-white'
-                        : 'bg-gray-800 text-gray-300',
-                    )
-                  }
+                  className="app-nav-link capitalize"
                 >
                   {category}
                 </NavLink>
@@ -65,33 +56,13 @@ export default function Layout() {
             )}
             <NavLink
               to={`/compare/${comparisonCategory(pathname)}`}
-              className={cn(
-                'app-nav-link',
-                pathname.startsWith('/compare/')
-                  ? 'bg-blue-600 text-white'
-                  : 'text-gray-300',
-              )}
+              className="app-nav-link"
             >
               Compare
             </NavLink>
           </div>
         </div>
       </nav>
-      {!dismissed && (
-        <div className="lg:hidden flex gap-3 items-center p-3 bg-gray-950 border-b border-gray-700 text-gray-300 text-sm">
-          <p>
-            The visualizer works best on a larger screen. Keyboard controls are
-            available for grids and graphs.
-          </p>
-          <button
-            type="button"
-            onClick={() => setDismissed(true)}
-            className="underline"
-          >
-            Dismiss
-          </button>
-        </div>
-      )}
       {error && (
         <div
           role="alert"

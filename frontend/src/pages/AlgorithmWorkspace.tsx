@@ -27,7 +27,7 @@ export default function AlgorithmWorkspace() {
   const navigate = useNavigate();
   const p = w.playback;
   if (w.isLoading) return <p role="status">Loading algorithms...</p>;
-  if (w.loadError)
+  if (w.loadError && !w.categoryAlgorithms)
     return <p>Algorithms are unavailable. Use Retry above to reconnect.</p>;
   if (!w.categoryAlgorithms)
     return (

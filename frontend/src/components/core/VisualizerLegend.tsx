@@ -8,10 +8,10 @@ export default function VisualizerLegend({
   const entries =
     category === 'sorting'
       ? [
-          ['#38bdf8', 'Value'],
-          ['#facc15', 'Comparison / write'],
-          ['#f87171', 'Swap'],
-          ['#4ade80', 'Sorted'],
+          ['var(--color-sky-500)', 'Value'],
+          ['var(--color-yellow-500)', 'Comparison / write'],
+          ['var(--color-red-500)', 'Swap'],
+          ['var(--color-green-500)', 'Sorted'],
         ]
       : category === 'trees'
         ? [

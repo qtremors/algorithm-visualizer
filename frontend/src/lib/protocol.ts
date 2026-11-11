@@ -24,6 +24,10 @@ function metadata(value: unknown): value is AlgorithmMetadata {
     texts(value.pseudocode) &&
     texts(value.pros) &&
     texts(value.cons) &&
+    (value.supports_negative === undefined ||
+      typeof value.supports_negative === 'boolean') &&
+    (value.heuristics === undefined ||
+      (texts(value.heuristics) && value.heuristics.length <= 10)) &&
     ['list[int]', 'graph_grid', 'tree'].includes(String(value.input_type)) &&
     ['bar_chart', 'grid_2d', 'tree'].includes(String(value.visualizer)) &&
     record(value.complexity) &&
@@ -36,7 +40,10 @@ export function parseAlgorithms(value: unknown): AlgorithmsData {
     !record(value) ||
     !Object.keys(value).length ||
     !Object.values(value).every(
-      (category) => record(category) && Object.values(category).every(metadata),
+      (category) =>
+        record(category) &&
+        Object.keys(category).length > 0 &&
+        Object.values(category).every(metadata),
     )
   )
     throw new Error('The server returned invalid algorithm metadata.');
@@ -187,6 +194,21 @@ export function parseMessage(text: string): ServerMessage {
     if (!record(value.learning)) throw new Error('Invalid learning state.');
     const learning = value.learning;
     if (
+      learning.explanation !== undefined &&
+      (typeof learning.explanation !== 'string' ||
+        learning.explanation.length > 2000)
+    )
+      throw new Error('Invalid learning explanation.');
+    if (
+      learning.boundary !== undefined &&
+      (!Array.isArray(learning.boundary) ||
+        learning.boundary.length > LIMITS.array ||
+        !learning.boundary.every(
+          (v) => Number.isSafeInteger(v) && v >= 0 && v <= LIMITS.array,
+        ))
+    )
+      throw new Error('Invalid active boundaries.');
+    if (
       learning.frontier !== undefined &&
       (!Array.isArray(learning.frontier) ||
         learning.frontier.length > 80 ||
@@ -205,6 +227,17 @@ export function parseMessage(text: string): ServerMessage {
         (!record(learning[field]) || Object.keys(learning[field]).length > 2500)
       )
         throw new Error('Invalid learning table.');
+      if (
+        record(learning[field]) &&
+        !Object.entries(learning[field]).every(
+          ([key, entry]) =>
+            key.length <= 128 &&
+            (field === 'distances'
+              ? typeof entry === 'number' && Number.isFinite(entry)
+              : node(entry)),
+        )
+      )
+        throw new Error('Invalid learning table entry.');
     }
   }
   return value as unknown as ServerMessage;

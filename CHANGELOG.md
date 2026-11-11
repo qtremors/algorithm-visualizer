@@ -1,10 +1,14 @@
 # AlgoVisualizer Changelog
 
 > **Project:** AlgoVisualizer
-> **Version:** 0.1.4
+> **Version:** 0.1.5
 > **Last Updated:** 2026-11-11
 
 ---
+
+## [0.1.5] - 2026-11-11
+
+- **Soften OLED Presentation And Fix Recovery Issues**: Use pastel accents, quieter surfaces, rounded controls, and consistent visualization colors. Fix comparison operation stepping, final-frame playback races, background playback jumps, malformed learning-state rendering, lost cached metadata after retries, hanging capability requests, saved-draft recovery from invalid share links, binary WebSocket errors, and non-ASCII metrics authentication.
 
 ## [0.1.4] - 2026-11-11
 

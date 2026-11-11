@@ -174,10 +174,7 @@ function IconButton({
     <button
       type="button"
       {...props}
-      className={cn(
-        'control-icon text-gray-200 disabled:cursor-not-allowed',
-        className,
-      )}
+      className={cn('control-icon disabled:cursor-not-allowed', className)}
     />
   );
 }

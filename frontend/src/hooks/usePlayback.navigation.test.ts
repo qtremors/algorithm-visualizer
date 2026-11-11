@@ -63,3 +63,20 @@ describe('timeline and breakpoints', () => {
     expect(result.current.breakpoints).toEqual([]);
   });
 });
+
+it('pauses at the current frame when the tab becomes hidden without resuming on return', () => {
+  const hidden = vi.spyOn(document, 'hidden', 'get').mockReturnValue(false);
+  const { result, unmount } = renderHook(() => usePlayback(steps));
+  act(() => result.current.seek(2));
+  act(() => result.current.play());
+  hidden.mockReturnValue(true);
+  act(() => document.dispatchEvent(new Event('visibilitychange')));
+  expect(result.current.isPlaying).toBe(false);
+  expect(result.current.currentStepIndex).toBe(2);
+  hidden.mockReturnValue(false);
+  act(() => document.dispatchEvent(new Event('visibilitychange')));
+  expect(result.current.isPlaying).toBe(false);
+  act(() => result.current.play());
+  expect(result.current.isPlaying).toBe(true);
+  unmount();
+});

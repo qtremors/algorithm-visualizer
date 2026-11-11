@@ -16,6 +16,7 @@ from app.registry import registry
 from app.observability import run_logger
 from app.contracts import AlgorithmMetadata, Capabilities, SUPPORTED_PROTOCOLS
 from app.trace import TraceEncoder
+from app.transport import receive_input
 from app.metrics import RunMetrics, service_metrics
 
 import app.algorithms.sorting.bubble_sort  # noqa: F401
@@ -33,7 +34,7 @@ import app.algorithms.pathfinding.bellman_ford  # noqa: F401
 import app.algorithms.trees.search_tree  # noqa: F401
 
 logger = run_logger()
-APP_VERSION = "0.1.4"
+APP_VERSION = "0.1.5"
 REVISION = os.getenv("VERCEL_GIT_COMMIT_SHA", os.getenv("APP_REVISION", "development"))
 api = FastAPI(title="AlgoVisualizer", version=APP_VERSION)
 api.add_middleware(
@@ -67,7 +68,7 @@ async def get_algorithms_api(response: Response):
 @api.get("/api/metrics", include_in_schema=False)
 async def metrics(authorization: str | None = Header(default=None)):
     token = os.getenv("METRICS_TOKEN")
-    if not token or not hmac.compare_digest(authorization or "", f"Bearer {token}"):
+    if not token or not hmac.compare_digest((authorization or "").encode("utf-8"), f"Bearer {token}".encode("utf-8")):
         raise HTTPException(404)
     return Response(service_metrics.render(), media_type="text/plain")
 
@@ -82,10 +83,6 @@ async def finish(socket, code, message=None, error_code="execution_failed"):
             await socket.close(code=code)
     except (WebSocketDisconnect, OSError, TimeoutError):
         pass
-
-
-def reject_constant(_: str):
-    raise ValueError("Numbers must be finite.")
 
 
 @api.websocket("/ws/visualize/{category}/{algorithm_name}")
@@ -116,10 +113,8 @@ async def websocket_endpoint(websocket: WebSocket, category: str, algorithm_name
         algorithm_class = registry.get_algorithm(category, algorithm_name)
         if algorithm_class is None:
             raise ValueError("Algorithm not found.")
-        raw = await asyncio.wait_for(websocket.receive_text(), timeout=limits.input_timeout)
-        if len(raw.encode("utf-8")) > limits.max_input_bytes:
-            raise ValueError("Input is too large. Use a smaller input.")
-        algorithm = algorithm_class(json.loads(raw, parse_constant=reject_constant))
+        data = await receive_input(websocket, timeout=limits.input_timeout, max_bytes=limits.max_input_bytes)
+        algorithm = algorithm_class(data)
         run_metrics = RunMetrics()
         async with asyncio.timeout(limits.execution_timeout):
             for step in algorithm.run():
@@ -139,11 +134,11 @@ async def websocket_endpoint(websocket: WebSocket, category: str, algorithm_name
             await websocket.send_json(completion)
         await finish(websocket, 1000)
         outcome = "completed"
-    except WebSocketDisconnect:
-        outcome = "cancelled"
     except TimeoutError:
         outcome = error_code = "timeout"
         await finish(websocket, 1008, "Visualization timed out. Retry with a smaller input.", error_code)
+    except (WebSocketDisconnect, OSError):
+        outcome = "cancelled"
     except (ValueError, RecursionError) as error:
         outcome = error_code = "invalid_input"
         await finish(websocket, 1003, str(error)[:500], error_code)

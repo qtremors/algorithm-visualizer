@@ -86,3 +86,23 @@ def test_max_grid_completes_through_real_transport(client, monkeypatch):
                 assert message["metrics"]["path_hops"] == 98
                 break
             count += 1
+
+
+def test_binary_socket_input_is_rejected_as_invalid_input(client):
+    with client.websocket_connect("/ws/visualize/sorting/bubble_sort?protocol=3") as socket:
+        socket.send_bytes(b"[2, 1]")
+        message = socket.receive_json()
+        assert message["code"] == "invalid_input"
+        assert "JSON text" in message["message"]
+    assert not main.admission.active
+
+
+@pytest.mark.asyncio
+async def test_non_ascii_metrics_credentials_do_not_raise_internal_errors(monkeypatch):
+    from fastapi import HTTPException
+    monkeypatch.setenv("METRICS_TOKEN", "test-only")
+    with pytest.raises(HTTPException) as error:
+        await main.metrics("Bearer café")
+    assert error.value.status_code == 404
+    monkeypatch.setenv("METRICS_TOKEN", "café")
+    assert (await main.metrics("Bearer café")).status_code == 200

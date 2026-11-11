@@ -14,8 +14,16 @@ export function usePlayback(
   steps: AlgorithmStep[],
   streaming = false,
   failed = false,
+  matchesOperation?: (index: number, operation: PlaybackOperation) => boolean,
 ) {
   const [index, setIndex] = useState(0);
+  // React may commit a render after another animation callback has run. Keep
+  // the clock's cursor outside render synchronization so a late commit cannot rewind it.
+  const position = useRef(0);
+  const move = useCallback((target: number) => {
+    position.current = target;
+    setIndex(target);
+  }, []);
   const [isPlaying, setIsPlaying] = useState(false);
   const [speed, setSpeed] = useState(200);
   const [breakpoints, setBreakpoints] = useState<number[]>([]);
@@ -25,7 +33,6 @@ export function usePlayback(
     speed,
     steps,
     streaming,
-    index: currentStepIndex,
     breakpoints,
   });
   useEffect(() => {
@@ -33,10 +40,9 @@ export function usePlayback(
       speed,
       steps,
       streaming,
-      index: currentStepIndex,
       breakpoints,
     };
-  }, [speed, steps, streaming, currentStepIndex, breakpoints]);
+  }, [speed, steps, streaming, breakpoints]);
   useEffect(() => {
     if (!isPlaying || failed) return;
     let frame = 0;
@@ -47,10 +53,11 @@ export function usePlayback(
       if (now - last >= state.speed) {
         const advance = Math.floor((now - last) / state.speed);
         last = now - ((now - last) % state.speed);
-        if (state.index < available) {
-          let target = Math.min(available, state.index + advance);
+        const from = Math.min(position.current, Math.max(0, available));
+        if (from < available) {
+          let target = Math.min(available, from + advance);
           let hit = false;
-          for (let next = state.index + 1; next <= target; next++) {
+          for (let next = from + 1; next <= target; next++) {
             if (
               state.steps[next].line !== state.steps[next - 1].line &&
               state.breakpoints.includes(state.steps[next].line)
@@ -60,8 +67,7 @@ export function usePlayback(
               break;
             }
           }
-          state.index = target;
-          setIndex(target);
+          move(target);
           if (hit) {
             setIsPlaying(false);
             return;
@@ -75,51 +81,77 @@ export function usePlayback(
     };
     frame = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(frame);
-  }, [isPlaying, failed]);
+  }, [isPlaying, failed, move]);
+  useEffect(() => {
+    const pauseWhenHidden = () => {
+      if (document.hidden) setIsPlaying(false);
+    };
+    document.addEventListener('visibilitychange', pauseWhenHidden);
+    return () =>
+      document.removeEventListener('visibilitychange', pauseWhenHidden);
+  }, []);
   const reset = useCallback(() => {
     setIsPlaying(false);
-    setIndex(0);
-  }, []);
+    move(0);
+  }, [move]);
   const start = useCallback(() => {
-    setIndex(0);
+    move(0);
     setIsPlaying(
       !window.matchMedia?.('(prefers-reduced-motion: reduce)').matches,
     );
-  }, []);
+  }, [move]);
   const play = useCallback(() => {
     if (failed) return;
-    if (steps.length > 1 && currentStepIndex === steps.length - 1 && !streaming)
-      setIndex(0);
+    if (steps.length > 1 && position.current >= steps.length - 1 && !streaming)
+      move(0);
     setIsPlaying(true);
-  }, [steps.length, currentStepIndex, streaming, failed]);
+  }, [steps.length, streaming, failed, move]);
   const pause = useCallback(() => setIsPlaying(false), []);
   const seek = useCallback(
     (target: number) => {
       if (!Number.isFinite(target)) return;
       setIsPlaying(false);
-      setIndex(Math.max(0, Math.min(Math.trunc(target), steps.length - 1)));
+      move(Math.max(0, Math.min(Math.trunc(target), steps.length - 1)));
     },
-    [steps.length],
+    [steps.length, move],
   );
   const nextStep = useCallback(() => {
-    setIndex((previous) => {
-      const from = Math.min(previous, Math.max(0, steps.length - 1));
-      if (operation === 'any')
-        return Math.min(from + 1, Math.max(0, steps.length - 1));
-      for (let next = from + 1; next < steps.length; next++)
-        if (steps[next].type === operation) return next;
-      return Math.max(0, steps.length - 1);
-    });
-  }, [steps, operation]);
+    const last = Math.max(0, steps.length - 1);
+    const from = Math.min(position.current, last);
+    if (operation === 'any') {
+      move(Math.min(from + 1, last));
+      return;
+    }
+    for (let next = from + 1; next < steps.length; next++) {
+      if (
+        matchesOperation
+          ? matchesOperation(next, operation)
+          : steps[next].type === operation
+      ) {
+        move(next);
+        return;
+      }
+    }
+    move(last);
+  }, [steps, operation, matchesOperation, move]);
   const prevStep = useCallback(() => {
-    setIndex((previous) => {
-      const from = Math.min(previous, Math.max(0, steps.length - 1));
-      if (operation === 'any') return Math.max(0, from - 1);
-      for (let next = from - 1; next >= 0; next--)
-        if (steps[next].type === operation) return next;
-      return 0;
-    });
-  }, [steps, operation]);
+    const from = Math.min(position.current, Math.max(0, steps.length - 1));
+    if (operation === 'any') {
+      move(Math.max(0, from - 1));
+      return;
+    }
+    for (let next = from - 1; next >= 0; next--) {
+      if (
+        matchesOperation
+          ? matchesOperation(next, operation)
+          : steps[next].type === operation
+      ) {
+        move(next);
+        return;
+      }
+    }
+    move(0);
+  }, [steps, operation, matchesOperation, move]);
   const toggleBreakpoint = (line: number) => {
     if (!Number.isInteger(line) || line < 1) return;
     setBreakpoints((previous) =>

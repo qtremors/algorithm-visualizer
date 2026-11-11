@@ -224,30 +224,35 @@ export function initialSession(category: string): {
   session: Session;
   notice: string | null;
 } {
+  let notice: string | null = null;
+  let saved: Session | null = null;
   try {
-    const shared = sessionFromUrl(window.location.hash);
-    const saved =
-      shared ||
-      (localStorage.getItem(SESSION_KEY)
-        ? parseSession(localStorage.getItem(SESSION_KEY)!)
-        : null);
-    if (saved)
-      return {
-        session: {
+    saved = sessionFromUrl(window.location.hash);
+  } catch (error) {
+    notice =
+      error instanceof Error ? error.message : 'Cannot restore shared session.';
+  }
+  if (!saved) {
+    try {
+      const raw = localStorage.getItem(SESSION_KEY);
+      saved = raw ? parseSession(raw) : null;
+    } catch (error) {
+      notice ||=
+        error instanceof Error
+          ? error.message
+          : 'Cannot restore saved session.';
+    }
+  }
+  return {
+    session: saved
+      ? {
           ...saved,
           category,
           selection: saved.category === category ? saved.selection : '',
-        },
-        notice: null,
-      };
-  } catch (error) {
-    return {
-      session: defaultSession(category),
-      notice:
-        error instanceof Error ? error.message : 'Cannot restore session.',
-    };
-  }
-  return { session: defaultSession(category), notice: null };
+        }
+      : defaultSession(category),
+    notice,
+  };
 }
 
 export function parseSessionText(text: string): Session {
