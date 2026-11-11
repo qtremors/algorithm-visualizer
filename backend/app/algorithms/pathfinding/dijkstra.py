@@ -17,6 +17,7 @@ class Dijkstra(BasePathfindingAlgorithm):
             "  PQ := {s}",
             "  while PQ is not empty",
             "    u := PQ.extract_min()",
+            "    if u = goal: return reconstruct_path(u)",
             "    for each neighbor v of u",
             "      alt := dist[u] + weight(u, v)",
             "      if alt < dist[v]",
@@ -26,13 +27,13 @@ class Dijkstra(BasePathfindingAlgorithm):
             "      end if",
             "    end for",
             "  end while",
-            "end procedure",
+            "  return no_path",
         ],
         "input_type": "graph_grid",
         "visualizer": "grid_2d",
         "description": "Dijkstra's algorithm finds the shortest path between nodes in a graph.",
         "complexity": {"time": "O((V+E) log V)", "space": "O(V)"},
-        "pros": ["Always finds shortest path.", "Works with weighted graphs."],
+        "pros": ["Finds a minimum-cost path with nonnegative weights.", "Works with weighted graphs."],
         "cons": ["Slower than BFS/DFS.", "Doesn't work with negative weights."],
     }
 
@@ -79,7 +80,7 @@ class Dijkstra(BasePathfindingAlgorithm):
                     "payload": {"path": path, "dist": curr_dist},
                     "snapshot": self.get_snapshot(visited, path),
                     "message": f"Shortest path found! Distance: {curr_dist}",
-                    "line": 18,
+                    "line": 9,
                 }
                 return
 
@@ -102,7 +103,7 @@ class Dijkstra(BasePathfindingAlgorithm):
                         },
                         "snapshot": self.get_snapshot(visited, []),
                         "message": f"Relaxing {neighbor} (new dist: {new_dist})",
-                        "line": 14,
+                        "line": 15,
                     }
 
         yield {
@@ -110,5 +111,5 @@ class Dijkstra(BasePathfindingAlgorithm):
             "payload": {},
             "snapshot": self.get_snapshot(visited, []),
             "message": "No path found.",
-            "line": 16,
+            "line": 19,
         }

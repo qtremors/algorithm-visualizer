@@ -27,7 +27,7 @@ async def execute(
         sent.append(event)
 
     scope = {
-        "type": "websocket",
+        "type": "websocket", "query_string": b"",
         "path": f"/ws/visualize/{category}/{algorithm}",
         "headers": [(b"origin", b"https://client.example")],
         "client": ("test", 1),
@@ -166,7 +166,7 @@ async def test_idle_socket_times_out_and_releases_admission(monkeypatch):
         sent.append(event)
 
     socket = WebSocket(
-        {"type": "websocket", "path": "/", "headers": [], "client": ("idle", 1)},
+        {"type": "websocket", "query_string": b"", "path": "/", "headers": [], "client": ("idle", 1)},
         receive,
         send,
     )

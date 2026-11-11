@@ -1,10 +1,14 @@
 # AlgoVisualizer Changelog
 
 > **Project:** AlgoVisualizer
-> **Version:** 0.1.0
-> **Last Updated:** 2026-08-23
+> **Version:** 0.1.1
+> **Last Updated:** 2026-11-11
 
 ---
+
+## [0.1.1] - 2026-11-11
+
+- **Correct Algorithm Execution And Bound Trace Storage**: Fix DFS descent and pseudocode, add checkpointed delta streaming, validate metadata, publish capabilities and execution metrics, and add dependency and contract checks.
 
 ## [0.1.0] - 2026-08-23
 

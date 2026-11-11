@@ -1,30 +1,33 @@
-from typing import Dict, Type
+"""Algorithm registration with validated metadata and duplicate protection."""
+
+import re
+from typing import Type
+from app.contracts import validate_metadata
 
 
 class AlgorithmRegistry:
     def __init__(self):
-        self._registry: Dict[str, Dict[str, Type]] = {}
+        self._registry: dict[str, dict[str, Type]] = {}
 
     def register(self, category: str, name: str):
-        """Decorator to register an algorithm class."""
+        for value in (category, name):
+            if not re.fullmatch(r"[a-z][a-z0-9_]{0,63}", value):
+                raise ValueError("Registry keys must be lowercase identifiers.")
 
         def decorator(cls: Type):
-            if category not in self._registry:
-                self._registry[category] = {}
-            self._registry[category][name] = cls
+            algorithms = self._registry.setdefault(category, {})
+            if name in algorithms:
+                raise ValueError(f"Duplicate algorithm: {category}/{name}")
+            cls.metadata = validate_metadata(cls.metadata)
+            algorithms[name] = cls
             return cls
 
         return decorator
 
-    def get_algorithms(self) -> Dict[str, Dict[str, Type]]:
-        """Return a copy of the registration table."""
-        return {
-            category: algorithms.copy()
-            for category, algorithms in self._registry.items()
-        }
+    def get_algorithms(self) -> dict[str, dict[str, Type]]:
+        return {category: items.copy() for category, items in self._registry.items()}
 
     def get_algorithm(self, category: str, name: str) -> Type | None:
-        """Return the algorithm class or None for an unknown name."""
         return self._registry.get(category, {}).get(name)
 
 

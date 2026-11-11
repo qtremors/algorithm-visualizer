@@ -6,9 +6,11 @@ import logging
 
 class RunFormatter(logging.Formatter):
     def format(self, record: logging.LogRecord) -> str:
-        event = {"event": record.getMessage(), "level": record.levelname}
+        event = {"event": record.getMessage(), "level": record.levelname, "timestamp": self.formatTime(record)}
         for field in (
             "run_id",
+            "outcome",
+            "error_code",
             "category",
             "algorithm",
             "steps",

@@ -17,7 +17,7 @@ class SelectionSort(BaseAlgorithm):
             "  n = length(A)",
             "  for i = 0 to n-1 do",
             "     minIndex = i",
-            "     for j = i+1 to n do",
+            "     for j = i+1 to n-1 inclusive do",
             "        if A[j] < A[minIndex] then",
             "           minIndex = j",
             "        end if",

@@ -32,6 +32,8 @@ export interface GraphSnapshot {
   path: string[];
 }
 export interface AlgorithmStep {
+  sequence?: number;
+  learning?: LearningState;
   type:
     | 'info'
     | 'compare'
@@ -47,6 +49,15 @@ export interface AlgorithmStep {
 }
 export type ServerMessage =
   | AlgorithmStep
-  | { type: 'complete'; steps: number }
+  | { type: 'complete'; steps: number; metrics?: Record<string, number | string> }
   | { type: 'error'; code: string; message: string };
 export type RunStatus = 'idle' | 'running' | 'completed' | 'failed';
+
+export interface LearningState {
+  frontier?: NodeId[];
+  frontier_count?: number;
+  distances?: Record<string, number>;
+  parents?: Record<string, NodeId>;
+  boundary?: number[];
+  explanation?: string;
+}

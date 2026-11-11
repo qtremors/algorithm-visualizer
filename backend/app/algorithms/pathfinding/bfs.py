@@ -34,7 +34,7 @@ class BFS(BasePathfindingAlgorithm):
         ],
         "cons": [
             "High memory usage (stores all nodes at depth).",
-            "Doesn't work for weighted graphs.",
+            "Minimizes hops; ignores edge weights.",
         ],
     }
 

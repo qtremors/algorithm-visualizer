@@ -103,14 +103,36 @@ export function parseMessage(text: string): ServerMessage {
         ? cell
         : (v: unknown) => typeof v === 'string' && node(v);
     if (
-      !Array.isArray(s.visited) ||
+      (!Array.isArray(s.visited) && !Array.isArray(s.added)) ||
       !Array.isArray(s.path) ||
-      s.visited.length > 2500 ||
+      (Array.isArray(s.visited) && s.visited.length > 2500) ||
       s.path.length > 2500 ||
-      !s.visited.every(validNode) ||
+      (Array.isArray(s.visited) && !s.visited.every(validNode)) ||
       !s.path.every(validNode)
     )
       throw new Error('Invalid pathfinding snapshot.');
   } else throw new Error('Invalid visualization snapshot.');
+  if (record(s) && s.added !== undefined) {
+    const validNode = s.type === 'grid' ? cell : (v: unknown) => typeof v === 'string' && node(v);
+    if (!Number.isSafeInteger(value.sequence) || Number(value.sequence) < 0 ||
+        !Array.isArray(s.added) || !Array.isArray(s.removed) ||
+        s.added.length > 2500 || s.removed.length > 2500 ||
+        !s.added.every(validNode) || !s.removed.every(validNode))
+      throw new Error('Invalid visualization delta.');
+  }
+  if (value.learning !== undefined) {
+    if (!record(value.learning)) throw new Error('Invalid learning state.');
+    const learning = value.learning;
+    if (learning.frontier !== undefined &&
+        (!Array.isArray(learning.frontier) || learning.frontier.length > 80 || !learning.frontier.every(node)))
+      throw new Error('Invalid frontier.');
+    if (learning.frontier_count !== undefined &&
+        (!Number.isSafeInteger(learning.frontier_count) || Number(learning.frontier_count) < 0))
+      throw new Error('Invalid frontier count.');
+    for (const field of ['distances', 'parents']) {
+      if (learning[field] !== undefined && (!record(learning[field]) || Object.keys(learning[field]).length > 2500))
+        throw new Error('Invalid learning table.');
+    }
+  }
   return value as unknown as ServerMessage;
 }

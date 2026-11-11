@@ -4,6 +4,7 @@ import type { InputData } from '../types/input';
 import { apiUrl } from '../lib/api';
 import { LIMITS } from '../lib/input';
 import { parseMessage } from '../lib/protocol';
+import { TraceDecoder } from '../lib/trace';
 
 type Run = {
   key: string;
@@ -43,6 +44,7 @@ export function useAlgorithmRunner(category?: string, algorithmName?: string) {
       disconnect();
       const id = ++sequence.current;
       const steps: AlgorithmStep[] = [];
+      const decoder = new TraceDecoder();
       setState({ key, id, steps: [], status: 'running', error: null });
       if (!category || !algorithmName) {
         setState({
@@ -58,7 +60,7 @@ export function useAlgorithmRunner(category?: string, algorithmName?: string) {
       try {
         socket = new WebSocket(
           apiUrl(
-            `/ws/visualize/${encodeURIComponent(category)}/${encodeURIComponent(algorithmName)}`,
+            `/ws/visualize/${encodeURIComponent(category)}/${encodeURIComponent(algorithmName)}?protocol=3`,
             true,
           ),
         );
@@ -156,7 +158,7 @@ export function useAlgorithmRunner(category?: string, algorithmName?: string) {
             throw new Error(
               'This visualization is too large. Use a smaller input.',
             );
-          steps.push(message);
+          steps.push(decoder.decode(message));
           if (steps.length === 1 || steps.length % 128 === 0) publish();
           else batch ??= setTimeout(publish, 32);
         } catch (error) {

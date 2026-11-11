@@ -60,3 +60,21 @@ class BasePathfindingAlgorithm(BaseAlgorithm):
                 "path": list(path),
                 "grid": self.grid,
             }
+
+    def reconstruct(self, parent, node):
+        path = [node]
+        while node in parent:
+            node = parent[node]
+            path.append(node)
+        return list(reversed(path))
+
+    def step(self, kind, visited, route, message, line, **payload):
+        frontier = payload.pop("frontier", None)
+        learning = {}
+        if frontier is not None:
+            learning = {"frontier": frontier[:80], "frontier_count": len(frontier)}
+        return {
+            "type": kind, "payload": payload,
+            "snapshot": self.get_snapshot(visited, route),
+            "message": message, "line": line, "learning": learning,
+        }
