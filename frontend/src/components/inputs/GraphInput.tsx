@@ -94,47 +94,44 @@ export default function GraphInput({
     onSubmit(data);
   };
   return (
-    <fieldset
-      disabled={disabled}
-      className="w-full flex flex-wrap gap-3 items-center disabled:opacity-60"
-    >
+    <fieldset disabled={disabled} className="grid-editor disabled:opacity-60">
       <legend className="sr-only">Graph input</legend>
-      <div className="flex flex-wrap gap-2 items-center bg-gray-900 max-w-full border border-gray-700 p-2 rounded-lg">
-        <label className="text-xs flex items-center gap-1">
-          Nodes
+      <div className="graph-generator">
+        <label className="control-field">
+          <span>Nodes</span>
           <input
             aria-label="Node count"
             type="number"
-            min="1"
-            max="50"
+            min={1}
+            max={50}
             value={nodeCount}
             onChange={(e) => setNodeCount(Number(e.target.value))}
-            className="w-12 bg-transparent"
+            className="control-input"
           />
         </label>
-        <label className="text-xs flex items-center gap-1">
-          Neighbors
+        <label className="control-field">
+          <span>Neighbors</span>
           <input
             aria-label="Neighbors per node"
             type="number"
-            min="1"
-            max="8"
+            min={1}
+            max={8}
             value={density}
             onChange={(e) => setDensity(Number(e.target.value))}
-            className="w-10 bg-transparent"
+            className="control-input"
           />
         </label>
         <button
           type="button"
           onClick={() => generate(true)}
-          className="text-purple-400 text-xs px-2"
+          className="action-secondary"
         >
           Tree
         </button>
         <button
           type="button"
           onClick={() => generate(false)}
-          className="text-blue-400 text-xs px-2"
+          className="action-secondary"
         >
           Mesh
         </button>
@@ -145,17 +142,22 @@ export default function GraphInput({
             onSubmit(createGraph());
           }}
           aria-label="Clear graph"
-          title="Clear"
-          className="p-1"
+          title="Clear graph"
+          className="control-icon"
         >
-          <Trash2 size={16} />
+          <Trash2 size={17} />
         </button>
+        <label className="playback-speed">
+          <input
+            type="checkbox"
+            checked={directed}
+            disabled={disabled}
+            onChange={(e) => onDirectedChange?.(e.target.checked)}
+          />
+          Directed connections
+        </label>
       </div>
-      <div
-        role="group"
-        aria-label="Graph tools"
-        className="flex flex-wrap gap-1 bg-gray-900 p-1 rounded-lg"
-      >
+      <div role="group" aria-label="Graph tools" className="tool-group">
         <ToolButton
           active={mode === 'node'}
           onClick={() => setMode('node')}
@@ -199,17 +201,8 @@ export default function GraphInput({
           color="text-blue-300"
         />
       </div>
-      <label className="flex gap-2 items-center text-sm">
-        <input
-          type="checkbox"
-          checked={directed}
-          disabled={disabled}
-          onChange={(event) => onDirectedChange?.(event.target.checked)}
-        />
-        Directed connections
-      </label>
       {error && (
-        <p role="alert" className="text-xs text-red-400 w-full">
+        <p role="alert" className="text-xs text-red-400">
           {error}
         </p>
       )}

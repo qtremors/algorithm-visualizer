@@ -3,8 +3,10 @@ import type { Cell } from './input';
 export interface AlgorithmMetadata {
   name: string;
   pseudocode: string[];
-  input_type: 'list[int]' | 'graph_grid';
-  visualizer: 'bar_chart' | 'grid_2d';
+  input_type: 'list[int]' | 'graph_grid' | 'tree';
+  visualizer: 'bar_chart' | 'grid_2d' | 'tree';
+  supports_negative?: boolean;
+  heuristics?: string[];
   description: string;
   complexity: { time: string; space: string };
   pros: string[];
@@ -39,17 +41,24 @@ export interface AlgorithmStep {
     | 'compare'
     | 'swap'
     | 'sorted'
+    | 'write'
+    | 'negative_cycle'
+    | 'tree_update'
     | 'visit_node'
     | 'relax_edge'
     | 'found_path';
   payload: StepPayload;
-  snapshot: SortingSnapshot | GridSnapshot | GraphSnapshot;
+  snapshot: SortingSnapshot | GridSnapshot | GraphSnapshot | TreeSnapshot;
   message: string;
   line: number;
 }
 export type ServerMessage =
   | AlgorithmStep
-  | { type: 'complete'; steps: number; metrics?: Record<string, number | string> }
+  | {
+      type: 'complete';
+      steps: number;
+      metrics?: Record<string, number | string>;
+    }
   | { type: 'error'; code: string; message: string };
 export type RunStatus = 'idle' | 'running' | 'completed' | 'failed';
 
@@ -60,4 +69,19 @@ export interface LearningState {
   parents?: Record<string, NodeId>;
   boundary?: number[];
   explanation?: string;
+}
+
+export interface TreeNode {
+  id: string;
+  value: number;
+  count: number;
+  left: string | null;
+  right: string | null;
+  height: number;
+}
+export interface TreeSnapshot {
+  type: 'tree';
+  root: string | null;
+  nodes: TreeNode[];
+  visited: string[];
 }

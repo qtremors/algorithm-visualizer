@@ -8,6 +8,7 @@ type Props = {
   totalSteps: number;
   currentStepIndex: number;
   isRunning: boolean;
+  isPlaying?: boolean;
 };
 export default function StatusLog({
   logHistory,
@@ -15,6 +16,7 @@ export default function StatusLog({
   totalSteps,
   currentStepIndex,
   isRunning,
+  isPlaying = false,
 }: Props) {
   const [open, setOpen] = useState(false);
   return (
@@ -40,7 +42,7 @@ export default function StatusLog({
       </div>
       <div
         role={error ? 'alert' : 'status'}
-        aria-live="polite"
+        aria-live={isPlaying && !error ? 'off' : 'polite'}
         className={`bg-black rounded p-3 text-sm ${error ? 'text-red-400' : 'text-yellow-300'}`}
       >
         {error || logHistory.at(-1) || 'Ready.'}

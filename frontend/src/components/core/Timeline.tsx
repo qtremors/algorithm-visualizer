@@ -7,7 +7,9 @@ export default function Timeline({
   onSeek,
   operation,
   onOperationChange,
+  breakpointHint = true,
 }: {
+  breakpointHint?: boolean;
   index: number;
   length: number;
   streaming: boolean;
@@ -17,10 +19,7 @@ export default function Timeline({
   onOperationChange: (operation: PlaybackOperation) => void;
 }) {
   return (
-    <section
-      aria-label="Timeline"
-      className="rounded-xl border border-gray-700 bg-gray-900 p-3 flex flex-wrap gap-3 items-center"
-    >
+    <section aria-label="Timeline" className="timeline-controls">
       <button
         className="action-secondary"
         disabled={disabled}
@@ -28,9 +27,11 @@ export default function Timeline({
       >
         First step
       </button>
-      <label className="flex-1 min-w-32 text-xs text-gray-300">
-        Step {length ? index + 1 : 0} of {length}
-        {streaming ? ' received so far' : ''}
+      <label className="control-field">
+        <span>
+          Step {length ? index + 1 : 0} of {length}
+          {streaming ? ' received so far' : ''}
+        </span>
         <input
           type="range"
           aria-label="Playback timeline"
@@ -49,15 +50,15 @@ export default function Timeline({
       >
         Last step
       </button>
-      <label className="text-xs">
-        Step by
+      <label className="control-field timeline-operation">
+        <span>Step by</span>
         <select
           aria-label="Step operation"
           value={operation}
           onChange={(event) =>
             onOperationChange(event.target.value as PlaybackOperation)
           }
-          className="block bg-gray-800 p-2 rounded mt-1"
+          className="control-input"
         >
           <option value="any">Every step</option>
           <option value="compare">Comparison</option>
@@ -66,10 +67,12 @@ export default function Timeline({
           <option value="relax_edge">Edge relaxation</option>
         </select>
       </label>
-      <p className="text-xs text-gray-400 w-full">
-        Click a pseudocode line number to pause there. Timeline movement pauses
-        playback.
-      </p>
+      {breakpointHint && (
+        <p className="timeline-help">
+          Click a pseudocode line number to pause there. Timeline movement
+          pauses playback.
+        </p>
+      )}
     </section>
   );
 }

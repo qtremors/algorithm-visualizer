@@ -29,12 +29,12 @@ def finite_number(value: Any, minimum: float, maximum: float) -> bool:
     )
 
 
-def validate_pathfinding(data: Any) -> dict:
+def validate_pathfinding(data: Any, allow_negative: bool = False) -> dict:
     if not isinstance(data, dict):
         raise ValueError("Pathfinding input must be an object.")
     if ("grid" in data) == ("adjacency" in data):
         raise ValueError("Provide either a grid or a graph.")
-    return validate_graph(data) if "adjacency" in data else validate_grid(data)
+    return validate_graph(data, allow_negative) if "adjacency" in data else validate_grid(data)
 
 
 def validate_grid(data: dict) -> dict:
@@ -71,7 +71,7 @@ def validate_grid(data: dict) -> dict:
     return {"kind": "grid", "grid": [row.copy() for row in grid], **points}
 
 
-def validate_graph(data: dict) -> dict:
+def validate_graph(data: dict, allow_negative: bool = False) -> dict:
     adjacency = data["adjacency"]
     if data.get("kind", "graph") != "graph" or not isinstance(adjacency, dict):
         raise ValueError("Graph adjacency must be an object matching its input kind.")
@@ -110,10 +110,10 @@ def validate_graph(data: dict) -> dict:
                 f"Graph may contain at most {limits.max_graph_edges} directed edges."
             )
         if any(
-            not finite_number(weight, 0, 1_000_000) for weight in neighbors.values()
+            not finite_number(weight, -1_000_000 if allow_negative else 0, 1_000_000) for weight in neighbors.values()
         ):
             raise ValueError(
-                "Edge weights must be finite numbers between 0 and 1000000."
+                "Edge weights must be finite and within the supported range; negative edges require Bellman–Ford."
             )
     for name in ("start", "end"):
         if not isinstance(data.get(name), str) or data[name] not in ids:

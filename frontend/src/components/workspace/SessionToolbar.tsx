@@ -101,7 +101,7 @@ export default function SessionToolbar({
           Seed
           <input
             aria-label="Generator seed"
-            className="bg-gray-800 rounded p-2 w-28"
+            className="control-input w-28"
             maxLength={128}
             value={session.seed}
             disabled={disabled}

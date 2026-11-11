@@ -3,11 +3,14 @@ import { useAlgorithmWorkspace } from '../hooks/useAlgorithmWorkspace';
 import WorkspaceHeader from '../components/workspace/WorkspaceHeader';
 import VisualizerPanel from '../components/workspace/VisualizerPanel';
 import PlaybackControls from '../components/core/PlaybackControls';
-import Pseudocode, { CodeRenderer } from '../components/core/Pseudocode';
+import { CodeRenderer } from '../components/core/Pseudocode';
 import StatusLog from '../components/core/StatusLog';
 import InfoModal from '../components/core/InfoModal';
 import Modal from '../components/core/Modal';
 import LogList from '../components/core/LogList';
+import LearningTabs from '../components/core/LearningTabs';
+import RunSummary from '../components/core/RunSummary';
+import VisualizerLegend from '../components/core/VisualizerLegend';
 import Timeline from '../components/core/Timeline';
 import WeightEditor from '../components/core/WeightEditor';
 import SessionToolbar from '../components/workspace/SessionToolbar';
@@ -32,6 +35,12 @@ export default function AlgorithmWorkspace() {
   return (
     <div className="workspace flex flex-col gap-4 min-w-0">
       <h1 className="sr-only">{w.category} algorithm workspace</h1>
+      <div className="flex flex-wrap gap-3 items-center justify-between">
+        <h2 className="font-bold capitalize">{w.category} workspace</h2>
+        <Link className="text-blue-300 text-sm" to={`/compare/${w.category}`}>
+          Compare algorithms
+        </Link>
+      </div>
       <SessionToolbar
         session={w.editor.session}
         setSeed={w.editor.setSeed}
@@ -72,6 +81,43 @@ export default function AlgorithmWorkspace() {
         graphTool={w.graphTool}
         setGraphTool={w.setGraphTool}
       />
+      {w.selectedAlgoName === 'astar' &&
+        w.inputData &&
+        !Array.isArray(w.inputData) &&
+        w.inputData.kind === 'grid' && (
+          <label className="text-sm">
+            A* heuristic
+            <select
+              aria-label="A* heuristic"
+              className="bg-gray-900 p-2 rounded ml-2"
+              disabled={w.busy}
+              value={w.inputData.heuristic || 'manhattan'}
+              onChange={(event) =>
+                w.inputData &&
+                !Array.isArray(w.inputData) &&
+                w.inputData.kind === 'grid' &&
+                w.handleInputUpdate({
+                  ...w.inputData,
+                  heuristic: event.target.value as
+                    | 'manhattan'
+                    | 'euclidean'
+                    | 'zero',
+                })
+              }
+            >
+              <option value="manhattan">Manhattan</option>
+              <option value="euclidean">Euclidean</option>
+              <option value="zero">Zero (Dijkstra)</option>
+            </select>
+          </label>
+        )}
+      {w.category === 'pathfinding' &&
+        ['bfs', 'dfs'].includes(w.selectedAlgoName) && (
+          <p className="text-sm text-gray-400">
+            BFS minimizes hops; DFS finds a reachable route. Both ignore edge
+            weights. Use Dijkstra, A*, or Bellman–Ford to minimize cost.
+          </p>
+        )}
       <PlaybackControls
         isPlaying={p.isPlaying}
         onPlay={p.play}
@@ -99,6 +145,40 @@ export default function AlgorithmWorkspace() {
         showEdgeColors={w.showEdgeColors}
         onToggleEdgeColors={() => w.setShowEdgeColors(!w.showEdgeColors)}
       />
+      {w.validationError && (
+        <p className="text-sm text-amber-300">{w.validationError}</p>
+      )}
+      <VisualizerLegend category={w.category} />
+      <div className="workspace-stage">
+        <div className="workspace-canvas">
+          <VisualizerPanel
+            algorithmMetadata={w.algorithmMetadata}
+            currentStep={p.currentStep}
+            inputData={w.inputData}
+            visualizationMode={w.visualizationMode}
+            graphTool={w.graphTool}
+            busy={w.busy}
+            onInputUpdate={w.handleInputUpdate}
+            onGraphInteraction={w.handleGraphInteraction}
+            onWeightChange={w.handleWeightChange}
+            tempLine={w.tempLine}
+            zoom={w.zoom}
+            isFitToScreen={w.isFitToScreen}
+            showEdgeColors={w.showEdgeColors}
+            showPath={w.showPath}
+          />
+        </div>
+        <LearningTabs
+          code={w.algorithmMetadata?.pseudocode || []}
+          step={p.currentStep}
+          steps={w.steps}
+          index={p.currentStepIndex}
+          algorithm={w.selectedAlgoName}
+          messages={w.logHistory}
+          breakpoints={p.breakpoints}
+          onToggleBreakpoint={p.toggleBreakpoint}
+        />
+      </div>
       <Timeline
         index={p.currentStepIndex}
         length={w.steps.length}
@@ -108,45 +188,21 @@ export default function AlgorithmWorkspace() {
         operation={p.operation}
         onOperationChange={p.setOperation}
       />
-      {w.validationError && (
-        <p className="text-sm text-amber-300">{w.validationError}</p>
-      )}
-      <div className="workspace-panels flex-1 flex flex-col lg:flex-row gap-4 min-h-0">
-        <VisualizerPanel
-          algorithmMetadata={w.algorithmMetadata}
-          currentStep={p.currentStep}
-          inputData={w.inputData}
-          visualizationMode={w.visualizationMode}
-          graphTool={w.graphTool}
-          busy={w.busy}
-          onInputUpdate={w.handleInputUpdate}
-          onGraphInteraction={w.handleGraphInteraction}
-          onWeightChange={w.handleWeightChange}
-          tempLine={w.tempLine}
-          zoom={w.zoom}
-          isFitToScreen={w.isFitToScreen}
-          showEdgeColors={w.showEdgeColors}
-          showPath={w.showPath}
+      <RunSummary
+        steps={w.steps}
+        index={p.currentStepIndex}
+        metrics={w.metrics}
+        category={w.category}
+      />
+      <div className="workspace-status">
+        <StatusLog
+          logHistory={w.logHistory}
+          error={w.error}
+          totalSteps={w.steps.length}
+          currentStepIndex={p.currentStepIndex}
+          isRunning={w.isRunning}
+          isPlaying={p.isPlaying}
         />
-        <aside className="w-full lg:w-96 flex-shrink-0 flex flex-col gap-4 min-h-0">
-          <div className="bg-gray-800 p-4 rounded-xl border border-gray-700 flex-1 flex flex-col min-h-48">
-            <Pseudocode
-              code={w.algorithmMetadata?.pseudocode || []}
-              highlightedLine={p.currentStep?.line || 0}
-              breakpoints={p.breakpoints}
-              onToggleBreakpoint={p.toggleBreakpoint}
-            />
-          </div>
-          <div className="bg-gray-800 p-4 rounded-xl border border-gray-700">
-            <StatusLog
-              logHistory={w.logHistory}
-              error={w.error}
-              totalSteps={w.steps.length}
-              currentStepIndex={p.currentStepIndex}
-              isRunning={w.isRunning}
-            />
-          </div>
-        </aside>
       </div>
       {w.graphEditor.edge && (
         <WeightEditor

@@ -10,7 +10,7 @@ class BasePathfindingAlgorithm(BaseAlgorithm):
     """
 
     def __init__(self, data: Any):
-        data = validate_pathfinding(data)
+        data = validate_pathfinding(data, getattr(self, "supports_negative", False))
         super().__init__(data)
         self.mode = data["kind"]
         if self.mode == "graph":
@@ -71,8 +71,15 @@ class BasePathfindingAlgorithm(BaseAlgorithm):
     def step(self, kind, visited, route, message, line, **payload):
         frontier = payload.pop("frontier", None)
         learning = {}
+        distances = payload.pop("distances", None)
+        parents = payload.pop("parents", None)
+        if self.mode == "graph":
+            if distances is not None:
+                learning["distances"] = dict(distances)
+            if parents is not None:
+                learning["parents"] = dict(parents)
         if frontier is not None:
-            learning = {"frontier": frontier[:80], "frontier_count": len(frontier)}
+            learning.update({"frontier": frontier[:80], "frontier_count": len(frontier)})
         return {
             "type": kind, "payload": payload,
             "snapshot": self.get_snapshot(visited, route),

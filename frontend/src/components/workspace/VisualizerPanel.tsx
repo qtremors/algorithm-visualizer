@@ -1,3 +1,4 @@
+import TreeVisualizer from '../visualizers/TreeVisualizer';
 import SortingVisualizer from '../visualizers/SortingVisualizer';
 import GridVisualizer from '../visualizers/GridVisualizer';
 import GraphVisualizer from '../visualizers/GraphVisualizer';
@@ -34,7 +35,9 @@ export default function VisualizerPanel(props: Props) {
       aria-label="Visualization"
     >
       <div className="absolute inset-0">
-        {algorithmMetadata?.visualizer === 'bar_chart' ? (
+        {algorithmMetadata?.visualizer === 'tree' ? (
+          <TreeVisualizer step={currentStep || null} />
+        ) : algorithmMetadata?.visualizer === 'bar_chart' ? (
           <SortingVisualizer
             step={currentStep || null}
             initialData={Array.isArray(inputData) ? inputData : null}

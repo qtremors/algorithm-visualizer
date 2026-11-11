@@ -61,6 +61,7 @@ class BFS(BasePathfindingAlgorithm):
                 "snapshot": self.get_snapshot(visited, []),
                 "message": f"Processing {curr}",
                 "line": 6,
+                "learning": {"frontier": list(queue)[:80], "frontier_count": len(queue)},
             }
 
             if curr == self.end:
@@ -91,6 +92,7 @@ class BFS(BasePathfindingAlgorithm):
                         "snapshot": self.get_snapshot(visited, []),
                         "message": f"Enqueuing {neighbor}",
                         "line": 11,
+                        "learning": {"frontier": list(queue)[:80], "frontier_count": len(queue)},
                     }
 
         yield {

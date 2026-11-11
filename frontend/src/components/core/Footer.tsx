@@ -1,8 +1,8 @@
-import { useState } from 'react';
+import { lazy, Suspense, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { Github, HelpCircle, Heart } from 'lucide-react';
-import GuideModal from './GuideModal';
-import AboutModal from './AboutModal';
+const GuideModal = lazy(() => import('./GuideModal'));
+const AboutModal = lazy(() => import('./AboutModal'));
 
 export default function Footer() {
   const location = useLocation();
@@ -21,7 +21,7 @@ export default function Footer() {
   return (
     <>
       <footer className="w-full bg-gray-900 border-t border-gray-800 mt-auto">
-        <div className="container relative mx-auto px-4 py-4 flex flex-col md:flex-row items-center justify-between gap-4">
+        <div className="container mx-auto footer-layout">
           {/* Left: Copyright / Branding */}
           <div className="text-gray-500 text-sm flex items-center gap-1">
             <span>© {new Date().getFullYear()} AlgoVisualizer. Made with</span>
@@ -40,7 +40,7 @@ export default function Footer() {
           {/* Center: Dynamic Action Button */}
           <button
             onClick={() => setIsGuideOpen(true)}
-            className="group flex items-center gap-2 px-4 py-1.5 bg-gray-800 hover:bg-gray-700 border border-gray-700 rounded-full transition-all shadow-sm hover:shadow-md hover:border-gray-600 md:absolute md:left-1/2 md:-translate-x-1/2"
+            className="group flex items-center gap-2 px-4 py-1.5 bg-gray-800 hover:bg-gray-700 border border-gray-700 rounded-full transition-all shadow-sm hover:shadow-md hover:border-gray-600"
           >
             <HelpCircle
               size={16}
@@ -54,7 +54,7 @@ export default function Footer() {
           </button>
 
           {/* Right: Links */}
-          <div className="flex items-center gap-6">
+          <div className="footer-links">
             <a
               href="https://github.com/qtremors/algorithm-visualizer"
               target="_blank"
@@ -75,12 +75,21 @@ export default function Footer() {
       </footer>
 
       {/* Modals */}
-      <GuideModal
-        isOpen={isGuideOpen}
-        onClose={() => setIsGuideOpen(false)}
-        category={category}
-      />
-      <AboutModal isOpen={isAboutOpen} onClose={() => setIsAboutOpen(false)} />
+      <Suspense fallback={null}>
+        {isGuideOpen && (
+          <GuideModal
+            isOpen={isGuideOpen}
+            onClose={() => setIsGuideOpen(false)}
+            category={category}
+          />
+        )}
+        {isAboutOpen && (
+          <AboutModal
+            isOpen={isAboutOpen}
+            onClose={() => setIsAboutOpen(false)}
+          />
+        )}
+      </Suspense>
     </>
   );
 }

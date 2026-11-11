@@ -26,6 +26,7 @@ class RunMetrics:
         result = {
             "comparisons": self.counts["compare"],
             "swaps": self.counts["swap"],
+            "writes": self.counts["write"],
             "relaxations": self.counts["relax_edge"],
             "visited": len(self.visited),
             "path_hops": self.path_hops,

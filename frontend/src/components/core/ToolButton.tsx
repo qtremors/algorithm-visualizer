@@ -19,7 +19,7 @@ export default function ToolButton({
       aria-pressed={active}
       onClick={onClick}
       className={cn(
-        'flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-colors',
+        'tool-button',
         active ? 'bg-gray-700 text-white' : 'text-gray-400 hover:bg-gray-800',
       )}
     >

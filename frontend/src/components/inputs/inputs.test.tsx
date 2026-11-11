@@ -84,12 +84,32 @@ describe('input regressions', () => {
   });
 });
 
-
 it('updates the visible array when undo or import replaces its data', () => {
   const submit = vi.fn();
-  const { rerender } = render(<ArrayInput currentData={[3, 2]} onSubmit={submit} disabled={false} />);
-  fireEvent.change(screen.getByLabelText('Custom Input'), { target: { value: 'oops' } });
-  rerender(<ArrayInput currentData={[-1, 9]} onSubmit={submit} disabled={false} />);
+  const { rerender } = render(
+    <ArrayInput currentData={[3, 2]} onSubmit={submit} disabled={false} />,
+  );
+  fireEvent.change(screen.getByLabelText('Custom Input'), {
+    target: { value: 'oops' },
+  });
+  rerender(
+    <ArrayInput currentData={[-1, 9]} onSubmit={submit} disabled={false} />,
+  );
   expect(screen.getByLabelText('Custom Input')).toHaveValue('-1, 9');
   expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+});
+
+it('keeps the sorting axis stable while merge writes temporarily repeat values', () => {
+  const step = {
+    type: 'write' as const,
+    payload: { indices: [0] },
+    snapshot: [1, 1, 3],
+    message: 'Write buffered value',
+    line: 7,
+  };
+  const { container } = render(
+    <SortingVisualizer initialData={[9, 1, 3]} step={step} />,
+  );
+  const first = container.querySelector<HTMLElement>('[data-value="1"]');
+  expect(Number.parseFloat(first!.style.height)).toBeCloseTo(100 / 9);
 });

@@ -3,12 +3,15 @@ import { AlgorithmContext } from './algorithm-context';
 import type { AlgorithmsData } from '../types';
 import { apiUrl } from '../lib/api';
 import { parseAlgorithms } from '../lib/protocol';
+import { readCatalog, saveCatalog } from '../lib/catalog';
+import { applyCapabilities } from '../lib/capabilities';
 
 export function AlgorithmProvider({ children }: { children: ReactNode }) {
   const [attempt, setAttempt] = useState(0);
+  const [cached] = useState(readCatalog);
   const [state, setState] = useState({
-    algorithms: null as AlgorithmsData | null,
-    isLoading: true,
+    algorithms: cached as AlgorithmsData | null,
+    isLoading: !cached,
     isServerWaking: false,
     error: null as string | null,
   });
@@ -41,6 +44,7 @@ export function AlgorithmProvider({ children }: { children: ReactNode }) {
             `Cannot load algorithms (${response.status}). Please retry.`,
           );
         const algorithms = parseAlgorithms(await response.json());
+        if (active) saveCatalog(algorithms);
         if (active)
           setState({
             algorithms,
@@ -51,7 +55,7 @@ export function AlgorithmProvider({ children }: { children: ReactNode }) {
       } catch (error) {
         if (active)
           setState({
-            algorithms: null,
+            algorithms: cached,
             isLoading: false,
             isServerWaking: false,
             error:
@@ -65,13 +69,21 @@ export function AlgorithmProvider({ children }: { children: ReactNode }) {
       }
     }
     void fetchMetadata();
+    void fetch(apiUrl('/api/capabilities'), { signal: controller.signal })
+      .then((response) => (response.ok ? response.json() : null))
+      .then((value) => {
+        if (active && value) applyCapabilities(value);
+      })
+      .catch(() => {
+        /* Legacy servers retain conservative client caps. */
+      });
     return () => {
       active = false;
       controller.abort();
       clearTimeout(wake);
       clearTimeout(deadline);
     };
-  }, [attempt]);
+  }, [attempt, cached]);
   return (
     <AlgorithmContext.Provider value={{ ...state, retry }}>
       {children}

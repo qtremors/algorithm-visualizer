@@ -65,6 +65,7 @@ class Dijkstra(BasePathfindingAlgorithm):
                 "snapshot": self.get_snapshot(visited, []),
                 "message": f"Processing {curr_node} (dist: {curr_dist})",
                 "line": 8,
+                "learning": self.learning(pq, distances, came_from),
             }
 
             if curr_node == self.end:
@@ -104,6 +105,7 @@ class Dijkstra(BasePathfindingAlgorithm):
                         "snapshot": self.get_snapshot(visited, []),
                         "message": f"Relaxing {neighbor} (new dist: {new_dist})",
                         "line": 15,
+                        "learning": self.learning(pq, distances, came_from),
                     }
 
         yield {
@@ -113,3 +115,9 @@ class Dijkstra(BasePathfindingAlgorithm):
             "message": "No path found.",
             "line": 19,
         }
+
+    def learning(self, queue, distances, parents):
+        result = {"frontier": [entry[1] for entry in queue[:80]], "frontier_count": len(queue)}
+        if self.mode == "graph":
+            result.update({"distances": dict(distances), "parents": dict(parents)})
+        return result

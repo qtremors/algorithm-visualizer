@@ -1,6 +1,7 @@
 """Metadata, capabilities, and bounded single-execution WebSocket streaming."""
 
 import asyncio
+import hmac
 import json
 import os
 from dataclasses import asdict
@@ -24,8 +25,15 @@ import app.algorithms.pathfinding.dijkstra  # noqa: F401
 import app.algorithms.pathfinding.bfs  # noqa: F401
 import app.algorithms.pathfinding.dfs  # noqa: F401
 
+import app.algorithms.sorting.merge_sort  # noqa: F401
+import app.algorithms.sorting.quick_sort  # noqa: F401
+import app.algorithms.pathfinding.astar  # noqa: F401
+import app.algorithms.pathfinding.bellman_ford  # noqa: F401
+
+import app.algorithms.trees.search_tree  # noqa: F401
+
 logger = run_logger()
-APP_VERSION = "0.1.2"
+APP_VERSION = "0.1.3"
 REVISION = os.getenv("VERCEL_GIT_COMMIT_SHA", os.getenv("APP_REVISION", "development"))
 api = FastAPI(title="AlgoVisualizer", version=APP_VERSION)
 api.add_middleware(
@@ -59,7 +67,7 @@ async def get_algorithms_api(response: Response):
 @api.get("/api/metrics", include_in_schema=False)
 async def metrics(authorization: str | None = Header(default=None)):
     token = os.getenv("METRICS_TOKEN")
-    if not token or authorization != f"Bearer {token}":
+    if not token or not hmac.compare_digest(authorization or "", f"Bearer {token}"):
         raise HTTPException(404)
     return Response(service_metrics.render(), media_type="text/plain")
 

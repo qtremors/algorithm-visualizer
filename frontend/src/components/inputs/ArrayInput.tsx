@@ -16,8 +16,13 @@ export default function ArrayInput({
   seed = 'algoviz',
 }: Props) {
   const id = useId();
-  const [draft, setDraft] = useState({ source: currentData, previous: currentData, text: currentData?.join(', ') || '' });
-  const localDraft = draft.source === currentData || draft.previous === currentData;
+  const [draft, setDraft] = useState({
+    source: currentData,
+    previous: currentData,
+    text: currentData?.join(', ') || '',
+  });
+  const localDraft =
+    draft.source === currentData || draft.previous === currentData;
   const text = localDraft ? draft.text : currentData?.join(', ') || '';
   const [preset, setPreset] = useState<ArrayPreset>('random');
   const [size, setSize] = useState(15);
@@ -37,7 +42,11 @@ export default function ArrayInput({
       return;
     }
     const values = arrayPreset(preset, size, seed, min, max);
-    setDraft({ source: values, previous: currentData, text: values.join(', ') });
+    setDraft({
+      source: values,
+      previous: currentData,
+      text: values.join(', '),
+    });
     setError(null);
     onSubmit(values);
   };
@@ -54,67 +63,47 @@ export default function ArrayInput({
     }
   };
   return (
-    <fieldset
-      disabled={disabled}
-      className="flex flex-col xl:flex-row gap-4 w-full disabled:opacity-60"
-    >
+    <fieldset disabled={disabled} className="array-editor disabled:opacity-60">
       <legend className="sr-only">Sorting input</legend>
-      <div>
-        <span className="text-xs font-bold text-gray-400 uppercase">
-          Generator
-        </span>
-        <div className="flex flex-wrap items-center gap-2 bg-gray-900 rounded-lg border border-gray-700 p-2">
-          <label htmlFor={`${id}-size`} className="text-xs">
-            Size
-          </label>
-          <input
-            id={`${id}-size`}
-            type="number"
-            min="1"
-            max="100"
-            value={size}
-            onChange={(e) => setSize(Number(e.target.value))}
-            className="w-14 bg-transparent"
-          />
-          <label htmlFor={`${id}-min`} className="sr-only">
-            Minimum value
-          </label>
-          <input
-            id={`${id}-min`}
-            type="number"
-            value={min}
-            onChange={(e) => setMin(Number(e.target.value))}
-            className="w-16 bg-transparent"
-          />
-          <span aria-hidden="true">–</span>
-          <label htmlFor={`${id}-max`} className="sr-only">
-            Maximum value
-          </label>
-          <input
-            id={`${id}-max`}
-            type="number"
-            value={max}
-            onChange={(e) => setMax(Number(e.target.value))}
-            className="w-16 bg-transparent"
-          />
-          <button
-            type="button"
-            onClick={generate}
-            title="Generate New"
-            aria-label="Generate New"
-            className="p-1 text-blue-400"
-          >
-            <RefreshCw size={16} />
-          </button>
-        </div>
-      </div>
-      <label className="text-xs">
-        Preset
+      <label className="control-field">
+        <span>Size</span>
+        <input
+          aria-label="Size"
+          type="number"
+          min={1}
+          max={LIMITS.array}
+          value={size}
+          onChange={(e) => setSize(Number(e.target.value))}
+          className="control-input"
+        />
+      </label>
+      <label className="control-field">
+        <span>Minimum</span>
+        <input
+          aria-label="Minimum value"
+          type="number"
+          value={min}
+          onChange={(e) => setMin(Number(e.target.value))}
+          className="control-input"
+        />
+      </label>
+      <label className="control-field">
+        <span>Maximum</span>
+        <input
+          aria-label="Maximum value"
+          type="number"
+          value={max}
+          onChange={(e) => setMax(Number(e.target.value))}
+          className="control-input"
+        />
+      </label>
+      <label className="control-field array-preset">
+        <span>Preset</span>
         <select
           aria-label="Array preset"
           value={preset}
-          onChange={(event) => setPreset(event.target.value as ArrayPreset)}
-          className="block bg-gray-900 p-2 rounded border border-gray-700"
+          onChange={(e) => setPreset(e.target.value as ArrayPreset)}
+          className="control-input"
         >
           <option value="random">Random</option>
           <option value="sorted">Sorted</option>
@@ -124,33 +113,38 @@ export default function ArrayInput({
           <option value="signed">Signed</option>
         </select>
       </label>
-      <div className="flex-grow min-w-0">
-        <label
-          htmlFor={`${id}-text`}
-          className="text-xs font-bold text-gray-400 uppercase"
-        >
-          Custom Input
-        </label>
+      <label className="control-field array-custom">
+        <span>Custom input</span>
         <input
           id={`${id}-text`}
+          aria-label="Custom Input"
           type="text"
           value={text}
           onChange={(e) => update(e.target.value)}
           aria-invalid={!!error && localDraft}
           aria-describedby={error && localDraft ? `${id}-error` : undefined}
-          placeholder="e.g., 50, 20, 80..."
-          className="w-full bg-gray-900 text-white p-2 rounded-lg border border-gray-700 text-sm font-mono"
+          placeholder="50, 20, 80..."
+          className="control-input font-mono"
         />
-        {error && localDraft && (
-          <p
-            id={`${id}-error`}
-            role="alert"
-            className="text-xs text-red-400 mt-1"
-          >
-            {error}
-          </p>
-        )}
-      </div>
+      </label>
+      <button
+        type="button"
+        onClick={generate}
+        title="Generate New"
+        aria-label="Generate New"
+        className="control-icon"
+      >
+        <RefreshCw size={18} />
+      </button>
+      {error && localDraft && (
+        <p
+          id={`${id}-error`}
+          role="alert"
+          className="text-xs text-red-400 col-span-full"
+        >
+          {error}
+        </p>
+      )}
     </fieldset>
   );
 }

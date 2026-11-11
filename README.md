@@ -29,10 +29,12 @@ Open [AlgoVisualizer](https://algoviz-qt.vercel.app/) in your browser. The backe
 
 ## Features
 
-- **Sorting:** Explore Bubble Sort, Selection Sort, and Insertion Sort with animated bars and highlighted comparisons.
-- **Pathfinding:** Run BFS, DFS, and Dijkstra on editable grids and network graphs. Compare reachability, hop counts, and weighted paths.
+- **Sorting:** Explore Bubble Sort, Selection Sort, Insertion Sort, Merge Sort, and Quick Sort with animated bars and highlighted comparisons.
+- **Pathfinding:** Run BFS, DFS, Dijkstra, A*, and Bellman–Ford on editable grids and network graphs. Compare reachability, hop counts, and weighted paths.
+- **Search trees:** Build and edit BST/AVL trees, search keys, inspect balancing rotations, and follow inorder, preorder, or postorder traversal.
+- **Compare and share:** Compare algorithms with synchronized playback, save drafts, export/import sessions, and share seeded inputs through URLs.
 - **Custom inputs:** Enter or generate arrays, draw grid walls and weighted cells, and edit graph nodes and connections.
-- **Playback:** Pause, adjust speed, step forward or backward, and reset a visualization.
+- **Playback:** Pause, adjust speed, step forward or backward, seek along the timeline, pause at pseudocode breakpoints, and reset a visualization.
 - **Pseudocode and logs:** Follow the current pseudocode line and review the execution history as steps arrive from the backend.
 - **Algorithm explanations:** Read time and space complexity, advantages, and limitations for each algorithm.
 - **Keyboard controls:** Use playback shortcuts and keyboard actions for grid and graph editing.

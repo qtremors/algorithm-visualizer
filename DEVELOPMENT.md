@@ -2,7 +2,7 @@
 
 > Architecture, local setup, protocol contracts, and verification guidance for AlgoVisualizer development.
 
-**Version:** 0.1.0 | **Last Updated:** 2026-08-23
+**Version:** 0.1.3 | **Last Updated:** 2026-11-11
 
 **Scope:** Frontend and backend development, testing, deployment, and maintenance.
 
@@ -58,7 +58,7 @@ flowchart TD
 | Styling and icons | Tailwind CSS 4, Lucide, clsx, tailwind-merge |
 | Frontend tooling | Vite 8, ESLint 9, npm |
 | Backend | Python 3.11+, FastAPI, Uvicorn, websockets, uv |
-| Transport | HTTP metadata and protocol version 2 WebSocket messages |
+| Transport | HTTP metadata and protocol version 3 WebSocket messages, with legacy version 2 transport available |
 | Tests | pytest, pytest-asyncio, Vitest 5, Testing Library, Playwright |
 
 Dependency declarations live in `frontend/package.json` and `backend/pyproject.toml`. Their lockfiles record resolved versions; Python deployment requirements are exported from `backend/uv.lock`.
@@ -110,6 +110,8 @@ algorithm-visualizer/
 
 ### Requirements
 
+Use `make setup`, `make dev`, `make check`, and `make audit` for local setup, both services, verification, and dependency audits. `make serve` starts the production ASGI process; set `FORWARDED_ALLOW_IPS` only to trusted ingress addresses.
+
 - Python 3.11 or newer and uv.
 - Node.js matching `^22.12.0 || ^24.0.0 || >=26.0.0`, as declared in `frontend/package.json`, and npm. Node 23 and 25 are outside this range.
 
@@ -149,7 +151,7 @@ Open [http://localhost:5173](http://localhost:5173). The development frontend co
 
 ## Workspace and Playback
 
-Each workspace keeps separate array, grid, and graph drafts. Changing category remounts the workspace and cleans up its socket. Changing algorithm or view clears incompatible playback while preserving drafts. Editor controls are disabled during execution or playback; Reset cancels an active run.
+Each workspace keeps separate array, grid, graph, and tree drafts, persisted in browser storage and included in validated versioned session imports/exports and share URLs. Seeded generators make shared examples reproducible. Undo/redo retains at most 40 editor states. Changing category remounts the workspace and cleans up its socket while retaining saved drafts. Changing algorithm or view clears incompatible playback while preserving drafts. Editor controls are disabled during execution or playback; Reset cancels an active run.
 
 Playback supports pause, forward and backward steps, and a 10-500 ms step interval. It can wait for incoming steps without resetting the playhead. Native dialogs provide focus containment, an inert background, Escape dismissal, and focus restoration.
 
@@ -159,14 +161,14 @@ Graph positions use one stable SVG coordinate space. Pointer positions pass thro
 
 | Endpoint | Response |
 | --- | --- |
-| `GET /api/health` | `{"status":"ok","protocol":2}` after algorithm imports. |
+| `GET /api/health` | Status, protocol 3, application version, and revision after algorithm imports. |
 | `GET /api/algorithms` | Category keys containing algorithm keys and their metadata. |
 
 Metadata includes name, pseudocode, input type, visualizer, description, complexity, advantages, and disadvantages. Registered modules must be imported by `backend/app/main.py` for their decorators to run.
 
 ## WebSocket Protocol
 
-Protocol version 2 uses `/ws/visualize/{category}/{algorithm_name}`. Send one JSON text input per connection.
+Protocol version 3 uses `/ws/visualize/{category}/{algorithm_name}?protocol=3`. Pathfinding frames contain added/removed nodes and a full checkpoint every 128 frames; the client reconstructs visited state for playback. Omitting the query parameter retains version 2 full snapshots. Send one JSON text input per connection.
 
 ### Inputs
 
@@ -192,7 +194,7 @@ The backend also accepts legacy inputs without `kind`, inferring it from grid/ad
 
 ### Steps and Terminal Messages
 
-Steps have `type`, `payload`, `snapshot`, `message`, and a one-based `line`. Step types are `info`, `compare`, `swap`, `sorted`, `visit_node`, `relax_edge`, and `found_path`. Payload fields include `indices`, `node`, `from`, `to`, `dist`, and `path`, depending on the step. Sorting snapshots are stable integer arrays. Grid/graph snapshots contain `type`, `visited`, and `path`; static grid geometry is held by the client and omitted on the wire.
+Steps have `type`, `payload`, `snapshot`, `message`, and a one-based `line`. Step types are `info`, `compare`, `swap`, `write`, `sorted`, `visit_node`, `relax_edge`, `found_path`, `negative_cycle`, and `tree_update`. Tree snapshots contain explicit root/child IDs, counts, heights, and traversal state. Payload fields include `indices`, `node`, `from`, `to`, `dist`, and `path`, depending on the step. Sorting snapshots are stable integer arrays. Grid/graph snapshots contain `type`, `visited`, and `path`; static grid geometry is held by the client and omitted on the wire.
 
 Successful exhaustion sends `{"type":"complete","steps":N}` and closes with code 1000. A search that finds no path still completes successfully.
 
@@ -235,14 +237,14 @@ Large valid inputs can exceed trace or time budgets and return an error asking f
 
 - Arrays contain safe integers; booleans and decimals are rejected. An empty array is valid for the backend, although the UI requires input.
 - Grids are nonempty and rectangular, with integer endpoints inside non-wall cells. Cells use 0 for open space, 1 for walls, and 5 for an entry cost of 5.
-- Graph weights are finite numbers from 0 to 1,000,000.
+- Graph weights are finite numbers from 0 to 1,000,000, or down to -1,000,000 when using Bellman–Ford. A* uses Manhattan/Euclidean heuristics on grids and a zero heuristic on arbitrary graphs.
 - BFS optimizes hop count. DFS finds a reachable path without an optimality guarantee. Dijkstra optimizes nonnegative total cost.
 
 ## Data Handling and Logging
 
-The browser sends the selected array, grid, or graph to the configured backend for execution. The application has no account system or database. Per-worker admission control temporarily tracks client addresses to enforce connection and rate limits.
+The browser sends the selected array, grid, graph, or tree to the configured backend for execution. The application has no account system or database. Per-worker admission control temporarily tracks client addresses to enforce connection and rate limits.
 
-Structured execution events record run IDs, step and byte counts, elapsed time, and failure information. Failure events can include category, algorithm, and exception details. The structured logger does not explicitly record input payloads; hosting and server access logs have their own behavior and retention settings. Review those settings before making public privacy or retention claims.
+Structured execution events record timestamps, run IDs, algorithms, outcomes, step and byte counts, elapsed time, and failure information. `/api/capabilities` publishes client budgets and the deployed revision; `/api/metrics` is disabled unless `METRICS_TOKEN` is set and requires its bearer token. Failure events can include category, algorithm, and exception details. The structured logger does not explicitly record input payloads; hosting and server access logs have their own behavior and retention settings. Review those settings before making public privacy or retention claims.
 
 ## Adding an Algorithm
 
@@ -289,19 +291,21 @@ Playwright uses one worker and starts both servers unless reusable development s
 
 ### Historical Verification
 
+The November 11, 2026 local review passed 201 backend tests (97% coverage), 113 frontend unit tests, 17 Chromium browser regressions, lint, production build, and direct Chromium scenarios for comparisons, tree edits, weighted search, 50×50 execution, and 390 px layouts. Public deployment access and Firefox/WebKit browser downloads returned network-policy 403 responses and remain unverified.
+
 The October 17, 2026 review recorded 96 passing backend tests, 49 frontend unit tests, and 17 Chromium browser regressions, with lint and the production build passing. It also recorded no reported npm vulnerabilities, Python lock consistency, and a passing whitespace check. These are historical results, not checks rerun for this documentation update; audit results change with the advisory database.
 
 That review covered desktop Chromium, including a tall viewport. Firefox, Safari, physical mobile devices, production routing/TLS, and sustained or distributed load were not verified. This guide describes local checks; remote CI execution is outside its scope.
 
 ## Deployment
 
-Deploy the frontend and backend together: protocol version 2 clients require explicit terminal messages that older backends do not send. The README links to the existing Netlify demo; the Vercel configuration is a separate deployment option and does not establish which code is running at that demo.
+Deploy the frontend and backend together: protocol version 3 clients support delta traces and the expanded metadata catalog; legacy transport does not guarantee compatibility with older catalog parsers. The README links to the existing Vercel demo; configuration alone does not establish which revision is deployed.
 
 ### Vercel Configuration
 
 `vercel.json` builds the Vite frontend and routes `/api/*` and `/ws/*` to `api/index.py`, which exposes the FastAPI instance. Other routes fall back to `index.html`. The configured function duration is 60 seconds.
 
-Vercel documents [native WebSocket support, including FastAPI/ASGI](https://vercel.com/docs/functions/websockets). Configure the deployment's allowed origins and service limits, then verify an actual deployed handshake, terminal completion, and SPA route refresh. Local checks do not confirm deployed routing. Track that remaining verification in [TASKS.md](TASKS.md#deployment-verification).
+Confirm long-lived WebSocket upgrade support with the current hosting plan and [provider documentation](https://vercel.com/docs/functions/websockets). Configure the deployment's allowed origins and service limits, then verify an actual deployed handshake, terminal completion, and SPA route refresh. Local checks do not confirm deployed routing. Track that remaining verification in [TASKS.md](TASKS.md#deployment-verification).
 
 ### Separate Frontend and Backend Hosts
 

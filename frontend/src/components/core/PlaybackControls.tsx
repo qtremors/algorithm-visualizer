@@ -41,12 +41,8 @@ type Props = {
 };
 export default function PlaybackControls(p: Props) {
   return (
-    <div className="bg-gray-800 p-3 rounded-xl flex flex-wrap items-center justify-between gap-4 border border-gray-700">
-      <div
-        className="flex items-center gap-2"
-        role="group"
-        aria-label="Playback"
-      >
+    <div className="playback-toolbar">
+      <div className="playback-group" role="group" aria-label="Playback">
         <IconButton
           onClick={p.onReset}
           disabled={!p.canReset}
@@ -87,7 +83,7 @@ export default function PlaybackControls(p: Props) {
           R: Cancel and reset
         </p>
       </details>
-      <label className="flex items-center gap-2 text-xs">
+      <label className="playback-speed">
         Speed
         <input
           aria-label="Playback speed"
@@ -109,11 +105,7 @@ export default function PlaybackControls(p: Props) {
           : ''}
       </span>
       {p.hasViewControls && (
-        <div
-          className="flex items-center gap-2"
-          role="group"
-          aria-label="View controls"
-        >
+        <div className="playback-group" role="group" aria-label="View controls">
           <IconButton
             onClick={p.onToggleFit}
             aria-label="Fit to screen"
@@ -155,7 +147,7 @@ export default function PlaybackControls(p: Props) {
           )}
         </div>
       )}
-      <div className="flex items-center gap-2">
+      <div className="playback-actions">
         <IconButton onClick={p.onOpenCombined} aria-label="Detailed view">
           <Code size={18} />
         </IconButton>
@@ -163,7 +155,7 @@ export default function PlaybackControls(p: Props) {
           type="button"
           onClick={p.onVisualize}
           disabled={!p.canVisualize || p.isVisualizing || p.isPlaying}
-          className="flex items-center gap-2 bg-blue-600 hover:bg-blue-500 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold py-2 px-4 rounded-lg text-sm"
+          className="action-primary"
         >
           <Zap size={16} />
           {p.isVisualizing ? 'Running...' : 'Visualize'}
@@ -181,7 +173,7 @@ function IconButton({
       type="button"
       {...props}
       className={cn(
-        'p-2 rounded-full bg-gray-700 text-gray-200 hover:bg-gray-600 disabled:opacity-40 disabled:cursor-not-allowed border border-gray-600',
+        'control-icon text-gray-200 disabled:cursor-not-allowed',
         className,
       )}
     />

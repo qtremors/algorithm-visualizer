@@ -24,8 +24,8 @@ function metadata(value: unknown): value is AlgorithmMetadata {
     texts(value.pseudocode) &&
     texts(value.pros) &&
     texts(value.cons) &&
-    ['list[int]', 'graph_grid'].includes(String(value.input_type)) &&
-    ['bar_chart', 'grid_2d'].includes(String(value.visualizer)) &&
+    ['list[int]', 'graph_grid', 'tree'].includes(String(value.input_type)) &&
+    ['bar_chart', 'grid_2d', 'tree'].includes(String(value.visualizer)) &&
     record(value.complexity) &&
     typeof value.complexity.time === 'string' &&
     typeof value.complexity.space === 'string'
@@ -50,8 +50,17 @@ export function parseMessage(text: string): ServerMessage {
     Number.isInteger(value.steps) &&
     Number(value.steps) >= 0 &&
     Number(value.steps) <= LIMITS.steps
-  )
+  ) {
+    if (
+      value.metrics !== undefined &&
+      (!record(value.metrics) ||
+        !Object.values(value.metrics).every(
+          (v) => typeof v === 'number' && Number.isFinite(v),
+        ))
+    )
+      throw new Error('Invalid run measurements.');
     return value as ServerMessage;
+  }
   if (
     value.type === 'error' &&
     typeof value.message === 'string' &&
@@ -64,6 +73,9 @@ export function parseMessage(text: string): ServerMessage {
       'compare',
       'swap',
       'sorted',
+      'write',
+      'negative_cycle',
+      'tree_update',
       'visit_node',
       'relax_edge',
       'found_path',
@@ -90,7 +102,7 @@ export function parseMessage(text: string): ServerMessage {
     throw new Error('Invalid path.');
   if (
     p.dist !== undefined &&
-    (typeof p.dist !== 'number' || !Number.isFinite(p.dist) || p.dist < 0)
+    (typeof p.dist !== 'number' || !Number.isFinite(p.dist))
   )
     throw new Error('Invalid distance.');
   const s = value.snapshot;
@@ -111,26 +123,87 @@ export function parseMessage(text: string): ServerMessage {
       !s.path.every(validNode)
     )
       throw new Error('Invalid pathfinding snapshot.');
+  } else if (record(s) && s.type === 'tree') {
+    if (
+      !Array.isArray(s.nodes) ||
+      s.nodes.length > 50 ||
+      !Array.isArray(s.visited) ||
+      s.visited.length > 50 ||
+      !s.visited.every((v) => typeof v === 'string' && node(v))
+    )
+      throw new Error('Invalid tree snapshot.');
+    const ids = new Set<string>();
+    for (const entry of s.nodes) {
+      if (
+        !record(entry) ||
+        typeof entry.id !== 'string' ||
+        !node(entry.id) ||
+        ids.has(entry.id) ||
+        !Number.isSafeInteger(entry.value) ||
+        !Number.isInteger(entry.count) ||
+        Number(entry.count) < 1 ||
+        !Number.isInteger(entry.height) ||
+        Number(entry.height) < 1
+      )
+        throw new Error('Invalid tree node.');
+      ids.add(entry.id);
+    }
+    if (s.root !== null && (typeof s.root !== 'string' || !ids.has(s.root)))
+      throw new Error('Invalid tree root.');
+    const entries = s.nodes as Record<string, unknown>[];
+    const byId = new Map(entries.map((entry) => [String(entry.id), entry]));
+    const reached = new Set<string>();
+    const visit = (id: unknown) => {
+      if (id === null) return;
+      if (typeof id !== 'string' || !ids.has(id) || reached.has(id))
+        throw new Error('Invalid or cyclic tree edge.');
+      reached.add(id);
+      const entry = byId.get(id)!;
+      visit(entry.left);
+      visit(entry.right);
+    };
+    visit(s.root);
+    if (reached.size !== ids.size)
+      throw new Error('Disconnected tree snapshot.');
   } else throw new Error('Invalid visualization snapshot.');
   if (record(s) && s.added !== undefined) {
-    const validNode = s.type === 'grid' ? cell : (v: unknown) => typeof v === 'string' && node(v);
-    if (!Number.isSafeInteger(value.sequence) || Number(value.sequence) < 0 ||
-        !Array.isArray(s.added) || !Array.isArray(s.removed) ||
-        s.added.length > 2500 || s.removed.length > 2500 ||
-        !s.added.every(validNode) || !s.removed.every(validNode))
+    const validNode =
+      s.type === 'grid'
+        ? cell
+        : (v: unknown) => typeof v === 'string' && node(v);
+    if (
+      !Number.isSafeInteger(value.sequence) ||
+      Number(value.sequence) < 0 ||
+      !Array.isArray(s.added) ||
+      !Array.isArray(s.removed) ||
+      s.added.length > 2500 ||
+      s.removed.length > 2500 ||
+      !s.added.every(validNode) ||
+      !s.removed.every(validNode)
+    )
       throw new Error('Invalid visualization delta.');
   }
   if (value.learning !== undefined) {
     if (!record(value.learning)) throw new Error('Invalid learning state.');
     const learning = value.learning;
-    if (learning.frontier !== undefined &&
-        (!Array.isArray(learning.frontier) || learning.frontier.length > 80 || !learning.frontier.every(node)))
+    if (
+      learning.frontier !== undefined &&
+      (!Array.isArray(learning.frontier) ||
+        learning.frontier.length > 80 ||
+        !learning.frontier.every(node))
+    )
       throw new Error('Invalid frontier.');
-    if (learning.frontier_count !== undefined &&
-        (!Number.isSafeInteger(learning.frontier_count) || Number(learning.frontier_count) < 0))
+    if (
+      learning.frontier_count !== undefined &&
+      (!Number.isSafeInteger(learning.frontier_count) ||
+        Number(learning.frontier_count) < 0)
+    )
       throw new Error('Invalid frontier count.');
     for (const field of ['distances', 'parents']) {
-      if (learning[field] !== undefined && (!record(learning[field]) || Object.keys(learning[field]).length > 2500))
+      if (
+        learning[field] !== undefined &&
+        (!record(learning[field]) || Object.keys(learning[field]).length > 2500)
+      )
         throw new Error('Invalid learning table.');
     }
   }

@@ -12,7 +12,12 @@ export class TraceDecoder {
 
   decode(step: AlgorithmStep): AlgorithmStep {
     const snapshot = step.snapshot;
-    if (Array.isArray(snapshot) || !('added' in snapshot)) return step;
+    if (
+      Array.isArray(snapshot) ||
+      snapshot.type === 'tree' ||
+      !('added' in snapshot)
+    )
+      return step;
     const delta = snapshot as typeof snapshot & Delta;
     if (step.sequence !== this.sequence++)
       throw new Error('Missing or reordered visualization frame.');
@@ -24,7 +29,10 @@ export class TraceDecoder {
       this.pending = [];
     } else {
       if (!this.base) throw new Error('Missing visualization checkpoint.');
-      this.pending = [...this.pending, { added: delta.added, removed: delta.removed }];
+      this.pending = [
+        ...this.pending,
+        { added: delta.added, removed: delta.removed },
+      ];
       if (this.pending.length >= 128)
         throw new Error('Missing periodic visualization checkpoint.');
     }

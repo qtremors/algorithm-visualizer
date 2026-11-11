@@ -23,12 +23,12 @@ export const CodeRenderer = ({
       className,
     )}
   >
-    <code>
+    <code className="block min-w-max">
       {code.map((line, index) => (
         <div
           key={index}
           className={cn(
-            'transition-colors py-0.5 px-2 border-l-2 border-transparent whitespace-pre-wrap',
+            'code-line transition-colors py-0.5 px-2 border-l-2 border-transparent whitespace-pre',
             highlightedLine === index + 1
               ? 'bg-blue-900/50 border-blue-500 text-white rounded-sm'
               : 'text-gray-400',
@@ -39,12 +39,12 @@ export const CodeRenderer = ({
               aria-label={`Breakpoint line ${index + 1}`}
               aria-pressed={breakpoints.includes(index + 1)}
               onClick={() => onToggleBreakpoint(index + 1)}
-              className="inline-block min-w-8 mr-1 text-gray-300"
+              className="code-line-number"
             >
               {breakpoints.includes(index + 1) ? '●' : index + 1}
             </button>
           )}
-          {line}
+          <span>{line || ' '}</span>
         </div>
       ))}
     </code>
@@ -71,6 +71,7 @@ export default function Pseudocode({
             onClick={() => setIsModalOpen(true)}
             className="text-gray-400 hover:text-white transition-colors p-1 hover:bg-gray-700 rounded"
             title="Maximize"
+            aria-label="Maximize pseudocode"
           >
             <Maximize2 size={16} />
           </button>

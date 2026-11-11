@@ -1,5 +1,15 @@
-import type { GraphInputData, GridInputData } from '../types/input';
-import { createArray, createGraph, createGrid, LIMITS } from './input';
+import type {
+  GraphInputData,
+  GridInputData,
+  TreeInputData,
+} from '../types/input';
+import {
+  createArray,
+  createGraph,
+  createGrid,
+  createTree,
+  LIMITS,
+} from './input';
 
 export const SESSION_KEY = 'algoviz.session.v1';
 export const SESSION_BYTES = 65536;
@@ -14,6 +24,7 @@ export interface Session {
     array: number[] | null;
     grid: GridInputData;
     graph: GraphInputData;
+    tree: TreeInputData;
   };
 }
 export const defaultSession = (category = 'sorting'): Session => ({
@@ -22,7 +33,12 @@ export const defaultSession = (category = 'sorting'): Session => ({
   selection: '',
   view: 'grid',
   seed: 'algoviz',
-  drafts: { array: createArray(), grid: createGrid(), graph: createGraph() },
+  drafts: {
+    array: createArray(),
+    grid: createGrid(),
+    graph: createGraph(),
+    tree: createTree(),
+  },
 });
 const record = (v: unknown): v is Record<string, unknown> =>
   v !== null && typeof v === 'object' && !Array.isArray(v);
@@ -152,6 +168,8 @@ export function parseSession(text: string): Session {
     throw new Error('Invalid session array.');
   validateGrid(value.drafts.grid);
   validateGraph(value.drafts.graph);
+  const tree = value.drafts.tree || createTree();
+  validateTree(tree);
   // Explicit construction discards unknown fields and prototype-like keys.
   return {
     version: 1,
@@ -163,6 +181,7 @@ export function parseSession(text: string): Session {
       array: array as number[] | null,
       grid: value.drafts.grid,
       graph: value.drafts.graph,
+      tree,
     }),
   };
 }
@@ -239,4 +258,32 @@ export function parseSessionText(text: string): Session {
     return session;
   }
   return parseSession(text);
+}
+
+export function validateTree(value: unknown): asserts value is TreeInputData {
+  if (
+    !record(value) ||
+    value.kind !== 'tree' ||
+    value.invalid === true ||
+    !Array.isArray(value.values) ||
+    value.values.length > 40 ||
+    !value.values.every(Number.isSafeInteger) ||
+    !Array.isArray(value.operations) ||
+    value.operations.length > 40 ||
+    !['inorder', 'preorder', 'postorder'].includes(String(value.traversal))
+  )
+    throw new Error(
+      'Invalid tree input. Use at most 40 values and 40 operations.',
+    );
+  const ids = new Set(value.values);
+  for (const op of value.operations) {
+    if (
+      !record(op) ||
+      !['insert', 'delete', 'search'].includes(String(op.type)) ||
+      !Number.isSafeInteger(op.value)
+    )
+      throw new Error('Invalid tree operation.');
+    if (op.type === 'insert') ids.add(op.value);
+  }
+  if (ids.size > 50) throw new Error('Use at most 50 distinct tree values.');
 }

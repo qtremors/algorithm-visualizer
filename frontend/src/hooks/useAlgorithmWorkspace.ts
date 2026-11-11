@@ -5,7 +5,7 @@ import { useAlgorithmRunner } from './useAlgorithmRunner';
 import { usePlayback } from './usePlayback';
 import { useEditorSession } from './useEditorSession';
 import { useGraphEditor } from './useGraphEditor';
-import { inputError } from '../lib/input';
+import { algorithmInputError } from '../lib/input';
 import type { GridTool, InputData } from '../types/input';
 
 export function useAlgorithmWorkspace() {
@@ -23,10 +23,16 @@ export function useAlgorithmWorkspace() {
       ? selection
       : Object.keys(categoryAlgorithms || {})[0] || '';
   const algorithmMetadata = categoryAlgorithms?.[selectedAlgoName] || null;
-  const { array, grid, graph } = session.drafts;
+  const { array, grid, graph, tree } = session.drafts;
   const viewMode = session.view;
   const inputData: InputData | null =
-    category === 'sorting' ? array : viewMode === 'grid' ? grid : graph;
+    category === 'trees'
+      ? tree
+      : category === 'sorting'
+        ? array
+        : viewMode === 'grid'
+          ? grid
+          : graph;
   const [visualizationMode, setVisualizationMode] = useState<GridTool>('wall');
   const [zoom, setZoom] = useState(1);
   const [isFitToScreen, setIsFitToScreen] = useState(true);
@@ -49,7 +55,10 @@ export function useAlgorithmWorkspace() {
     reset,
   } = playback;
   const busy = isRunning || isPlaying;
-  const validationError = inputError(inputData);
+  const validationError = algorithmInputError(
+    inputData,
+    algorithmMetadata || undefined,
+  );
   const graphEditor = useGraphEditor(graph, busy, (data) => {
     reset();
     resetSteps();
@@ -73,6 +82,7 @@ export function useAlgorithmWorkspace() {
   const setSelectedAlgoName = (name: string) => {
     if (!busy) {
       handleReset();
+      playback.clearBreakpoints();
       setSelection(name);
     }
   };
@@ -84,7 +94,10 @@ export function useAlgorithmWorkspace() {
   };
   const handleRun = () => {
     if (busy || !algorithmMetadata) return;
-    const problem = inputError(inputData);
+    const problem = algorithmInputError(
+      inputData,
+      algorithmMetadata || undefined,
+    );
     if (problem || !inputData) {
       setEditorError(problem);
       return;
@@ -204,6 +217,7 @@ export function useAlgorithmWorkspace() {
     isInfoModalOpen,
     setIsInfoModalOpen,
     steps,
+    metrics: runner.metrics,
     isRunning,
     error: error || editorError || graphEditor.error,
     status,

@@ -81,7 +81,9 @@ export function usePlayback(
   }, []);
   const start = useCallback(() => {
     setIndex(0);
-    setIsPlaying(true);
+    setIsPlaying(
+      !window.matchMedia?.('(prefers-reduced-motion: reduce)').matches,
+    );
   }, []);
   const play = useCallback(() => {
     if (failed) return;

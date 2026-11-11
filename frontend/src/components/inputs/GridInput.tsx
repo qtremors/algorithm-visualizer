@@ -78,73 +78,66 @@ export default function GridInput({
     onSubmit(data);
   };
   return (
-    <fieldset
-      disabled={disabled}
-      className="w-full flex flex-col gap-2 disabled:opacity-60"
-    >
+    <fieldset disabled={disabled} className="grid-editor disabled:opacity-60">
       <legend className="sr-only">Grid input</legend>
-      <div className="flex flex-wrap items-center gap-3">
-        <div className="flex flex-wrap items-center gap-2 bg-gray-900 max-w-full p-2 rounded-lg border border-gray-700">
-          <label htmlFor={`${id}-rows`} className="text-xs">
-            Rows
+      <div className="grid-editor-row">
+        <div className="grid-dimensions">
+          <label className="control-field" htmlFor={`${id}-rows`}>
+            <span>Rows</span>
+            <input
+              id={`${id}-rows`}
+              type="number"
+              min={1}
+              max={50}
+              value={rows}
+              onChange={(e) => setRows(Number(e.target.value))}
+              className="control-input"
+            />
           </label>
-          <input
-            id={`${id}-rows`}
-            type="number"
-            min="1"
-            max="50"
-            value={rows}
-            onChange={(e) => setRows(Number(e.target.value))}
-            className="w-12 bg-transparent"
-          />
-          <label htmlFor={`${id}-cols`} className="text-xs">
-            Columns
+          <label className="control-field" htmlFor={`${id}-cols`}>
+            <span>Columns</span>
+            <input
+              id={`${id}-cols`}
+              type="number"
+              min={1}
+              max={50}
+              value={cols}
+              onChange={(e) => setCols(Number(e.target.value))}
+              className="control-input"
+            />
           </label>
-          <input
-            id={`${id}-cols`}
-            type="number"
-            min="1"
-            max="50"
-            value={cols}
-            onChange={(e) => setCols(Number(e.target.value))}
-            className="w-12 bg-transparent"
-          />
-          <label htmlFor={`${id}-density`} className="text-xs">
-            Walls %
+          <label className="control-field" htmlFor={`${id}-density`}>
+            <span>Walls %</span>
+            <input
+              id={`${id}-density`}
+              type="number"
+              min={0}
+              max={90}
+              value={density}
+              onChange={(e) => setDensity(Number(e.target.value))}
+              className="control-input"
+            />
           </label>
-          <input
-            id={`${id}-density`}
-            type="number"
-            min="0"
-            max="90"
-            value={density}
-            onChange={(e) => setDensity(Number(e.target.value))}
-            className="w-12 bg-transparent"
-          />
           <button
             type="button"
             onClick={() => generate(false)}
             title="Clear Grid"
             aria-label="Clear Grid"
-            className="p-1 text-gray-300"
+            className="control-icon"
           >
-            <RefreshCw size={16} />
+            <RefreshCw size={17} />
           </button>
           <button
             type="button"
             onClick={() => generate(true)}
             title="Randomize Walls"
             aria-label="Randomize Walls"
-            className="p-1 text-purple-400"
+            className="control-icon"
           >
-            <Shuffle size={16} />
+            <Shuffle size={17} />
           </button>
         </div>
-        <div
-          className="flex flex-wrap gap-1 bg-gray-900 p-1 rounded-lg"
-          role="group"
-          aria-label="Grid tools"
-        >
+        <div className="tool-group" role="group" aria-label="Grid tools">
           <ToolButton
             active={mode === 'start'}
             onClick={() => setMode('start')}
@@ -181,48 +174,19 @@ export default function GridInput({
             color="text-gray-300"
           />
         </div>
-        <div className="flex flex-wrap gap-2">
-          <button
-            type="button"
-            className="action-secondary"
-            onClick={() => {
-              try {
-                onSubmit(generateMaze(rows, cols, seed, 'backtracker'));
-                setError(null);
-              } catch (problem) {
-                setError(String(problem));
-              }
-            }}
-          >
-            Backtracker maze
-          </button>
-          <button
-            type="button"
-            className="action-secondary"
-            onClick={() => {
-              try {
-                onSubmit(generateMaze(rows, cols, seed, 'prim'));
-                setError(null);
-              } catch (problem) {
-                setError(String(problem));
-              }
-            }}
-          >
-            Prim maze
-          </button>
-        </div>
+      </div>
+      <div className="grid-editor-row">
         {(['start', 'end'] as const).map((type) => (
-          <div key={type} className="flex gap-1 text-xs items-center">
-            <span className="capitalize">{type}:</span>
+          <div key={type} className="coordinate-group">
             {(['row', 'col'] as const).map((axis) => (
-              <label key={axis} className="flex gap-1 items-center">
-                <span className="sr-only">
+              <label key={axis} className="control-field">
+                <span className="capitalize">
                   {type} {axis}
                 </span>
                 <input
                   type="number"
                   aria-label={`${type} ${axis}`}
-                  min="0"
+                  min={0}
                   max={
                     (axis === 'row'
                       ? currentData.grid.length
@@ -232,12 +196,40 @@ export default function GridInput({
                   onChange={(e) =>
                     updateCoordinate(type, axis, Number(e.target.value))
                   }
-                  className="w-12 bg-gray-900 p-1 rounded"
+                  className="control-input"
                 />
               </label>
             ))}
           </div>
         ))}
+        <button
+          type="button"
+          className="action-secondary"
+          onClick={() => {
+            try {
+              onSubmit(generateMaze(rows, cols, seed, 'backtracker'));
+              setError(null);
+            } catch (problem) {
+              setError(String(problem));
+            }
+          }}
+        >
+          Backtracker maze
+        </button>
+        <button
+          type="button"
+          className="action-secondary"
+          onClick={() => {
+            try {
+              onSubmit(generateMaze(rows, cols, seed, 'prim'));
+              setError(null);
+            } catch (problem) {
+              setError(String(problem));
+            }
+          }}
+        >
+          Prim maze
+        </button>
       </div>
       {error && (
         <p role="alert" className="text-red-400 text-xs">

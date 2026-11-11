@@ -46,17 +46,19 @@ export default function HomePage() {
 
   const getCategoryColor = (category: string) => {
     if (category.toLowerCase().includes('sort'))
-      return 'from-indigo-500/20 to-blue-600/5 border-indigo-500/30 hover:border-indigo-400';
+      return 'border-indigo-500/30 hover:border-indigo-400';
     if (category.toLowerCase().includes('path'))
-      return 'from-emerald-500/20 to-teal-600/5 border-emerald-500/30 hover:border-emerald-400';
-    return 'from-pink-500/20 to-rose-600/5 border-pink-500/30 hover:border-pink-400';
+      return 'border-emerald-500/30 hover:border-emerald-400';
+    return 'border-pink-500/30 hover:border-pink-400';
   };
 
   const getCategoryDescription = (category: string) => {
     if (category.toLowerCase().includes('sort'))
-      return 'Master the art of ordering. Visualize Bubble, Insertion, and Selection sort in real-time.';
+      return 'Master the art of ordering. Explore Bubble, Insertion, Selection, Merge, and Quick Sort.';
     if (category.toLowerCase().includes('path'))
-      return 'Navigate the maze. Explore BFS and DFS, and find weighted shortest paths with Dijkstra.';
+      return 'Navigate the maze. Explore BFS, DFS, Dijkstra, A*, and Bellman–Ford on weighted grids and graphs.';
+    if (category === 'trees')
+      return 'Build BST and AVL trees, apply edits, and follow searches, rotations, and traversals.';
     return 'Explore fundamental algorithmic concepts through interactive visualizations.';
   };
 
@@ -122,7 +124,7 @@ export default function HomePage() {
                   <Link
                     key={category}
                     to={`/${category}`}
-                    className={`group relative overflow-hidden rounded-3xl border p-8 transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 bg-gradient-to-br ${getCategoryColor(category)} bg-gray-800/50`}
+                    className={`group relative overflow-hidden rounded-3xl border p-8 transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 ${getCategoryColor(category)} bg-gray-800/50`}
                   >
                     <div className="absolute top-0 right-0 p-4 opacity-50 group-hover:opacity-100 transition-opacity">
                       <ArrowRight className="w-6 h-6 text-white -rotate-45 group-hover:rotate-0 transition-transform duration-300" />
@@ -160,7 +162,7 @@ export default function HomePage() {
           <FeatureItem
             icon={<Zap className="text-yellow-400" />}
             title="Lightning Fast"
-            desc="Powered by a FastAPI backend and WebSocket streaming for instant, lag-free visualizations."
+            desc="Start playback while steps arrive, then pause, inspect state, and replay at your pace."
           />
           <FeatureItem
             icon={<Code2 className="text-blue-400" />}

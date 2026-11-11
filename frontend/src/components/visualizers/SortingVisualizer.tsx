@@ -10,11 +10,12 @@ export default function SortingVisualizer({ step, initialData }: Props) {
     [step, initialData],
   );
   const { min, span, baseline } = useMemo(() => {
-    const min = values.reduce((a, b) => Math.min(a, b), 0);
-    const max = values.reduce((a, b) => Math.max(a, b), 0);
+    const axis = initialData?.length ? initialData : values;
+    const min = axis.reduce((a, b) => Math.min(a, b), 0);
+    const max = axis.reduce((a, b) => Math.max(a, b), 0);
     const span = max - min || 1;
     return { min, span, baseline: (-min / span) * 100 };
-  }, [values]);
+  }, [values, initialData]);
   const color = (index: number) =>
     step?.type === 'sorted'
       ? 'bg-green-500'

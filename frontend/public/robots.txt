@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://algoviz-qt.vercel.app/sitemap.xml

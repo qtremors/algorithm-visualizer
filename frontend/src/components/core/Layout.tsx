@@ -9,6 +9,20 @@ export default function Layout() {
   const [dismissed, setDismissed] = useState(false);
   useEffect(() => {
     window.scrollTo(0, 0);
+    const names: Record<string, string> = {
+      sorting: 'Sorting Algorithms',
+      pathfinding: 'Pathfinding Algorithms',
+      trees: 'Search Trees',
+    };
+    const category = pathname.split('/').filter(Boolean).at(-1) || '';
+    document.title =
+      pathname === '/'
+        ? 'AlgoVisualizer — Learn Algorithms Visually'
+        : `${pathname.startsWith('/compare/') ? 'Compare ' : ''}${names[category] || 'Page Not Found'} | AlgoVisualizer`;
+    const canonical = document.querySelector<HTMLLinkElement>(
+      'link[rel="canonical"]',
+    );
+    if (canonical) canonical.href = `https://algoviz-qt.vercel.app${pathname}`;
   }, [pathname]);
   return (
     <div className="min-h-screen flex flex-col bg-gray-950">
@@ -22,11 +36,11 @@ export default function Layout() {
         aria-label="Main navigation"
         className="bg-gray-900 border-b border-gray-800 sticky top-0 z-40"
       >
-        <div className="container mx-auto px-4 h-16 flex justify-between items-center gap-4">
+        <div className="container mx-auto app-nav">
           <NavLink to="/" className="text-xl font-bold whitespace-nowrap">
             Algo<span className="text-blue-500">Visualizer</span>
           </NavLink>
-          <div className="flex gap-2 overflow-auto">
+          <div className="app-nav-links">
             {isLoading ? (
               <span role="status">Connecting...</span>
             ) : (
@@ -48,6 +62,12 @@ export default function Layout() {
                 </NavLink>
               ))
             )}
+            <NavLink
+              to="/compare/sorting"
+              className="px-4 py-2 rounded-full text-sm bg-gray-800 text-gray-300"
+            >
+              Compare
+            </NavLink>
           </div>
         </div>
       </nav>
@@ -71,7 +91,12 @@ export default function Layout() {
           role="alert"
           className="container mx-auto mt-4 p-4 bg-red-950 border border-red-700 rounded flex items-center justify-between gap-3"
         >
-          <p>{error}</p>
+          <p>
+            {error}
+            {algorithms
+              ? ' Showing the saved catalog; running algorithms still requires a connection.'
+              : ''}
+          </p>
           <button
             type="button"
             onClick={retry}

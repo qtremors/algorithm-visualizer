@@ -1,10 +1,14 @@
 # AlgoVisualizer Changelog
 
 > **Project:** AlgoVisualizer
-> **Version:** 0.1.2
+> **Version:** 0.1.3
 > **Last Updated:** 2026-11-11
 
 ---
+
+## [0.1.3] - 2026-11-11
+
+- **Expand Algorithms And Interactive Learning**: Add Merge Sort, Quick Sort, A*, Bellman–Ford, BST/AVL operations and traversals, synchronized comparisons, state and result panels, catalog caching, capability-aware limits, route splitting, discovery metadata, aligned controls, pure OLED surfaces, and local development and deployment commands.
 
 ## [0.1.2] - 2026-11-11
 

@@ -1,4 +1,5 @@
 import { Info, Grid3X3, Network } from 'lucide-react';
+import TreeInput from '../inputs/TreeInput';
 import ArrayInput from '../inputs/ArrayInput';
 import GridInput from '../inputs/GridInput';
 import GraphInput from '../inputs/GraphInput';
@@ -7,6 +8,7 @@ import type { GraphTool, GridTool, InputData } from '../../types/input';
 
 type Props = {
   category?: string;
+  hideAlgorithm?: boolean;
   seed?: string;
   directed?: boolean;
   onDirectedChange?: (value: boolean) => void;
@@ -34,72 +36,80 @@ export default function WorkspaceHeader(props: Props) {
     onInputUpdate,
   } = props;
   return (
-    <div className="bg-gray-800 border border-gray-700 p-4 rounded-xl shadow-lg flex flex-col xl:flex-row gap-4 items-start xl:items-center">
-      <div className="w-full xl:w-64 shrink-0">
-        <div className="flex justify-between items-center mb-2">
-          <label
-            htmlFor="algorithm-selection"
-            className="text-xs font-bold text-gray-400 uppercase"
-          >
-            Algorithm
-          </label>
-          <div className="flex gap-2">
-            {category === 'pathfinding' && (
-              <div
-                className="flex gap-1"
-                role="group"
-                aria-label="Pathfinding view"
-              >
-                <button
-                  type="button"
-                  disabled={busy}
-                  aria-pressed={props.viewMode === 'grid'}
-                  aria-label="Grid View"
-                  title="Grid View"
-                  onClick={() => props.onViewModeChange('grid')}
-                  className="p-1 bg-gray-900 rounded"
-                >
-                  <Grid3X3 size={16} />
-                </button>
-                <button
-                  type="button"
-                  disabled={busy}
-                  aria-pressed={props.viewMode === 'graph'}
-                  aria-label="Graph View"
-                  title="Graph View"
-                  onClick={() => props.onViewModeChange('graph')}
-                  className="p-1 bg-gray-900 rounded"
-                >
-                  <Network size={16} />
-                </button>
-              </div>
-            )}
-            <button
-              type="button"
-              onClick={props.onOpenInfo}
-              className="text-blue-400 flex items-center gap-1 text-xs"
+    <div className={`editor-card${props.hideAlgorithm ? ' editor-only' : ''}`}>
+      {!props.hideAlgorithm && (
+        <div className="editor-selector">
+          <div className="editor-selector-heading">
+            <label
+              htmlFor="algorithm-selection"
+              className="text-[11px] font-semibold text-gray-400"
             >
-              <Info size={14} />
-              Info
-            </button>
+              Algorithm
+            </label>
+            <div className="flex gap-2">
+              {category === 'pathfinding' && (
+                <div
+                  className="flex gap-1"
+                  role="group"
+                  aria-label="Pathfinding view"
+                >
+                  <button
+                    type="button"
+                    disabled={busy}
+                    aria-pressed={props.viewMode === 'grid'}
+                    aria-label="Grid View"
+                    title="Grid View"
+                    onClick={() => props.onViewModeChange('grid')}
+                    className="p-1 bg-gray-900 rounded"
+                  >
+                    <Grid3X3 size={16} />
+                  </button>
+                  <button
+                    type="button"
+                    disabled={busy}
+                    aria-pressed={props.viewMode === 'graph'}
+                    aria-label="Graph View"
+                    title="Graph View"
+                    onClick={() => props.onViewModeChange('graph')}
+                    className="p-1 bg-gray-900 rounded"
+                  >
+                    <Network size={16} />
+                  </button>
+                </div>
+              )}
+              <button
+                type="button"
+                onClick={props.onOpenInfo}
+                className="text-blue-400 flex items-center gap-1 text-xs"
+              >
+                <Info size={14} />
+                Info
+              </button>
+            </div>
           </div>
+          <select
+            id="algorithm-selection"
+            value={selectedAlgoName}
+            onChange={(e) => props.onAlgoChange(e.target.value)}
+            disabled={busy}
+            className="control-input"
+          >
+            {Object.entries(algorithms).map(([name, metadata]) => (
+              <option key={name} value={name}>
+                {metadata.name}
+              </option>
+            ))}
+          </select>
         </div>
-        <select
-          id="algorithm-selection"
-          value={selectedAlgoName}
-          onChange={(e) => props.onAlgoChange(e.target.value)}
-          disabled={busy}
-          className="w-full bg-gray-900 text-white p-2.5 rounded-lg border border-gray-700"
-        >
-          {Object.entries(algorithms).map(([name, metadata]) => (
-            <option key={name} value={name}>
-              {metadata.name}
-            </option>
-          ))}
-        </select>
-      </div>
-      <div className="flex-1 w-full min-w-0">
-        {category === 'sorting' ? (
+      )}
+      <div className="editor-inputs">
+        {inputData && !Array.isArray(inputData) && inputData.kind === 'tree' ? (
+          <TreeInput
+            data={inputData}
+            onChange={onInputUpdate}
+            disabled={busy}
+          />
+        ) : category === 'sorting' ? (
           <ArrayInput
             seed={props.seed}
             currentData={Array.isArray(inputData) ? inputData : null}

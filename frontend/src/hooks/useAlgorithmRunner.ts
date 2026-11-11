@@ -12,6 +12,7 @@ type Run = {
   steps: AlgorithmStep[];
   status: RunStatus;
   error: string | null;
+  metrics?: Record<string, number | string>;
 };
 export function useAlgorithmRunner(category?: string, algorithmName?: string) {
   const key = `${category}/${algorithmName}`;
@@ -76,6 +77,7 @@ export function useAlgorithmRunner(category?: string, algorithmName?: string) {
       }
       let active = true;
       let completed = false;
+      let metrics: Record<string, number | string> | undefined;
       let bytes = 0;
       let batch: ReturnType<typeof setTimeout> | undefined;
       const deadline = setTimeout(
@@ -137,6 +139,7 @@ export function useAlgorithmRunner(category?: string, algorithmName?: string) {
             if (completed || message.steps !== steps.length)
               throw new Error('The visualization ended with missing steps.');
             completed = true;
+            metrics = message.metrics;
             publish();
             return;
           }
@@ -184,6 +187,7 @@ export function useAlgorithmRunner(category?: string, algorithmName?: string) {
           steps: steps.slice(),
           status: 'completed',
           error: null,
+          metrics,
         });
         cleanup();
         connection.current = null;
@@ -201,6 +205,7 @@ export function useAlgorithmRunner(category?: string, algorithmName?: string) {
     status: visible.status,
     error: visible.error,
     runId: visible.id,
+    metrics: visible.metrics,
     runAlgorithm,
     resetSteps,
   };

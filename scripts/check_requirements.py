@@ -1,4 +1,4 @@
-"""Fail CI when exported Python deployment dependencies drift from the lock."""
+"""Check exported Python deployment dependencies against the lock."""
 
 import subprocess
 import tempfile

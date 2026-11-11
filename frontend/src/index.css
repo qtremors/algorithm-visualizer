@@ -151,24 +151,153 @@
   }
 }
 
+
+@theme {
+  --color-gray-950: #000000;
+  --color-gray-900: #000000;
+  --color-gray-800: #000000;
+  --color-gray-700: #272727;
+  --color-gray-600: #4a4a4a;
+  --color-gray-500: #808080;
+  --color-gray-400: #a3a3a3;
+  --color-gray-300: #d4d4d4;
+}
+
 @layer components {
+  .action-secondary, .action-primary, .control-icon, .control-input, .tool-button {
+    height: 40px;
+    min-height: 40px;
+    border-radius: 8px;
+  }
   .action-secondary {
-    @apply px-3 py-2 rounded-lg bg-gray-800 border border-gray-600 text-sm text-gray-200 disabled:opacity-40;
-    min-height: 44px;
+    @apply inline-flex items-center justify-center gap-2 px-3 border border-gray-700 text-sm text-gray-200 disabled:opacity-40;
+    background: #000;
+    white-space: nowrap;
   }
+  .action-secondary:hover:not(:disabled), .control-icon:hover:not(:disabled) { background: #111; }
   .action-primary {
-    @apply px-4 py-2 rounded-lg bg-blue-600 text-white font-semibold disabled:opacity-40;
-    min-height: 44px;
+    @apply inline-flex items-center justify-center gap-2 px-4 bg-blue-600 text-white text-sm font-semibold disabled:opacity-40;
+    white-space: nowrap;
   }
-  .workspace { min-height: 700px; }
-  .workspace-panels > [aria-label="Visualization"] { min-height: 360px; flex-shrink: 0; }
-  @media (min-width: 1024px) {
-    .workspace { min-height: 1000px; }
-    .workspace-panels > [aria-label="Visualization"] { min-height: 480px; }
+  .control-icon {
+    @apply inline-flex items-center justify-center border border-gray-700 text-blue-400 disabled:opacity-40;
+    width: 40px;
+    flex-shrink: 0;
+    background: #000;
+  }
+  .control-field { display: grid; gap: 6px; min-width: 0; }
+  .control-field > span { color: #a3a3a3; font-size: 11px; font-weight: 600; line-height: 16px; }
+  .control-input { @apply min-w-0 w-full px-3 border border-gray-700 text-sm text-white; background: #000; }
+  .control-input:disabled { opacity: .5; }
+  .tool-button { @apply inline-flex items-center justify-center gap-2 px-3 border border-transparent text-xs font-medium; white-space: nowrap; }
+  .tool-button[aria-pressed="true"] { border-color: #525252; background: #151515; }
+  .workspace { min-width: 0; }
+  .workspace-stage { display: grid; grid-template-columns: minmax(0, 1fr) 360px; gap: 16px; align-items: stretch; }
+  .workspace-canvas { display: flex; min-width: 0; height: 480px; }
+  .workspace-canvas > [aria-label="Visualization"] { min-height: 0; height: 100%; }
+  .learning-tabs { display: flex; flex-direction: column; min-width: 0; height: 480px; border: 1px solid #272727; border-radius: 12px; overflow: hidden; background: #000; }
+  .learning-tablist { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); padding: 6px; gap: 4px; border-bottom: 1px solid #272727; }
+  .learning-tablist button { height: 36px; min-width: 0; border-radius: 6px; font-size: 12px; color: #a3a3a3; }
+  .learning-tablist button[aria-selected="true"] { color: #fff; background: #151515; }
+  .learning-tab-content { flex: 1; min-height: 0; overflow: auto; padding: 12px; }
+  .learning-tab-content > section { border: 0; padding: 0; }
+  .code-line { display: flex; gap: 8px; min-height: 25px; align-items: baseline; }
+  .code-line-number { flex: 0 0 24px; text-align: right; color: #808080; }
+  .workspace-status { border: 1px solid #272727; border-radius: 12px; padding: 12px 16px; }
+  .metrics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 12px; }
+  .array-editor { display: grid; grid-template-columns: 60px 76px 76px 112px minmax(140px, 1fr) 40px; gap: 10px; align-items: end; min-width: 0; }
+  .editor-card { border: 1px solid #272727; border-radius: 12px; background: #000; padding: 16px; display: grid; grid-template-columns: 240px minmax(0, 1fr); gap: 20px; align-items: start; }
+  .editor-card.editor-only { grid-template-columns: minmax(0, 1fr); }
+  .editor-selector { display: grid; gap: 6px; min-width: 0; }
+  .editor-selector-heading { display: flex; align-items: center; justify-content: space-between; gap: 8px; height: 16px; font-size: 11px; font-weight: 600; color: #a3a3a3; }
+  .editor-select-actions { display: flex; align-items: center; gap: 8px; }
+  .editor-inputs { min-width: 0; }
+  .grid-editor { display: flex; flex-direction: column; gap: 12px; }
+  .grid-editor-row { display: flex; flex-wrap: wrap; align-items: end; gap: 10px; }
+  .grid-dimensions { display: grid; grid-template-columns: repeat(3, minmax(60px, 80px)) 40px 40px; gap: 8px; align-items: end; }
+  .tool-group { display: flex; flex-wrap: wrap; gap: 4px; align-items: center; }
+  .coordinate-group { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; width: 128px; }
+  .coordinate-group .control-input { padding-left: 8px; padding-right: 8px; }
+  .coordinate-group .control-field > span { font-size: 10px; }
+  .graph-generator { display: flex; flex-wrap: wrap; align-items: end; gap: 8px; }
+  .graph-generator .control-field { width: 88px; }
+  .playback-toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 16px; padding: 12px; border: 1px solid #272727; border-radius: 12px; background: #000; }
+  .playback-group, .playback-actions { display: flex; align-items: center; gap: 8px; }
+  .playback-settings { display: flex; align-items: center; flex-wrap: wrap; gap: 16px; }
+  .playback-actions { margin-left: auto; }
+  .playback-speed { display: flex; align-items: center; gap: 8px; height: 40px; font-size: 12px; }
+  .timeline-controls { display: grid; grid-template-columns: auto minmax(80px, 1fr) auto 144px; gap: 12px; align-items: end; padding: 12px; border: 1px solid #272727; border-radius: 12px; }
+  .timeline-controls input[type="range"] { height: 40px; width: 100%; margin-top: 0; }
+  .timeline-help { grid-column: 1 / -1; font-size: 11px; color: #808080; }
+  .comparison-selectors { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; padding: 16px; border: 1px solid #272727; border-radius: 12px; }
+  .comparison-controls { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; }
+  .comparison-lanes { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; align-items: start; }
+  .comparison-lane { min-width: 0; display: flex; flex-direction: column; gap: 12px; }
+  .comparison-lane-heading { display: flex; align-items: center; justify-content: space-between; min-height: 40px; gap: 8px; font-size: 14px; }
+  .comparison-canvas { height: 400px; display: flex; min-width: 0; }
+  .comparison-canvas > [aria-label="Visualization"] { min-height: 0; }
+  .comparison-lane .learning-tabs { height: 360px; }
+  @media (max-width: 1279px) {
+    .editor-card { grid-template-columns: 220px minmax(0, 1fr); }
+    .array-editor { grid-template-columns: repeat(3, minmax(0, 1fr)) 40px; }
+    .array-preset { grid-column: 1; }
+    .array-custom { grid-column: 2 / 4; }
+    .array-editor > .control-icon { grid-column: 4; grid-row: 2; }
+    .workspace-stage { grid-template-columns: minmax(0, 1fr) 330px; }
   }
   @media (max-width: 1023px) {
-    .workspace-panels aside { min-height: 480px; }
-    .workspace input[type="number"] { min-height: 36px; }
-    .workspace-panels > [aria-label="Visualization"] { height: 420px; }
+    .editor-card { grid-template-columns: minmax(0, 1fr); gap: 16px; }
+    .editor-selector { max-width: 100%; }
+    .array-editor { grid-template-columns: 60px 76px 76px 112px minmax(100px, 1fr) 40px; }
+    .array-preset, .array-custom { grid-column: auto; }
+    .array-editor > .control-icon { grid-column: auto; grid-row: auto; }
+    .workspace-stage { grid-template-columns: minmax(0, 1fr); }
+    .workspace-canvas { height: 400px; }
+    .learning-tabs { height: 360px; }
+    .comparison-lanes { grid-template-columns: minmax(0, 1fr); }
   }
+  @media (max-width: 639px) {
+    .array-editor { grid-template-columns: repeat(3, minmax(0, 1fr)) 40px; }
+    .array-preset { grid-column: 1 / 4; }
+    .array-custom { grid-column: 1 / -1; grid-row: 3; }
+    .array-editor > .control-icon { grid-column: 4; grid-row: 2; }
+    .grid-dimensions { grid-template-columns: repeat(3, minmax(0, 1fr)) 40px 40px; gap: 6px; width: 100%; }
+    .grid-dimensions .control-input { padding-left: 8px; padding-right: 4px; }
+    .editor-card { padding: 12px; }
+    .playback-toolbar { gap: 12px; }
+    .playback-actions { margin-left: 0; }
+    .playback-settings { flex-basis: 100%; gap: 12px; }
+    .timeline-controls { grid-template-columns: auto minmax(80px, 1fr) auto; gap: 8px; }
+    .timeline-controls > .timeline-operation { grid-column: 1 / -1; }
+    .comparison-selectors { gap: 10px; padding: 12px; }
+    .comparison-selectors .control-input { padding-left: 8px; padding-right: 4px; font-size: 12px; }
+    .comparison-canvas { height: 340px; }
+  }
+}
+
+@layer components {
+  .app-nav { display: flex; min-height: 64px; padding: 12px 24px; gap: 16px; align-items: center; justify-content: space-between; }
+  .app-nav-links { display: flex; gap: 8px; align-items: center; }
+  .app-nav-links > a { white-space: nowrap; text-align: center; }
+  .footer-layout { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); align-items: center; gap: 16px; padding: 20px 24px; }
+  .footer-links { display: flex; align-items: center; gap: 24px; justify-self: end; }
+  .editor-selector-heading button { display: inline-flex; align-items: center; justify-content: center; height: 16px; padding-top: 0; padding-bottom: 0; }
+  .comparison-lane section[aria-label="Run measurements"] { min-height: 112px; }
+  @media (max-width: 639px) {
+    .app-nav { display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; padding: 12px 16px; }
+    .app-nav-links { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; }
+    .app-nav-links > a { padding: 8px 6px; font-size: 12px; }
+    .footer-layout { grid-template-columns: minmax(0, 1fr); justify-items: center; padding: 20px 16px; }
+    .footer-links { justify-self: center; }
+  }
+}
+
+@media (max-width: 639px) {
+  .tool-group[aria-label="Grid tools"], .tool-group[aria-label="Graph tools"] {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    width: 100%;
+    gap: 6px;
+  }
+  .tool-group[aria-label="Grid tools"] .tool-button, .tool-group[aria-label="Graph tools"] .tool-button { width: 100%; }
 }

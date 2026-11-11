@@ -1,4 +1,10 @@
-import type { GraphInputData, GridInputData, InputData } from '../types/input';
+import type { AlgorithmMetadata } from '../types';
+import type {
+  GraphInputData,
+  GridInputData,
+  InputData,
+  TreeInputData,
+} from '../types/input';
 export const LIMITS = {
   array: 100,
   rows: 50,
@@ -50,7 +56,39 @@ export function inputError(data: InputData | null): string | null {
       data.every(Number.isSafeInteger)
       ? null
       : 'Enter 1–100 safe integers.';
+  if (data.kind === 'grid') {
+    if (
+      !data.grid.length ||
+      data.grid.length > LIMITS.rows ||
+      !data.grid[0]?.length ||
+      data.grid[0].length > LIMITS.cols
+    )
+      return `Use a grid of at most ${LIMITS.rows} rows and ${LIMITS.cols} columns.`;
+    const cols = data.grid[0].length;
+    if (
+      !data.grid.every(
+        (row) =>
+          row.length === cols && row.every((cell) => [0, 1, 5].includes(cell)),
+      )
+    )
+      return 'Use a rectangular grid with valid cells.';
+    for (const point of [data.start, data.end])
+      if (
+        !integerInRange(point.row, 0, data.grid.length - 1) ||
+        !integerInRange(point.col, 0, cols - 1) ||
+        data.grid[point.row][point.col] === 1
+      )
+        return 'Choose endpoints inside open grid cells.';
+  }
   if (data.kind === 'graph') {
+    if (
+      Object.keys(data.nodes).length > LIMITS.nodes ||
+      Object.values(data.adjacency).reduce(
+        (sum, neighbors) => sum + Object.keys(neighbors).length,
+        0,
+      ) > LIMITS.edges
+    )
+      return `Use at most ${LIMITS.nodes} nodes and ${LIMITS.edges} directed edges.`;
     if (!Object.keys(data.nodes).length)
       return 'Add graph nodes and choose a start and end.';
     if (
@@ -61,5 +99,33 @@ export function inputError(data: InputData | null): string | null {
     )
       return 'Choose an existing start and end node.';
   }
+  return null;
+}
+
+export const createTree = (): TreeInputData => ({
+  kind: 'tree',
+  values: [30, 20, 40, 10, 25, 35, 50],
+  operations: [],
+  traversal: 'inorder',
+});
+
+export function algorithmInputError(
+  data: InputData | null,
+  algorithm?: AlgorithmMetadata,
+): string | null {
+  const problem = inputError(data);
+  if (problem) return problem;
+  if (data && !Array.isArray(data) && data.kind === 'tree' && data.invalid)
+    return 'Correct the tree input before visualizing.';
+  if (
+    data &&
+    !Array.isArray(data) &&
+    data.kind === 'graph' &&
+    algorithm?.supports_negative !== true &&
+    Object.values(data.adjacency).some((neighbors) =>
+      Object.values(neighbors).some((weight) => weight < 0),
+    )
+  )
+    return 'Negative edges require Bellman–Ford. Choose it or edit the edge weights.';
   return null;
 }
