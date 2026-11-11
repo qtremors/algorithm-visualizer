@@ -150,3 +150,25 @@
     transition-duration: 0.01ms !important;
   }
 }
+
+@layer components {
+  .action-secondary {
+    @apply px-3 py-2 rounded-lg bg-gray-800 border border-gray-600 text-sm text-gray-200 disabled:opacity-40;
+    min-height: 44px;
+  }
+  .action-primary {
+    @apply px-4 py-2 rounded-lg bg-blue-600 text-white font-semibold disabled:opacity-40;
+    min-height: 44px;
+  }
+  .workspace { min-height: 700px; }
+  .workspace-panels > [aria-label="Visualization"] { min-height: 360px; flex-shrink: 0; }
+  @media (min-width: 1024px) {
+    .workspace { min-height: 1000px; }
+    .workspace-panels > [aria-label="Visualization"] { min-height: 480px; }
+  }
+  @media (max-width: 1023px) {
+    .workspace-panels aside { min-height: 480px; }
+    .workspace input[type="number"] { min-height: 36px; }
+    .workspace-panels > [aria-label="Visualization"] { height: 420px; }
+  }
+}

@@ -25,7 +25,7 @@ import app.algorithms.pathfinding.bfs  # noqa: F401
 import app.algorithms.pathfinding.dfs  # noqa: F401
 
 logger = run_logger()
-APP_VERSION = "0.1.1"
+APP_VERSION = "0.1.2"
 REVISION = os.getenv("VERCEL_GIT_COMMIT_SHA", os.getenv("APP_REVISION", "development"))
 api = FastAPI(title="AlgoVisualizer", version=APP_VERSION)
 api.add_middleware(

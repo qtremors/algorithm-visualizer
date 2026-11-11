@@ -26,10 +26,11 @@ async function weight(
   target: string,
   value: number,
 ) {
-  page.once('dialog', (dialog) => void dialog.accept(String(value)));
   await page
     .getByRole('button', { name: new RegExp(`^Edge ${source} to ${target},`) })
     .click();
+  await page.getByLabel('Edge weight', { exact: true }).fill(String(value));
+  await page.getByRole('button', { name: 'Save weight', exact: true }).click();
 }
 async function addNode(page: Page, x: number, y: number) {
   const point = await page.locator('svg[preserveAspectRatio]').evaluate(
@@ -196,7 +197,8 @@ test('zero-weight edges disappear when their endpoint is deleted', async ({
   await page.locator('[data-node-id="B"]').click();
   await expect(page.locator('[data-node-id="B"]')).toHaveCount(0);
   let received:
-    { adjacency: Record<string, Record<string, number>> } | undefined;
+    | { adjacency: Record<string, Record<string, number>> }
+    | undefined;
   await page.routeWebSocket('**/ws/visualize/**', (ws) =>
     ws.onMessage((data) => {
       received = JSON.parse(String(data));
@@ -350,7 +352,9 @@ test('a failed execution can be retried and automatically plays the next result'
   await expect(page.getByRole('status')).toContainText('Algorithm finished.');
 });
 
-test('reconnecting existing graph nodes preserves zero and positive weights', async ({ page }) => {
+test('reconnecting existing graph nodes preserves zero and positive weights', async ({
+  page,
+}) => {
   await graph(page);
   await page.getByLabel('Node count').fill('2');
   await page.getByRole('button', { name: 'Mesh', exact: true }).click();
@@ -361,18 +365,27 @@ test('reconnecting existing graph nodes preserves zero and positive weights', as
     await page.keyboard.press('Enter');
     await page.locator('[data-node-id="B"]').focus();
     await page.keyboard.press('Enter');
-    await expect(page.getByRole('button', { name: `Edge A to B, weight ${value}. Edit weight.`, exact: true })).toBeVisible();
+    await expect(
+      page.getByRole('button', {
+        name: `Edge A to B, weight ${value}. Edit weight.`,
+        exact: true,
+      }),
+    ).toBeVisible();
     await expect(page.locator('[data-edge]')).toHaveCount(1);
   }
 });
 
-test('an unreachable search keeps its no-path result visible after completion', async ({ page }) => {
+test('an unreachable search keeps its no-path result visible after completion', async ({
+  page,
+}) => {
   await open(page);
   await page.getByLabel('Rows', { exact: true }).fill('3');
   await page.getByLabel('Columns', { exact: true }).fill('3');
   await page.getByRole('button', { name: 'Clear Grid', exact: true }).click();
   for (let row = 0; row < 3; row++)
-    await page.getByRole('button', { name: `Row ${row}, column 1: open`, exact: true }).click();
+    await page
+      .getByRole('button', { name: `Row ${row}, column 1: open`, exact: true })
+      .click();
   await page.getByRole('button', { name: 'Visualize', exact: true }).click();
   await fast(page);
   await expect(page.getByRole('status')).toContainText('Algorithm finished.');
@@ -380,14 +393,18 @@ test('an unreachable search keeps its no-path result visible after completion', 
   await expect(page.getByRole('alert')).toHaveCount(0);
 });
 
-test('execution history reaches the last message in a tall viewport', async ({ page }) => {
+test('execution history reaches the last message in a tall viewport', async ({
+  page,
+}) => {
   await page.setViewportSize({ width: 1600, height: 2400 });
-  await page.routeWebSocket('**/ws/visualize/**', (ws) => ws.onMessage(() => {
-    for (let i = 1; i <= 200; i++)
-      ws.send(JSON.stringify({ ...frame, message: `Trace ${i}` }));
-    ws.send(JSON.stringify({ type: 'complete', steps: 200 }));
-    ws.close({ code: 1000 });
-  }));
+  await page.routeWebSocket('**/ws/visualize/**', (ws) =>
+    ws.onMessage(() => {
+      for (let i = 1; i <= 200; i++)
+        ws.send(JSON.stringify({ ...frame, message: `Trace ${i}` }));
+      ws.send(JSON.stringify({ type: 'complete', steps: 200 }));
+      ws.close({ code: 1000 });
+    }),
+  );
   await open(page, '/sorting');
   await page.getByLabel('Custom Input').fill('2,1');
   await page.getByRole('button', { name: 'Visualize', exact: true }).click();

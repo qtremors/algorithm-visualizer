@@ -15,11 +15,12 @@ export type GraphInputData = {
 };
 export type ArrayInputData = number[];
 export type InputData = GridInputData | GraphInputData | ArrayInputData;
-export type GridTool = 'wall' | 'start' | 'end';
-export type GraphTool = 'node' | 'edge' | 'start' | 'end' | 'delete';
+export type GridTool = 'wall' | 'start' | 'end' | 'weight' | 'erase';
+export type GraphTool = 'node' | 'edge' | 'start' | 'end' | 'delete' | 'move';
 export type GraphInteraction =
   | { type: 'addNode'; point: Point }
   | { type: 'nodeClick'; nodeId: string }
+  | { type: 'moveNode'; nodeId: string; point: Point }
   | { type: 'connectStart'; nodeId: string }
   | { type: 'connectMove'; point: Point }
   | { type: 'connectEnd'; nodeId: string }

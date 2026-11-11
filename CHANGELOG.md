@@ -1,10 +1,14 @@
 # AlgoVisualizer Changelog
 
 > **Project:** AlgoVisualizer
-> **Version:** 0.1.1
+> **Version:** 0.1.2
 > **Last Updated:** 2026-11-11
 
 ---
+
+## [0.1.2] - 2026-11-11
+
+- **Preserve Sessions And Complete Interactive Editing**: Add validated session sharing and persistence, bounded undo/redo, seeded presets and mazes, weighted cells, directed connections, node movement, inline weight editing, timeline seeking, breakpoints, and responsive workspace layout.
 
 ## [0.1.1] - 2026-11-11
 

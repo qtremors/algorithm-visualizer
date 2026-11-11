@@ -1,15 +1,25 @@
 import { useId, useState } from 'react';
 import { RefreshCw } from 'lucide-react';
+import { arrayPreset, type ArrayPreset } from '../../lib/random';
 import { integerInRange, LIMITS, parseArray } from '../../lib/input';
 
 type Props = {
   onSubmit: (data: number[] | null) => void;
   currentData: number[] | null;
   disabled: boolean;
+  seed?: string;
 };
-export default function ArrayInput({ onSubmit, currentData, disabled }: Props) {
+export default function ArrayInput({
+  onSubmit,
+  currentData,
+  disabled,
+  seed = 'algoviz',
+}: Props) {
   const id = useId();
-  const [text, setText] = useState(() => currentData?.join(', ') || '');
+  const [draft, setDraft] = useState({ source: currentData, previous: currentData, text: currentData?.join(', ') || '' });
+  const localDraft = draft.source === currentData || draft.previous === currentData;
+  const text = localDraft ? draft.text : currentData?.join(', ') || '';
+  const [preset, setPreset] = useState<ArrayPreset>('random');
   const [size, setSize] = useState(15);
   const [min, setMin] = useState(10);
   const [max, setMax] = useState(100);
@@ -26,21 +36,19 @@ export default function ArrayInput({ onSubmit, currentData, disabled }: Props) {
       setError('Use a size of 1–100 and a safe integer range with min ≤ max.');
       return;
     }
-    const values = Array.from(
-      { length: size },
-      () => Math.floor(Math.random() * (max - min + 1)) + min,
-    );
-    setText(values.join(', '));
+    const values = arrayPreset(preset, size, seed, min, max);
+    setDraft({ source: values, previous: currentData, text: values.join(', ') });
     setError(null);
     onSubmit(values);
   };
   const update = (value: string) => {
-    setText(value);
     try {
       const values = parseArray(value);
+      setDraft({ source: values, previous: currentData, text: value });
       setError(null);
       onSubmit(values);
     } catch (problem) {
+      setDraft({ source: null, previous: currentData, text: value });
       setError(problem instanceof Error ? problem.message : 'Invalid input.');
       onSubmit(null);
     }
@@ -55,7 +63,7 @@ export default function ArrayInput({ onSubmit, currentData, disabled }: Props) {
         <span className="text-xs font-bold text-gray-400 uppercase">
           Generator
         </span>
-        <div className="flex items-center gap-2 bg-gray-900 rounded-lg border border-gray-700 p-2">
+        <div className="flex flex-wrap items-center gap-2 bg-gray-900 rounded-lg border border-gray-700 p-2">
           <label htmlFor={`${id}-size`} className="text-xs">
             Size
           </label>
@@ -100,7 +108,23 @@ export default function ArrayInput({ onSubmit, currentData, disabled }: Props) {
           </button>
         </div>
       </div>
-      <div className="flex-grow">
+      <label className="text-xs">
+        Preset
+        <select
+          aria-label="Array preset"
+          value={preset}
+          onChange={(event) => setPreset(event.target.value as ArrayPreset)}
+          className="block bg-gray-900 p-2 rounded border border-gray-700"
+        >
+          <option value="random">Random</option>
+          <option value="sorted">Sorted</option>
+          <option value="reversed">Reversed</option>
+          <option value="nearly_sorted">Nearly sorted</option>
+          <option value="duplicates">Duplicates</option>
+          <option value="signed">Signed</option>
+        </select>
+      </label>
+      <div className="flex-grow min-w-0">
         <label
           htmlFor={`${id}-text`}
           className="text-xs font-bold text-gray-400 uppercase"
@@ -112,12 +136,12 @@ export default function ArrayInput({ onSubmit, currentData, disabled }: Props) {
           type="text"
           value={text}
           onChange={(e) => update(e.target.value)}
-          aria-invalid={!!error}
-          aria-describedby={error ? `${id}-error` : undefined}
+          aria-invalid={!!error && localDraft}
+          aria-describedby={error && localDraft ? `${id}-error` : undefined}
           placeholder="e.g., 50, 20, 80..."
           className="w-full bg-gray-900 text-white p-2 rounded-lg border border-gray-700 text-sm font-mono"
         />
-        {error && (
+        {error && localDraft && (
           <p
             id={`${id}-error`}
             role="alert"

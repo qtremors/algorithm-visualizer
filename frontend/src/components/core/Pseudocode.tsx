@@ -6,12 +6,16 @@ import { cn } from '../../lib/utils';
 type PseudocodeProps = {
   code: string[];
   highlightedLine: number;
+  breakpoints?: number[];
+  onToggleBreakpoint?: (line: number) => void;
 };
 
 export const CodeRenderer = ({
   code,
   highlightedLine,
   className,
+  breakpoints = [],
+  onToggleBreakpoint,
 }: PseudocodeProps & { className?: string }) => (
   <pre
     className={cn(
@@ -30,6 +34,16 @@ export const CodeRenderer = ({
               : 'text-gray-400',
           )}
         >
+          {onToggleBreakpoint && (
+            <button
+              aria-label={`Breakpoint line ${index + 1}`}
+              aria-pressed={breakpoints.includes(index + 1)}
+              onClick={() => onToggleBreakpoint(index + 1)}
+              className="inline-block min-w-8 mr-1 text-gray-300"
+            >
+              {breakpoints.includes(index + 1) ? '●' : index + 1}
+            </button>
+          )}
           {line}
         </div>
       ))}
@@ -37,7 +51,12 @@ export const CodeRenderer = ({
   </pre>
 );
 
-export default function Pseudocode({ code, highlightedLine }: PseudocodeProps) {
+export default function Pseudocode({
+  code,
+  highlightedLine,
+  breakpoints,
+  onToggleBreakpoint,
+}: PseudocodeProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   return (
@@ -56,7 +75,12 @@ export default function Pseudocode({ code, highlightedLine }: PseudocodeProps) {
             <Maximize2 size={16} />
           </button>
         </div>
-        <CodeRenderer code={code} highlightedLine={highlightedLine} />
+        <CodeRenderer
+          code={code}
+          highlightedLine={highlightedLine}
+          breakpoints={breakpoints}
+          onToggleBreakpoint={onToggleBreakpoint}
+        />
       </div>
 
       {/* Individual Modal View */}
@@ -83,6 +107,8 @@ export default function Pseudocode({ code, highlightedLine }: PseudocodeProps) {
               <CodeRenderer
                 code={code}
                 highlightedLine={highlightedLine}
+                breakpoints={breakpoints}
+                onToggleBreakpoint={onToggleBreakpoint}
                 className="h-full text-base"
               />
             </div>

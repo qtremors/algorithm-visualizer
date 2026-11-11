@@ -95,7 +95,11 @@ export default function GridVisualizer({
       data.grid[r][c] =
         dragging && gesture.current
           ? gesture.current.wall
-          : Number(data.grid[r][c] !== 1);
+          : mode === 'weight'
+            ? 5
+            : mode === 'erase'
+              ? 0
+              : Number(data.grid[r][c] !== 1);
     if (!dragging)
       gesture.current = { data, wall: data.grid[r][c], touched: new Set([id]) };
     else if (gesture.current) {
@@ -205,7 +209,19 @@ export default function GridVisualizer({
                 )}
                 style={{ width: size, height: size }}
               >
-                {isStart ? 'S' : isEnd ? 'E' : value === 5 ? '5' : ''}
+                {isStart
+                  ? 'S'
+                  : isEnd
+                    ? 'E'
+                    : value === 1
+                      ? '×'
+                      : value === 5
+                        ? '5'
+                        : path.has(id)
+                          ? '•'
+                          : visited.has(id)
+                            ? '·'
+                            : ''}
               </button>
             );
           }),

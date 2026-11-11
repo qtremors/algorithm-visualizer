@@ -8,10 +8,14 @@ import StatusLog from '../components/core/StatusLog';
 import InfoModal from '../components/core/InfoModal';
 import Modal from '../components/core/Modal';
 import LogList from '../components/core/LogList';
-import { Link } from 'react-router-dom';
+import Timeline from '../components/core/Timeline';
+import WeightEditor from '../components/core/WeightEditor';
+import SessionToolbar from '../components/workspace/SessionToolbar';
+import { Link, useNavigate } from 'react-router-dom';
 
 export default function AlgorithmWorkspace() {
   const w = useAlgorithmWorkspace();
+  const navigate = useNavigate();
   const p = w.playback;
   if (w.isLoading) return <p role="status">Loading algorithms...</p>;
   if (w.loadError)
@@ -26,9 +30,33 @@ export default function AlgorithmWorkspace() {
       </div>
     );
   return (
-    <div className="flex flex-col gap-4 h-[calc(100vh-160px)] min-h-[700px]">
+    <div className="workspace flex flex-col gap-4 min-w-0">
       <h1 className="sr-only">{w.category} algorithm workspace</h1>
+      <SessionToolbar
+        session={w.editor.session}
+        setSeed={w.editor.setSeed}
+        disabled={w.busy}
+        canUndo={w.editor.canUndo}
+        canRedo={w.editor.canRedo}
+        undo={() => {
+          w.handleReset();
+          w.editor.undo();
+        }}
+        redo={() => {
+          w.handleReset();
+          w.editor.redo();
+        }}
+        onImport={(session) => {
+          w.handleReset();
+          w.editor.replace(session);
+          if (session.category !== w.category) navigate(`/${session.category}`);
+        }}
+      />
+      {w.editor.notice && <p role="alert">{w.editor.notice}</p>}
       <WorkspaceHeader
+        seed={w.editor.session.seed}
+        directed={w.directed}
+        onDirectedChange={w.setDirected}
         category={w.category}
         algorithms={w.categoryAlgorithms}
         selectedAlgoName={w.selectedAlgoName}
@@ -71,10 +99,19 @@ export default function AlgorithmWorkspace() {
         showEdgeColors={w.showEdgeColors}
         onToggleEdgeColors={() => w.setShowEdgeColors(!w.showEdgeColors)}
       />
+      <Timeline
+        index={p.currentStepIndex}
+        length={w.steps.length}
+        streaming={w.isRunning}
+        disabled={!w.steps.length || w.status === 'failed'}
+        onSeek={p.seek}
+        operation={p.operation}
+        onOperationChange={p.setOperation}
+      />
       {w.validationError && (
         <p className="text-sm text-amber-300">{w.validationError}</p>
       )}
-      <div className="flex-1 flex flex-col lg:flex-row gap-4 min-h-0">
+      <div className="workspace-panels flex-1 flex flex-col lg:flex-row gap-4 min-h-0">
         <VisualizerPanel
           algorithmMetadata={w.algorithmMetadata}
           currentStep={p.currentStep}
@@ -96,6 +133,8 @@ export default function AlgorithmWorkspace() {
             <Pseudocode
               code={w.algorithmMetadata?.pseudocode || []}
               highlightedLine={p.currentStep?.line || 0}
+              breakpoints={p.breakpoints}
+              onToggleBreakpoint={p.toggleBreakpoint}
             />
           </div>
           <div className="bg-gray-800 p-4 rounded-xl border border-gray-700">
@@ -109,6 +148,13 @@ export default function AlgorithmWorkspace() {
           </div>
         </aside>
       </div>
+      {w.graphEditor.edge && (
+        <WeightEditor
+          {...w.graphEditor.edge}
+          onSave={w.graphEditor.saveWeight}
+          onClose={w.graphEditor.closeWeight}
+        />
+      )}
       {w.isInfoModalOpen && w.algorithmMetadata && (
         <InfoModal
           metadata={w.algorithmMetadata}
@@ -141,6 +187,8 @@ export default function AlgorithmWorkspace() {
                 <CodeRenderer
                   code={w.algorithmMetadata?.pseudocode || []}
                   highlightedLine={p.currentStep?.line || 0}
+                  breakpoints={p.breakpoints}
+                  onToggleBreakpoint={p.toggleBreakpoint}
                 />
               </div>
               <div className="md:w-1/2 p-4 flex flex-col min-h-0">

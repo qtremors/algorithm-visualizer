@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Circle, Share2, PlayCircle, Flag, Trash2 } from 'lucide-react';
 import type { GraphInputData, GraphTool, Point } from '../../types/input';
 import { createGraph, integerInRange, LIMITS } from '../../lib/input';
+import { seededRandom } from '../../lib/random';
 import ToolButton from '../core/ToolButton';
 
 type Props = {
@@ -10,6 +11,9 @@ type Props = {
   setMode: (mode: GraphTool) => void;
   currentData: GraphInputData;
   disabled: boolean;
+  seed?: string;
+  directed?: boolean;
+  onDirectedChange?: (value: boolean) => void;
 };
 export default function GraphInput({
   onSubmit,
@@ -17,6 +21,9 @@ export default function GraphInput({
   setMode,
   currentData,
   disabled,
+  seed = 'algoviz',
+  directed = false,
+  onDirectedChange,
 }: Props) {
   const [nodeCount, setNodeCount] = useState(10);
   const [density, setDensity] = useState(3);
@@ -31,6 +38,7 @@ export default function GraphInput({
       return;
     }
     const data = createGraph();
+    const random = seededRandom(seed);
     const keys = Array.from({ length: nodeCount }, (_, i) =>
       i < 26 ? String.fromCharCode(65 + i) : String.fromCharCode(97 + i - 26),
     );
@@ -58,7 +66,7 @@ export default function GraphInput({
     if (tree)
       keys.slice(1).forEach((id, offset) => {
         data.adjacency[keys[Math.floor(offset / 2)]][id] =
-          1 + Math.floor(Math.random() * 10);
+          1 + Math.floor(random() * 10);
       });
     else {
       let edges = 0;
@@ -68,7 +76,7 @@ export default function GraphInput({
           const v = keys[(index + d) % keys.length];
           if (Object.hasOwn(data.adjacency[u], v) || edges + 2 > LIMITS.edges)
             continue;
-          const weight = 1 + Math.floor(Math.random() * 10);
+          const weight = 1 + Math.floor(random() * 10);
           data.adjacency[u][v] = data.adjacency[v][u] = weight;
           edges += 2;
         }
@@ -91,7 +99,7 @@ export default function GraphInput({
       className="w-full flex flex-wrap gap-3 items-center disabled:opacity-60"
     >
       <legend className="sr-only">Graph input</legend>
-      <div className="flex gap-2 items-center bg-gray-900 border border-gray-700 p-2 rounded-lg">
+      <div className="flex flex-wrap gap-2 items-center bg-gray-900 max-w-full border border-gray-700 p-2 rounded-lg">
         <label className="text-xs flex items-center gap-1">
           Nodes
           <input
@@ -183,7 +191,23 @@ export default function GraphInput({
           label="Delete"
           color="text-red-400"
         />
+        <ToolButton
+          active={mode === 'move'}
+          onClick={() => setMode('move')}
+          icon={<span>↔</span>}
+          label="Move"
+          color="text-blue-300"
+        />
       </div>
+      <label className="flex gap-2 items-center text-sm">
+        <input
+          type="checkbox"
+          checked={directed}
+          disabled={disabled}
+          onChange={(event) => onDirectedChange?.(event.target.checked)}
+        />
+        Directed connections
+      </label>
       {error && (
         <p role="alert" className="text-xs text-red-400 w-full">
           {error}

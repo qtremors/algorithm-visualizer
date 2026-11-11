@@ -83,3 +83,13 @@ describe('input regressions', () => {
     expect(container.innerHTML).not.toContain('NaN');
   });
 });
+
+
+it('updates the visible array when undo or import replaces its data', () => {
+  const submit = vi.fn();
+  const { rerender } = render(<ArrayInput currentData={[3, 2]} onSubmit={submit} disabled={false} />);
+  fireEvent.change(screen.getByLabelText('Custom Input'), { target: { value: 'oops' } });
+  rerender(<ArrayInput currentData={[-1, 9]} onSubmit={submit} disabled={false} />);
+  expect(screen.getByLabelText('Custom Input')).toHaveValue('-1, 9');
+  expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+});

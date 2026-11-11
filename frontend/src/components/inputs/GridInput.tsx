@@ -2,6 +2,8 @@ import { useId, useState } from 'react';
 import { Ban, Flag, PlayCircle, Shuffle, RefreshCw } from 'lucide-react';
 import type { GridInputData, GridTool } from '../../types/input';
 import { createGrid, integerInRange } from '../../lib/input';
+import { generateMaze } from '../../lib/maze';
+import { seededRandom } from '../../lib/random';
 import ToolButton from '../core/ToolButton';
 
 type Props = {
@@ -10,6 +12,7 @@ type Props = {
   setMode: (mode: GridTool) => void;
   currentData: GridInputData;
   disabled: boolean;
+  seed?: string;
 };
 export default function GridInput({
   onSubmit,
@@ -17,6 +20,7 @@ export default function GridInput({
   setMode,
   currentData,
   disabled,
+  seed = 'algoviz',
 }: Props) {
   const id = useId();
   const [rows, setRows] = useState(currentData.grid.length);
@@ -27,20 +31,21 @@ export default function GridInput({
     if (disabled) return;
     try {
       const data = createGrid(rows, cols);
+      const randomValue = seededRandom(seed);
       if (random) {
         if (!integerInRange(density, 0, 90))
           throw new Error('Wall density must be a whole number from 0 to 90.');
         const cells = rows * cols;
         if (cells < 2)
           throw new Error('Randomization needs at least two cells.');
-        const start = Math.floor(Math.random() * cells);
+        const start = Math.floor(randomValue() * cells);
         // Select uniformly from the other cells without a retry loop.
-        let end = Math.floor(Math.random() * (cells - 1));
+        let end = Math.floor(randomValue() * (cells - 1));
         if (end >= start) end++;
         data.start = { row: Math.floor(start / cols), col: start % cols };
         data.end = { row: Math.floor(end / cols), col: end % cols };
         data.grid = data.grid.map((row) =>
-          row.map(() => (Math.random() < density / 100 ? 1 : 0)),
+          row.map(() => (randomValue() < density / 100 ? 1 : 0)),
         );
         data.grid[data.start.row][data.start.col] = data.grid[data.end.row][
           data.end.col
@@ -79,7 +84,7 @@ export default function GridInput({
     >
       <legend className="sr-only">Grid input</legend>
       <div className="flex flex-wrap items-center gap-3">
-        <div className="flex items-center gap-2 bg-gray-900 p-2 rounded-lg border border-gray-700">
+        <div className="flex flex-wrap items-center gap-2 bg-gray-900 max-w-full p-2 rounded-lg border border-gray-700">
           <label htmlFor={`${id}-rows`} className="text-xs">
             Rows
           </label>
@@ -136,7 +141,7 @@ export default function GridInput({
           </button>
         </div>
         <div
-          className="flex gap-1 bg-gray-900 p-1 rounded-lg"
+          className="flex flex-wrap gap-1 bg-gray-900 p-1 rounded-lg"
           role="group"
           aria-label="Grid tools"
         >
@@ -161,6 +166,50 @@ export default function GridInput({
             label="Wall"
             color="text-gray-300"
           />
+          <ToolButton
+            active={mode === 'weight'}
+            onClick={() => setMode('weight')}
+            icon={<span>5</span>}
+            label="Weight"
+            color="text-purple-400"
+          />
+          <ToolButton
+            active={mode === 'erase'}
+            onClick={() => setMode('erase')}
+            icon={<span>×</span>}
+            label="Erase"
+            color="text-gray-300"
+          />
+        </div>
+        <div className="flex flex-wrap gap-2">
+          <button
+            type="button"
+            className="action-secondary"
+            onClick={() => {
+              try {
+                onSubmit(generateMaze(rows, cols, seed, 'backtracker'));
+                setError(null);
+              } catch (problem) {
+                setError(String(problem));
+              }
+            }}
+          >
+            Backtracker maze
+          </button>
+          <button
+            type="button"
+            className="action-secondary"
+            onClick={() => {
+              try {
+                onSubmit(generateMaze(rows, cols, seed, 'prim'));
+                setError(null);
+              } catch (problem) {
+                setError(String(problem));
+              }
+            }}
+          >
+            Prim maze
+          </button>
         </div>
         {(['start', 'end'] as const).map((type) => (
           <div key={type} className="flex gap-1 text-xs items-center">

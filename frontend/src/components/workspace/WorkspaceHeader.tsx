@@ -7,6 +7,9 @@ import type { GraphTool, GridTool, InputData } from '../../types/input';
 
 type Props = {
   category?: string;
+  seed?: string;
+  directed?: boolean;
+  onDirectedChange?: (value: boolean) => void;
   algorithms: Record<string, AlgorithmMetadata>;
   selectedAlgoName: string;
   onAlgoChange: (name: string) => void;
@@ -95,9 +98,10 @@ export default function WorkspaceHeader(props: Props) {
           ))}
         </select>
       </div>
-      <div className="flex-1 w-full">
+      <div className="flex-1 w-full min-w-0">
         {category === 'sorting' ? (
           <ArrayInput
+            seed={props.seed}
             currentData={Array.isArray(inputData) ? inputData : null}
             onSubmit={onInputUpdate}
             disabled={busy}
@@ -106,6 +110,7 @@ export default function WorkspaceHeader(props: Props) {
           !Array.isArray(inputData) &&
           inputData.kind === 'grid' ? (
           <GridInput
+            seed={props.seed}
             currentData={inputData}
             onSubmit={onInputUpdate}
             disabled={busy}
@@ -116,6 +121,9 @@ export default function WorkspaceHeader(props: Props) {
           !Array.isArray(inputData) &&
           inputData.kind === 'graph' ? (
           <GraphInput
+            directed={props.directed}
+            onDirectedChange={props.onDirectedChange}
+            seed={props.seed}
             currentData={inputData}
             onSubmit={onInputUpdate}
             disabled={busy}

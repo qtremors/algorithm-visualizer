@@ -37,6 +37,7 @@ export default function GraphVisualizer({
 }: Props) {
   const svg = useRef<SVGSVGElement>(null);
   const source = useRef<string | null>(null);
+  const moving = useRef<string | null>(null);
   const [cursor, setCursor] = useState({ x: 500, y: 360 });
   const marker = useId().replace(/:/g, '');
   const snapshot =
@@ -72,6 +73,7 @@ export default function GraphVisualizer({
     };
   }, []);
   const cancel = () => {
+    moving.current = null;
     source.current = null;
     onInteraction({ type: 'connectCancel' });
   };
@@ -176,6 +178,25 @@ export default function GraphVisualizer({
             onPointerMove={(event) => {
               if (
                 isInteracting &&
+                moving.current &&
+                event.buttons === 1 &&
+                svg.current
+              ) {
+                const point = svgPoint(
+                  svg.current,
+                  event.clientX,
+                  event.clientY,
+                );
+                if (point)
+                  onInteraction({
+                    type: 'moveNode',
+                    nodeId: moving.current,
+                    point,
+                  });
+                return;
+              }
+              if (
+                isInteracting &&
                 source.current &&
                 event.buttons === 1 &&
                 svg.current
@@ -189,6 +210,12 @@ export default function GraphVisualizer({
               }
             }}
             onPointerUp={(event) => {
+              if (moving.current) {
+                moving.current = null;
+                if (svg.current?.hasPointerCapture(event.pointerId))
+                  svg.current.releasePointerCapture(event.pointerId);
+                return;
+              }
               if (!source.current) return;
               const target = document
                 .elementFromPoint(event.clientX, event.clientY)
@@ -320,6 +347,14 @@ export default function GraphVisualizer({
                     event.stopPropagation();
                     if (
                       isInteracting &&
+                      tool === 'move' &&
+                      event.button === 0
+                    ) {
+                      moving.current = id;
+                      svg.current?.setPointerCapture(event.pointerId);
+                    }
+                    if (
+                      isInteracting &&
                       tool === 'edge' &&
                       event.button === 0
                     ) {
@@ -333,7 +368,38 @@ export default function GraphVisualizer({
                     if (tool !== 'edge') activate(id);
                   }}
                   onKeyDown={(event) => {
-                    if (event.key === 'Enter' || event.key === ' ') {
+                    if (
+                      tool === 'move' &&
+                      [
+                        'ArrowUp',
+                        'ArrowDown',
+                        'ArrowLeft',
+                        'ArrowRight',
+                      ].includes(event.key)
+                    ) {
+                      event.preventDefault();
+                      event.stopPropagation();
+                      onInteraction({
+                        type: 'moveNode',
+                        nodeId: id,
+                        point: {
+                          x:
+                            point.x +
+                            (event.key === 'ArrowRight'
+                              ? 20
+                              : event.key === 'ArrowLeft'
+                                ? -20
+                                : 0),
+                          y:
+                            point.y +
+                            (event.key === 'ArrowDown'
+                              ? 20
+                              : event.key === 'ArrowUp'
+                                ? -20
+                                : 0),
+                        },
+                      });
+                    } else if (event.key === 'Enter' || event.key === ' ') {
                       event.preventDefault();
                       event.stopPropagation();
                       activate(id);
