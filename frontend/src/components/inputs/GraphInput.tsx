@@ -94,7 +94,7 @@ export default function GraphInput({
     onSubmit(data);
   };
   return (
-    <fieldset disabled={disabled} className="grid-editor disabled:opacity-60">
+    <fieldset disabled={disabled} className="grid-editor">
       <legend className="sr-only">Graph input</legend>
       <div className="graph-generator">
         <label className="control-field">

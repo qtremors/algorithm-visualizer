@@ -113,14 +113,14 @@ export default function GridVisualizer({
     r: number,
     c: number,
   ) => {
-    let next = r * cols + c;
-    if (event.key === 'ArrowRight')
-      next = Math.min(grid.length * cols - 1, next + 1);
-    else if (event.key === 'ArrowLeft') next = Math.max(0, next - 1);
-    else if (event.key === 'ArrowDown')
-      next = Math.min(grid.length * cols - 1, next + cols);
-    else if (event.key === 'ArrowUp') next = Math.max(0, next - cols);
+    let row = r,
+      col = c;
+    if (event.key === 'ArrowRight') col = Math.min(cols - 1, c + 1);
+    else if (event.key === 'ArrowLeft') col = Math.max(0, c - 1);
+    else if (event.key === 'ArrowDown') row = Math.min(grid.length - 1, r + 1);
+    else if (event.key === 'ArrowUp') row = Math.max(0, r - 1);
     else return;
+    const next = row * cols + col;
     event.preventDefault();
     event.stopPropagation();
     setFocus(next);
@@ -173,6 +173,7 @@ export default function GridVisualizer({
                 key={id}
                 type="button"
                 data-cell-index={r * cols + c}
+                data-state={state}
                 aria-label={`Row ${r}, column ${c}: ${state}`}
                 aria-disabled={!isInteracting}
                 tabIndex={
@@ -191,22 +192,7 @@ export default function GridVisualizer({
                 onPointerEnter={(event) => {
                   if (event.buttons === 1 && gesture.current) paint(r, c, true);
                 }}
-                className={cn(
-                  'rounded-sm border border-white/10 text-[9px] text-black touch-none',
-                  isStart
-                    ? 'bg-green-500'
-                    : isEnd
-                      ? 'bg-red-500'
-                      : value === 1
-                        ? 'bg-gray-500'
-                        : path.has(id)
-                          ? 'bg-yellow-400'
-                          : visited.has(id)
-                            ? 'bg-blue-500'
-                            : value === 5
-                              ? 'bg-purple-400'
-                              : 'bg-gray-800',
-                )}
+                className="grid-cell text-[9px] touch-none"
                 style={{ width: size, height: size }}
               >
                 {isStart

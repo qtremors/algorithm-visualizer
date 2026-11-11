@@ -1,5 +1,4 @@
 import type { ReactNode } from 'react';
-import { cn } from '../../lib/utils';
 export default function ToolButton({
   active,
   onClick,
@@ -18,10 +17,7 @@ export default function ToolButton({
       type="button"
       aria-pressed={active}
       onClick={onClick}
-      className={cn(
-        'tool-button',
-        active ? 'bg-gray-700 text-white' : 'text-gray-400 hover:bg-gray-800',
-      )}
+      className="tool-button"
     >
       <span className={active ? color : ''} aria-hidden="true">
         {icon}

@@ -78,7 +78,7 @@ export default function GridInput({
     onSubmit(data);
   };
   return (
-    <fieldset disabled={disabled} className="grid-editor disabled:opacity-60">
+    <fieldset disabled={disabled} className="grid-editor">
       <legend className="sr-only">Grid input</legend>
       <div className="grid-editor-row">
         <div className="grid-dimensions">

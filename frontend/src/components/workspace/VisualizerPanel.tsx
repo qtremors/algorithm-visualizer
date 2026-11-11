@@ -31,10 +31,22 @@ export default function VisualizerPanel(props: Props) {
   const { inputData, algorithmMetadata, currentStep, busy } = props;
   return (
     <div
-      className="flex-1 min-w-0 bg-gray-800 rounded-xl shadow-lg border border-gray-700 relative min-h-80"
+      className="canvas-panel flex-1 min-w-0 rounded-xl relative min-h-80"
       aria-label="Visualization"
     >
-      <div className="absolute inset-0">
+      <div className="canvas-panel-header">
+        <span>Visualization</span>
+        <span>
+          {Array.isArray(inputData)
+            ? `${inputData.length} values`
+            : inputData?.kind === 'grid'
+              ? `${inputData.grid.length} × ${inputData.grid[0]?.length || 0} grid`
+              : inputData?.kind === 'graph'
+                ? `${Object.keys(inputData.nodes).length} nodes`
+                : 'Search tree'}
+        </span>
+      </div>
+      <div className="canvas-panel-content">
         {algorithmMetadata?.visualizer === 'tree' ? (
           <TreeVisualizer step={currentStep || null} />
         ) : algorithmMetadata?.visualizer === 'bar_chart' ? (

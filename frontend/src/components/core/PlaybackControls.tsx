@@ -11,6 +11,8 @@ import {
   Code,
 } from 'lucide-react';
 import type { ButtonHTMLAttributes } from 'react';
+import RangeControl from './RangeControl';
+import { playbackRate } from '../../lib/runState';
 import { cn } from '../../lib/utils';
 type Props = {
   isPlaying: boolean;
@@ -62,7 +64,7 @@ export default function PlaybackControls(p: Props) {
           onClick={p.isPlaying ? p.onPause : p.onPlay}
           disabled={p.disabled}
           aria-label={p.isPlaying ? 'Pause' : 'Play'}
-          className="bg-blue-600"
+          className="control-play"
         >
           {p.isPlaying ? <Pause size={20} /> : <Play size={20} />}
         </IconButton>
@@ -76,26 +78,28 @@ export default function PlaybackControls(p: Props) {
       </div>
       <details className="relative text-xs text-gray-400">
         <summary className="cursor-pointer">Shortcuts</summary>
-        <p className="absolute z-10 top-full bg-gray-900 p-3 rounded w-52">
+        <p className="shortcut-popover">
           Space: Play/Pause
           <br />← / →: Previous/Next
+          <br />
+          Home / End: First/Last
+          <br />
+          Ctrl/⌘ Z: Undo input
           <br />
           R: Cancel and reset
         </p>
       </details>
-      <label className="playback-speed">
-        Speed
-        <input
-          aria-label="Playback speed"
-          type="range"
-          min="10"
-          max="500"
-          value={510 - p.speed}
-          onChange={(e) => p.onSpeedChange(510 - Number(e.target.value))}
-          disabled={p.disabled}
-          className="w-28 accent-blue-500"
-        />
-      </label>
+      <RangeControl
+        label="Speed"
+        accessibleLabel="Playback speed"
+        value={510 - p.speed}
+        min={10}
+        max={500}
+        displayValue={playbackRate(p.speed)}
+        disabled={p.disabled}
+        disabledReason="Start a visualization to adjust playback speed."
+        onChange={(value) => p.onSpeedChange(510 - value)}
+      />
       <span
         className="text-xs text-gray-400"
         aria-label="Buffered playback time"
@@ -113,20 +117,18 @@ export default function PlaybackControls(p: Props) {
           >
             <Maximize size={16} />
           </IconButton>
-          <label className="text-xs">
-            Zoom
-            <input
-              aria-label="Zoom"
-              type="range"
-              min="0.5"
-              max="2"
-              step="0.1"
-              value={p.zoom}
-              onChange={(e) => p.onZoomChange(Number(e.target.value))}
-              disabled={p.isFitToScreen}
-              className="w-20 ml-1 accent-blue-500"
-            />
-          </label>
+          <RangeControl
+            label="Zoom"
+            value={p.zoom}
+            min={0.5}
+            max={2}
+            step={0.1}
+            displayValue={`${p.zoom.toFixed(1)}×`}
+            valueText={`${Math.round(p.zoom * 100)} percent`}
+            disabled={p.isFitToScreen}
+            disabledReason="Turn off Fit to screen to change zoom."
+            onChange={p.onZoomChange}
+          />
           {p.isGraphView && (
             <>
               <IconButton

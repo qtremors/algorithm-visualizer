@@ -1,14 +1,21 @@
 import { useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, NavLink, useParams } from 'react-router-dom';
 import { useAlgorithms } from '../contexts/algorithm-context';
 import { useEditorSession } from '../hooks/useEditorSession';
 import { useComparison } from '../hooks/useComparison';
+import { usePlaybackShortcuts } from '../hooks/usePlaybackShortcuts';
 import { useGraphEditor } from '../hooks/useGraphEditor';
 import { algorithmInputError } from '../lib/input';
 import type { GridTool, InputData } from '../types/input';
 import WorkspaceHeader from '../components/workspace/WorkspaceHeader';
 import VisualizerPanel from '../components/workspace/VisualizerPanel';
 import InfoModal from '../components/core/InfoModal';
+import { ArrowLeftRight } from 'lucide-react';
+import { categoryNames } from '../lib/presentation';
+import { playbackRate } from '../lib/runState';
+import RangeControl from '../components/core/RangeControl';
+import RunBadge from '../components/core/RunBadge';
+import ComparisonOutcome from '../components/workspace/ComparisonOutcome';
 import RunSummary from '../components/core/RunSummary';
 import LearningTabs from '../components/core/LearningTabs';
 import Timeline from '../components/core/Timeline';
@@ -51,6 +58,18 @@ export default function ComparisonWorkspace() {
     }
   };
   const graph = useGraphEditor(session.drafts.graph, comparison.busy, update);
+  usePlaybackShortcuts({
+    length: comparison.count,
+    playing: comparison.playback.isPlaying,
+    failed: comparison.failed,
+    play: comparison.playback.play,
+    pause: comparison.playback.pause,
+    next: comparison.playback.nextStep,
+    previous: comparison.playback.prevStep,
+    first: comparison.playback.first,
+    last: comparison.playback.last,
+    reset: comparison.reset,
+  });
   if (isLoading) return <p role="status">Loading algorithms...</p>;
   if (!available || error)
     return (
@@ -64,9 +83,15 @@ export default function ComparisonWorkspace() {
   const p = comparison.playback;
   return (
     <div className="space-y-4 min-w-0">
-      <header className="flex flex-wrap items-center justify-between gap-3">
-        <h1 className="text-xl font-bold">Compare {category} algorithms</h1>
-        <Link className="text-blue-300 text-sm" to={`/${category}`}>
+      <header className="workspace-heading">
+        <div>
+          <p className="section-eyebrow">Side-by-side learning</p>
+          <h1>
+            Compare {categoryNames[category]?.toLowerCase() || category}{' '}
+            algorithms
+          </h1>
+        </div>
+        <Link className="action-secondary" to={`/${category}`}>
           Single workspace
         </Link>
       </header>
@@ -74,6 +99,16 @@ export default function ComparisonWorkspace() {
         Both lanes use identical input and one shared timeline. The shorter run
         holds its last frame while the longer run continues.
       </p>
+      <nav
+        className="comparison-category-links"
+        aria-label="Comparison category"
+      >
+        {Object.entries(categoryNames).map(([key, label]) => (
+          <NavLink key={key} to={`/compare/${key}`}>
+            {label}
+          </NavLink>
+        ))}
+      </nav>
       <div className="comparison-selectors">
         {[
           { label: 'Left algorithm', name: leftName, change: setLeft },
@@ -122,6 +157,21 @@ export default function ComparisonWorkspace() {
             </div>
           </div>
         ))}
+        <div className="comparison-selector-footer">
+          <span>One shared input for both lanes</span>
+          <button
+            className="action-secondary"
+            disabled={comparison.busy}
+            onClick={() => {
+              comparison.reset();
+              setLeft(rightName);
+              setRight(leftName);
+            }}
+          >
+            <ArrowLeftRight size={15} aria-hidden="true" />
+            Swap algorithms
+          </button>
+        </div>
       </div>
       {category === 'pathfinding' && (
         <div className="tool-group" role="group" aria-label="Pathfinding view">
@@ -185,7 +235,7 @@ export default function ComparisonWorkspace() {
         </button>
         <button
           className="action-secondary"
-          disabled={!comparison.count}
+          disabled={!comparison.count || comparison.failed}
           onClick={p.isPlaying ? p.pause : p.play}
         >
           {p.isPlaying ? 'Pause comparison' : 'Play comparison'}
@@ -193,17 +243,15 @@ export default function ComparisonWorkspace() {
         <button className="action-secondary" onClick={comparison.reset}>
           Reset comparison
         </button>
-        <label className="playback-speed">
-          Speed
-          <input
-            aria-label="Comparison speed"
-            type="range"
-            min={10}
-            max={500}
-            value={510 - p.speed}
-            onChange={(event) => p.setSpeed(510 - Number(event.target.value))}
-          />
-        </label>
+        <RangeControl
+          label="Speed"
+          accessibleLabel="Comparison speed"
+          value={510 - p.speed}
+          min={10}
+          max={500}
+          displayValue={playbackRate(p.speed)}
+          onChange={(value) => p.setSpeed(510 - value)}
+        />
       </div>
       {validation && <p className="text-sm text-amber-300">{validation}</p>}
       {(comparison.failed || graph.error) && (
@@ -221,7 +269,7 @@ export default function ComparisonWorkspace() {
         operation={p.operation}
         onOperationChange={p.setOperation}
       />
-      <VisualizerLegend category={category} />
+      <VisualizerLegend category={category} view={session.view} />
       <div className="comparison-lanes">
         {[
           {
@@ -242,11 +290,18 @@ export default function ComparisonWorkspace() {
           >
             <h2 className="comparison-lane-heading font-semibold">
               <span>{available[name].name}</span>
-              <span className="text-xs text-gray-400 font-normal">
-                {runner.status}
-                {runner.steps.length
-                  ? ` · ${index + 1}/${runner.steps.length}`
-                  : ''}
+              <span className="comparison-lane-state">
+                <RunBadge
+                  status={runner.status}
+                  length={runner.steps.length}
+                  index={index}
+                  playing={p.isPlaying}
+                />
+                <span>
+                  {runner.steps.length
+                    ? ` · ${index + 1}/${runner.steps.length}`
+                    : ''}
+                </span>
               </span>
             </h2>
             <div className="comparison-canvas">
@@ -286,6 +341,23 @@ export default function ComparisonWorkspace() {
           </section>
         ))}
       </div>
+      <ComparisonOutcome
+        category={category}
+        complete={
+          comparison.left.status === 'completed' &&
+          comparison.right.status === 'completed'
+        }
+        left={{
+          name: available[leftName].name,
+          steps: comparison.left.steps,
+          metrics: comparison.left.metrics,
+        }}
+        right={{
+          name: available[rightName].name,
+          steps: comparison.right.steps,
+          metrics: comparison.right.metrics,
+        }}
+      />
       {info && (
         <InfoModal metadata={available[info]} onClose={() => setInfo(null)} />
       )}

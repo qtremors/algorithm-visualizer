@@ -1,4 +1,5 @@
 import { useMemo } from 'react';
+import CanvasEmptyState from '../core/CanvasEmptyState';
 import type { AlgorithmStep, TreeNode, TreeSnapshot } from '../../types';
 
 export default function TreeVisualizer({
@@ -35,11 +36,9 @@ export default function TreeVisualizer({
   const visited = new Set(snapshot?.visited || []);
   const current = step?.payload.node;
   return (
-    <div className="w-full h-full overflow-auto p-3">
+    <div className="relative w-full h-full overflow-auto p-3">
       {!layout.nodes.length ? (
-        <p className="text-gray-400 p-4">
-          Enter initial values and operations, then visualize the tree.
-        </p>
+        <CanvasEmptyState kind="tree" />
       ) : (
         <svg
           role="img"
@@ -73,21 +72,21 @@ export default function TreeVisualizer({
           {layout.nodes.map((node) => {
             const point = layout.positions.get(node.id)!;
             return (
-              <g key={node.id} transform={`translate(${point.x}, ${point.y})`}>
+              <g
+                key={node.id}
+                data-node-state={
+                  current === node.id
+                    ? 'current'
+                    : visited.has(node.id)
+                      ? 'visited'
+                      : 'unvisited'
+                }
+                transform={`translate(${point.x}, ${point.y})`}
+              >
                 <title>
                   {node.value}, count {node.count}, height {node.height}
                 </title>
-                <circle
-                  r={24}
-                  className={
-                    current === node.id
-                      ? 'fill-yellow-600 stroke-yellow-200'
-                      : visited.has(node.id)
-                        ? 'fill-blue-800 stroke-blue-300'
-                        : 'fill-gray-800 stroke-gray-400'
-                  }
-                  strokeWidth={2}
-                />
+                <circle r={24} strokeWidth={2} />
                 <text
                   textAnchor="middle"
                   dy=".3em"

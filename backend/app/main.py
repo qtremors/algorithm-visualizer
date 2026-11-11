@@ -33,7 +33,7 @@ import app.algorithms.pathfinding.bellman_ford  # noqa: F401
 import app.algorithms.trees.search_tree  # noqa: F401
 
 logger = run_logger()
-APP_VERSION = "0.1.3"
+APP_VERSION = "0.1.4"
 REVISION = os.getenv("VERCEL_GIT_COMMIT_SHA", os.getenv("APP_REVISION", "development"))
 api = FastAPI(title="AlgoVisualizer", version=APP_VERSION)
 api.add_middleware(

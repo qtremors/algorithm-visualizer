@@ -7,6 +7,7 @@ import type {
   GraphTool,
 } from '../../types/input';
 import { graphEdges, svgPoint } from '../../lib/graph';
+import CanvasEmptyState from '../core/CanvasEmptyState';
 import { cn } from '../../lib/utils';
 
 type Props = {
@@ -116,7 +117,7 @@ export default function GraphVisualizer({
             role="group"
             tabIndex={0}
             aria-label={`Graph canvas. ${Object.keys(nodes).length} nodes. New node position ${Math.round(cursor.x)}, ${Math.round(cursor.y)}.`}
-            className="block w-full h-full touch-none"
+            className="graph-canvas block w-full h-full touch-none"
             onKeyDown={(event) => {
               if (event.target !== event.currentTarget || !isInteracting)
                 return;
@@ -231,6 +232,14 @@ export default function GraphVisualizer({
             onPointerCancel={cancel}
           >
             <defs>
+              <pattern
+                id={`${marker}-dots`}
+                width="40"
+                height="40"
+                patternUnits="userSpaceOnUse"
+              >
+                <circle cx="20" cy="20" r="1" fill="#64748b" opacity=".5" />
+              </pattern>
               <marker
                 id={marker}
                 viewBox="0 0 10 10"
@@ -243,6 +252,25 @@ export default function GraphVisualizer({
                 <path d="M 0 0 L 10 5 L 0 10 z" fill="currentColor" />
               </marker>
             </defs>
+            {isInteracting && (
+              <rect
+                x="0"
+                y="0"
+                width="1000"
+                height="720"
+                fill={`url(#${marker}-dots)`}
+                className="pointer-events-none"
+              />
+            )}
+            {isInteracting && tool === 'node' && (
+              <g
+                className="graph-keyboard-cursor"
+                transform={`translate(${cursor.x},${cursor.y})`}
+              >
+                <circle r="12" />
+                <path d="M -18 0 H 18 M 0 -18 V 18" />
+              </g>
+            )}
             {graphEdges(initialData, path).map((edge, index) => {
               const u = nodes[edge.source],
                 v = nodes[edge.target];
@@ -262,6 +290,10 @@ export default function GraphVisualizer({
                         'stroke-teal-400',
                       ][index % 3]
                     : 'stroke-gray-500';
+              const badgeWidth = Math.max(
+                40,
+                String(edge.weight).length * 7 + 16,
+              );
               return (
                 <g key={JSON.stringify([edge.source, edge.target])}>
                   <path
@@ -294,10 +326,10 @@ export default function GraphVisualizer({
                     className="cursor-pointer"
                   >
                     <rect
-                      x="-16"
-                      y="-12"
-                      width="32"
-                      height="24"
+                      x={-badgeWidth / 2}
+                      y="-15"
+                      width={badgeWidth}
+                      height="30"
                       rx="4"
                       className="fill-gray-900 stroke-gray-500"
                     />
@@ -338,6 +370,7 @@ export default function GraphVisualizer({
                 <g
                   key={id}
                   data-node-id={id}
+                  data-node-state={state}
                   transform={`translate(${point.x}, ${point.y})`}
                   role="button"
                   tabIndex={isInteracting ? 0 : -1}
@@ -410,23 +443,7 @@ export default function GraphVisualizer({
                   }}
                   className="cursor-pointer"
                 >
-                  <circle
-                    r="20"
-                    className={cn(
-                      'stroke-2',
-                      id === start
-                        ? 'fill-green-600 stroke-green-300'
-                        : id === end
-                          ? 'fill-red-600 stroke-red-300'
-                          : pathSet.has(id)
-                            ? 'fill-yellow-600 stroke-yellow-300'
-                            : id === current
-                              ? 'fill-blue-500 stroke-blue-200'
-                              : visited.has(id)
-                                ? 'fill-blue-900 stroke-blue-400'
-                                : 'fill-gray-800 stroke-gray-400',
-                    )}
-                  />
+                  <circle r="20" className="stroke-2" />
                   <text
                     textAnchor="middle"
                     dy=".3em"
@@ -440,11 +457,7 @@ export default function GraphVisualizer({
           </svg>
         </div>
       </div>
-      {!Object.keys(nodes).length && (
-        <p className="absolute inset-x-0 top-6 text-center text-gray-400 pointer-events-none">
-          Generate a graph or use the Node tool to add nodes.
-        </p>
-      )}
+      {!Object.keys(nodes).length && <CanvasEmptyState kind="graph" />}
       {showPath && path.length > 0 && (
         <div
           className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-gray-900/95 border border-yellow-500/40 rounded-lg px-4 py-2 max-w-[90%] overflow-auto text-yellow-300 text-sm"

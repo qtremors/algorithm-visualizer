@@ -1,7 +1,8 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useAlgorithms } from '../contexts/algorithm-context';
 import { useAlgorithmRunner } from './useAlgorithmRunner';
+import { usePlaybackShortcuts } from './usePlaybackShortcuts';
 import { usePlayback } from './usePlayback';
 import { useEditorSession } from './useEditorSession';
 import { useGraphEditor } from './useGraphEditor';
@@ -130,57 +131,31 @@ export function useAlgorithmWorkspace() {
     isPlaying,
   ]);
 
-  useEffect(() => {
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (
-        document.querySelector('dialog[open]') ||
-        (event.target instanceof Element &&
-          event.target.closest(
-            'input, textarea, select, button, a, [role="button"], [contenteditable]',
-          )) ||
-        event.altKey ||
-        event.ctrlKey ||
-        event.metaKey
-      )
-        return;
-      switch (event.code) {
-        case 'Space':
-          if (steps.length) {
-            event.preventDefault();
-            if (isPlaying) pause();
-            else play();
-          }
-          break;
-        case 'ArrowRight':
-          if (steps.length && !isPlaying) {
-            event.preventDefault();
-            nextStep();
-          }
-          break;
-        case 'ArrowLeft':
-          if (steps.length && !isPlaying) {
-            event.preventDefault();
-            prevStep();
-          }
-          break;
-        case 'KeyR':
-          event.preventDefault();
-          handleReset();
-          break;
-      }
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [
-    steps.length,
-    isPlaying,
+  usePlaybackShortcuts({
+    length: steps.length,
+    playing: isPlaying,
+    failed: status === 'failed',
     play,
-    start,
     pause,
-    nextStep,
-    prevStep,
-    handleReset,
-  ]);
+    next: nextStep,
+    previous: prevStep,
+    first: playback.first,
+    last: playback.last,
+    reset: handleReset,
+    canEdit: !busy,
+    undo: () => {
+      if (editor.canUndo) {
+        handleReset();
+        editor.undo();
+      }
+    },
+    redo: () => {
+      if (editor.canRedo) {
+        handleReset();
+        editor.redo();
+      }
+    },
+  });
 
   return {
     category,

@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
+import { Download, Share2, Undo2, Redo2 } from 'lucide-react';
 import {
   parseSessionText,
   serializeSession,
@@ -29,6 +30,7 @@ export default function SessionToolbar({
   const [text, setText] = useState('');
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
+  const disclosure = useRef<HTMLDetailsElement>(null);
   const importText = (value: string) => {
     try {
       onImport(parseSessionText(value));
@@ -61,40 +63,47 @@ export default function SessionToolbar({
     }
   };
   const copyLink = async () => {
+    let url: string;
     try {
-      const url = shareUrl(session);
-      setText(url);
-      if (navigator.clipboard) {
-        await navigator.clipboard.writeText(url);
-        setMessage('Share link copied.');
-      } else setMessage('Copy the link from the session text field.');
-      setError('');
+      url = shareUrl(session);
     } catch (problem) {
       setError(
         problem instanceof Error
           ? problem.message
-          : 'Cannot copy link. Use Export session.',
+          : 'Cannot create a share link.',
       );
+      return;
+    }
+    setText(url);
+    setError('');
+    if (disclosure.current) disclosure.current.open = true;
+    try {
+      if (!navigator.clipboard) throw new Error('Clipboard unavailable');
+      await navigator.clipboard.writeText(url);
+      setMessage('Share link copied.');
+    } catch {
+      setMessage('Share link ready. Copy it from the field below.');
     }
   };
   return (
-    <section
-      aria-label="Session tools"
-      className="rounded-xl bg-gray-900 border border-gray-800 p-3 space-y-2"
-    >
-      <div className="flex flex-wrap gap-2 items-center">
+    <section aria-label="Session tools" className="session-tools">
+      <div className="session-row">
         <button
           className="action-secondary"
           disabled={disabled || !canUndo}
+          title="Undo (Ctrl/⌘ Z)"
           onClick={undo}
         >
+          <Undo2 size={14} aria-hidden="true" />
           Undo
         </button>
         <button
           className="action-secondary"
           disabled={disabled || !canRedo}
+          title="Redo (Ctrl/⌘ Shift Z)"
           onClick={redo}
         >
+          <Redo2 size={14} aria-hidden="true" />
           Redo
         </button>
         <label className="text-sm flex items-center gap-2">
@@ -113,6 +122,7 @@ export default function SessionToolbar({
           disabled={disabled}
           onClick={exportFile}
         >
+          <Download size={14} aria-hidden="true" />
           Export session
         </button>
         <button
@@ -120,22 +130,21 @@ export default function SessionToolbar({
           disabled={disabled}
           onClick={() => void copyLink()}
         >
+          <Share2 size={14} aria-hidden="true" />
           Share session
         </button>
-        <span className="text-xs text-gray-400">
-          Drafts save on this device.
-        </span>
+        <span className="session-saved-note">Drafts save on this device.</span>
       </div>
-      <details>
+      <details ref={disclosure} className="session-disclosure">
         <summary className="text-sm cursor-pointer py-2">
           Import or copy a session
         </summary>
         <div className="space-y-2 pt-2">
           <label className="block text-sm">
-            Session JSON or share link
+            Session data or share link
             <textarea
               aria-label="Session text"
-              className="w-full bg-gray-950 p-3 rounded font-mono text-xs"
+              className="session-text"
               rows={3}
               value={text}
               disabled={disabled}
@@ -148,7 +157,7 @@ export default function SessionToolbar({
               className="action-secondary"
               onClick={() => importText(text)}
             >
-              Import JSON
+              Import session
             </button>
             <label className="action-secondary cursor-pointer">
               Import file

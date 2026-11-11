@@ -9,6 +9,12 @@ import InfoModal from '../components/core/InfoModal';
 import Modal from '../components/core/Modal';
 import LogList from '../components/core/LogList';
 import LearningTabs from '../components/core/LearningTabs';
+import RunBadge from '../components/core/RunBadge';
+import {
+  categoryNames,
+  categoryDescriptions,
+  editorHint,
+} from '../lib/presentation';
 import RunSummary from '../components/core/RunSummary';
 import VisualizerLegend from '../components/core/VisualizerLegend';
 import Timeline from '../components/core/Timeline';
@@ -34,13 +40,26 @@ export default function AlgorithmWorkspace() {
     );
   return (
     <div className="workspace flex flex-col gap-4 min-w-0">
-      <h1 className="sr-only">{w.category} algorithm workspace</h1>
-      <div className="flex flex-wrap gap-3 items-center justify-between">
-        <h2 className="font-bold capitalize">{w.category} workspace</h2>
-        <Link className="text-blue-300 text-sm" to={`/compare/${w.category}`}>
-          Compare algorithms
-        </Link>
-      </div>
+      <header className="workspace-heading">
+        <div>
+          <p className="section-eyebrow">Algorithm workspace</p>
+          <h1>{categoryNames[w.category || ''] || w.category}</h1>
+          <p className="workspace-subtitle">
+            {categoryDescriptions[w.category || '']}
+          </p>
+        </div>
+        <div className="workspace-heading-actions">
+          <RunBadge
+            status={w.status}
+            length={w.steps.length}
+            index={p.currentStepIndex}
+            playing={p.isPlaying}
+          />
+          <Link className="action-secondary" to={`/compare/${w.category}`}>
+            Compare algorithms
+          </Link>
+        </div>
+      </header>
       <SessionToolbar
         session={w.editor.session}
         setSeed={w.editor.setSeed}
@@ -85,11 +104,11 @@ export default function AlgorithmWorkspace() {
         w.inputData &&
         !Array.isArray(w.inputData) &&
         w.inputData.kind === 'grid' && (
-          <label className="text-sm">
-            A* heuristic
+          <label className="control-field max-w-56">
+            <span>A* heuristic</span>
             <select
               aria-label="A* heuristic"
-              className="bg-gray-900 p-2 rounded ml-2"
+              className="control-input max-w-56"
               disabled={w.busy}
               value={w.inputData.heuristic || 'manhattan'}
               onChange={(event) =>
@@ -148,7 +167,14 @@ export default function AlgorithmWorkspace() {
       {w.validationError && (
         <p className="text-sm text-amber-300">{w.validationError}</p>
       )}
-      <VisualizerLegend category={w.category} />
+      <div className="visualizer-context">
+        <VisualizerLegend category={w.category} view={w.viewMode} />
+        {w.category === 'pathfinding' && (
+          <p className="editor-hint">
+            {editorHint(w.viewMode, w.visualizationMode, w.graphTool, w.busy)}
+          </p>
+        )}
+      </div>
       <div className="workspace-stage">
         <div className="workspace-canvas">
           <VisualizerPanel

@@ -1,10 +1,14 @@
 # AlgoVisualizer Changelog
 
 > **Project:** AlgoVisualizer
-> **Version:** 0.1.3
+> **Version:** 0.1.4
 > **Last Updated:** 2026-11-11
 
 ---
+
+## [0.1.4] - 2026-11-11
+
+- **Improve OLED Contrast And Workspace Presentation**: Add accessible contrast tokens, consistent selected and disabled controls, readable slider values, run-state badges, exact timeline jumps, contextual editing hints, graph and tree empty states, comparison category navigation, algorithm swapping, and final result tables. Fix mobile navigation spacing, keyboard grid boundaries, and clipboard fallback.
 
 ## [0.1.3] - 2026-11-11
 

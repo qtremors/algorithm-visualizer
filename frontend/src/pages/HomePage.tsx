@@ -11,6 +11,7 @@ import {
   Play,
   Server,
 } from 'lucide-react';
+import { categoryNames } from '../lib/presentation';
 import { cn } from '../lib/utils.ts';
 
 const SplitText = ({
@@ -44,14 +45,6 @@ export default function HomePage() {
     return <Cpu className="w-8 h-8 text-pink-400" />;
   };
 
-  const getCategoryColor = (category: string) => {
-    if (category.toLowerCase().includes('sort'))
-      return 'border-indigo-500/30 hover:border-indigo-400';
-    if (category.toLowerCase().includes('path'))
-      return 'border-emerald-500/30 hover:border-emerald-400';
-    return 'border-pink-500/30 hover:border-pink-400';
-  };
-
   const getCategoryDescription = (category: string) => {
     if (category.toLowerCase().includes('sort'))
       return 'Master the art of ordering. Explore Bubble, Insertion, Selection, Merge, and Quick Sort.';
@@ -83,18 +76,22 @@ export default function HomePage() {
           </div>
 
           <p className="text-lg md:text-xl text-gray-400 leading-relaxed max-w-2xl mx-auto">
-            A powerful visualization tool designed to help you understand
-            complex algorithms through real-time animations and step-by-step
-            execution.
+            Edit inputs, inspect each operation, and compare how algorithms
+            solve the same problem. Learn at your own pace with replay,
+            pseudocode, and live state.
           </p>
 
           <div className="flex flex-wrap justify-center gap-4 pt-4">
-            <a
-              href="#algorithms"
-              className="px-8 py-3 rounded-lg bg-blue-600 text-white font-bold hover:bg-blue-500 transition-all flex items-center gap-2 shadow-lg shadow-blue-900/20"
-            >
+            <a href="#algorithms" className="action-primary hero-action">
               <Play size={18} fill="currentColor" /> Start Visualizing
             </a>
+            <Link
+              to="/compare/sorting"
+              className="action-secondary hero-action"
+            >
+              Compare algorithms
+              <ArrowRight size={16} />
+            </Link>
           </div>
         </div>
 
@@ -118,13 +115,13 @@ export default function HomePage() {
               )}
             </div>
           ) : (
-            <div className="grid md:grid-cols-2 gap-6">
+            <div className="grid md:grid-cols-3 gap-5">
               {algorithms &&
                 Object.keys(algorithms).map((category) => (
                   <Link
                     key={category}
                     to={`/${category}`}
-                    className={`group relative overflow-hidden rounded-3xl border p-8 transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 ${getCategoryColor(category)} bg-gray-800/50`}
+                    className="category-card group"
                   >
                     <div className="absolute top-0 right-0 p-4 opacity-50 group-hover:opacity-100 transition-opacity">
                       <ArrowRight className="w-6 h-6 text-white -rotate-45 group-hover:rotate-0 transition-transform duration-300" />
@@ -136,9 +133,12 @@ export default function HomePage() {
                           {getCategoryIcon(category)}
                         </div>
                         <h2 className="text-3xl font-bold text-white capitalize mb-2">
-                          {category}
+                          {categoryNames[category] || category}
                         </h2>
-                        <p className="text-gray-400 text-sm md:text-base leading-relaxed">
+                        <p className="category-count">
+                          {Object.keys(algorithms[category]).length} algorithms
+                        </p>
+                        <p className="text-gray-400 text-sm leading-relaxed">
                           {getCategoryDescription(category)}
                         </p>
                       </div>
@@ -161,18 +161,18 @@ export default function HomePage() {
         <div className="grid md:grid-cols-3 gap-8 w-full max-w-5xl pt-12 border-t border-gray-800">
           <FeatureItem
             icon={<Zap className="text-yellow-400" />}
-            title="Lightning Fast"
+            title="Replay at your pace"
             desc="Start playback while steps arrive, then pause, inspect state, and replay at your pace."
           />
           <FeatureItem
             icon={<Code2 className="text-blue-400" />}
-            title="Code Sync"
+            title="Follow the logic"
             desc="Real-time pseudocode highlighting lets you follow the logic line-by-line as it executes."
           />
           <FeatureItem
             icon={<GitGraph className="text-purple-400" />}
-            title="Interactive Grids"
-            desc="Draw walls, move nodes, and randomize walls to test pathfinding edge cases dynamically."
+            title="Make it your own"
+            desc="Edit arrays, grids, graphs, and trees. Save a session or share the same input with someone else."
           />
         </div>
       </div>

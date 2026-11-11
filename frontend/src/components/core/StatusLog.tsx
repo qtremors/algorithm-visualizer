@@ -43,7 +43,8 @@ export default function StatusLog({
       <div
         role={error ? 'alert' : 'status'}
         aria-live={isPlaying && !error ? 'off' : 'polite'}
-        className={`bg-black rounded p-3 text-sm ${error ? 'text-red-400' : 'text-yellow-300'}`}
+        data-error={!!error}
+        className="status-message"
       >
         {error || logHistory.at(-1) || 'Ready.'}
       </div>

@@ -63,7 +63,7 @@ export default function ArrayInput({
     }
   };
   return (
-    <fieldset disabled={disabled} className="array-editor disabled:opacity-60">
+    <fieldset disabled={disabled} className="array-editor">
       <legend className="sr-only">Sorting input</legend>
       <label className="control-field">
         <span>Size</span>

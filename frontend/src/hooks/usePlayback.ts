@@ -5,6 +5,7 @@ export type PlaybackOperation =
   | 'any'
   | 'compare'
   | 'swap'
+  | 'write'
   | 'visit_node'
   | 'relax_edge';
 

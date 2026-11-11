@@ -24,7 +24,10 @@ export default function Modal({
     dialog.showModal();
     return () => {
       dialog.close();
-      if (previous instanceof HTMLElement && previous.isConnected)
+      if (
+        (previous instanceof HTMLElement || previous instanceof SVGElement) &&
+        previous.isConnected
+      )
         previous.focus();
     };
   }, [open]);
